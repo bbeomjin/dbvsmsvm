@@ -80,7 +80,7 @@ SRAMSVM_solve = function(x = NULL, K = NULL, y, gamma, lambda, kernel, kparam,
             as.double(gamma),
             as.vector(y_train),
             as.double(epsilon),
-            outalpha_ij = as.vector(numeric(nobs * k)))
+            outalpha_ij = as.vector(numeric(nobs * k)), PACKAGE = "GBFSMSVM")
 
     warm = matrix(data = aa$outalpha_ij, nrow = nobs, ncol = k)
 
