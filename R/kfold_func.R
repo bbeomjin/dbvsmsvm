@@ -2,14 +2,14 @@
 # GBFSMSVM v1.0.0: R functions written by Beomjin Park
 ###########################################################################
 
-Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6), 
+Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6),
                       gamma = 0.5, kernel = c("linear", "radial", "poly", "spline"), kparam = c(1),
                       scale = FALSE, criterion = c("0-1", "loss"), gd_scale = TRUE, nCores = 1, ...)
 {
   call = match.call()
   kernel = match.arg(kernel)
   criterion = match.arg(criterion)
-  
+
   if (scale) {
     x = scale(x)
     if (!is.null(valid_x)) {
@@ -18,25 +18,25 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
       valid_x = (valid_x - matrix(means, NROW(x), NCOL(x), byrow = TRUE)) / matrix(stds, NROW(x), NCOL(x), byrow = TRUE)
     }
   }
-  
-  if (!is.numeric(lambda)) {
-    lambda = as.numeric(lambda)
+
+  if (!is.numeric(lambda_seq)) {
+    lambda = as.numeric(lambda_seq)
   }
-  
+
   if (!is.numeric(kparam)) {
     kparam = as.numeric(kparam)
   }
-  
+
   # The number of classes
   k = length(unique(y))
-  
+
   # Combination of hyper-parameters
   params = expand.grid(lambda = lambda_seq, kparam = kparam)
-  
+
   if (!is.null(valid_x) & !is.null(valid_y)) {
     gd_list = vector("list", 1)
     fold_list = NULL
-    
+
     #  Parallel computation on the combination of hyper-parameters
     fold_err = mclapply(1:nrow(params),
                         function(j) {
@@ -44,11 +44,11 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
                                                    lambda = params$lambda[j], kernel = kernel,
                                                    kparam = params$kparam[j], ...)
                           pred_val = predict(msvm_fit, newx = valid_x)
-                          
+
                           # Compute the gradient with respect to x
-                          gd = gradient(alpha = msvm_fit$beta[[1]], x = x, y = y, scale = gd_scale, 
+                          gd = gradient(alpha = msvm_fit$beta[[1]], x = x, y = y, scale = gd_scale,
                                         kernel = kernel, kparam = list(kparam))
-                          
+
                           if (criterion == "0-1") {
                             acc = sum(valid_y == pred_val[[1]][[1]]) / length(valid_y)
                             err = 1 - acc
@@ -68,7 +68,7 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
     fold_list = data_split(y, nfolds, k = k)
     valid_err_mat = matrix(NA, nrow = nfolds, ncol = nrow(params))
     gd_list = vector("list", nfolds)
-    
+
     for (i in 1:nfolds) {
       cat(nfolds, "- fold CV :", i / nfolds * 100, "%", "\r")
       # fold = fold_list[[i]]
@@ -77,19 +77,19 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
       x_fold = x[-fold, , drop = FALSE]
       y_valid = y[fold]
       x_valid = x[fold, , drop = FALSE]
-      
+
       #  Parallel computation on the combination of hyper-parameters
-      fold_err = mclapply(1:nrow(params), 
+      fold_err = mclapply(1:nrow(params),
                           function(j) {
-                            msvm_fit = SRAMSVM_solve(x = x_fold, y = y_fold, gamma = gamma, 
+                            msvm_fit = SRAMSVM_solve(x = x_fold, y = y_fold, gamma = gamma,
                                                      lambda = params$lambda[j], kernel = kernel,
                                                      kparam = params$kparam[j], ...)
                             pred_val = predict(msvm_fit, newx = x_valid)
-                            
+
                             # Compute the gradient with respect to x
-                            gd = gradient(alpha = msvm_fit$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale, 
+                            gd = gradient(alpha = msvm_fit$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
                                           kernel = kernel, kparam = list(kparam))
-                            
+
                             if (criterion == "0-1") {
                               acc = sum(y_valid == pred_val[[1]][[1]]) / length(y_valid)
                               err = 1 - acc
@@ -106,7 +106,7 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
     opt_param = params[opt_ind, ]
     opt_valid_err = min(valid_err)
   }
-  
+
   out = list()
   out$opt_param = opt_param
   out$opt_valid_err = opt_valid_err
