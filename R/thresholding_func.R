@@ -10,7 +10,7 @@ threshold_fun = function(x, ...)
 
 threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 1, nfolds = 10, thresh_Ngrid = 10,
                                  gamma = 0.5, kernel = c("linear", "radial", "poly", "spline"), kparam = c(1),
-                                 scale = FALSE, nCores = 1, cv_type = c("original", "osr"), criterion = c("0-1", "loss"),
+                                 scale = FALSE, cv_type = c("original", "osr"), criterion = c("0-1", "loss"),
                                  interaction = FALSE, gd_scale = TRUE, nCores = 1, ...)
 {
   call = match.call()
