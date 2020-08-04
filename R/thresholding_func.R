@@ -174,7 +174,8 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
   fit = SRAMSVM_solve(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
   # Compute the gradient with respect to x
-  gd = gradient(alpha = fit$beta[[1]], x = x, y = y, scale = gd_scale, kernel = kernel, kparam = list(kparam))
+  gd = gradient(alpha = fit$beta[[1]], x = x, y = y, scale = object$gd_scale,
+                kernel = kernel, kparam = list(kparam))
 
   # Compute thresholding path
   gd_vec = c(0, seq(min(gd), max(gd), length.out = thresh_Ngrid))
