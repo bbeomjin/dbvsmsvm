@@ -589,9 +589,9 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   if (scale) {
     scaler = sum(drop(crossprod(W_mat, sqrt(scale_const)))^2)
     # res = colSums(gd_mat) / scaler
-    res = colMeans(grad_mat) / scaler
+    res = colSums(grad_mat) / k / scaler
   } else {
-    res = colSums(grad_mat)
+    res = colSums(grad_mat) / k
   }
   
   # if (scale) {res = gd / scale_const} else {res = gd}
