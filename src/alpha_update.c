@@ -82,7 +82,7 @@ fake[(i+nobs*j)] = yici;
 /*--update----------------------------------------------------*/
 
 
-    for (iter=0;iter<500;iter++)
+    for (iter=0;iter<300;iter++)
     {
     	for (i=0;i<nobs;i++)
 	{
