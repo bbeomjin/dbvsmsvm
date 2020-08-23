@@ -4,7 +4,7 @@
 
 /*******************************************************************************/
 
-void alpha_update(double* warmalpha_ij, double* warmalpha_yi, double* my, double* yyi, double* xinner, double* lam, double* wweight, int* nnobs, double* nnobsdouble, int* kk, double* kkdouble, double* erci, double* ggamma, int* ytrain, double* eepsilon, double* outalpha_ij)
+void alpha_update(double* warmalpha_ij, double* warmalpha_yi, double* my, double* yyi, double* xinner, double* lam, double* wweight, int* nnobs, double* nnobsdouble, int* kk, double* kkdouble, double* erci, double* ggamma, int* ytrain, double* eepsilon, double* outalpha_ij, int* maxiter)
 {
 
 int i, j, ii, jj, q, iter, iii, jjj; 
@@ -36,6 +36,8 @@ double change;
 double temp, temp2, yici, diff;
 
 double alphacheck[(nobs*k)];
+
+int iteration = *maxiter
 
 for (i=0;i<(nobs*k);i++)
 {
@@ -82,7 +84,7 @@ fake[(i+nobs*j)] = yici;
 /*--update----------------------------------------------------*/
 
 
-    for (iter=0;iter<3000;iter++)
+    for (iter=0;iter<iteration;iter++)
     {
     	for (i=0;i<nobs;i++)
 	{

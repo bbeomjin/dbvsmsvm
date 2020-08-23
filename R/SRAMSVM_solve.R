@@ -1,6 +1,7 @@
 # dyn.load("./alpha_update2.dll")
 SRAMSVM_solve = function(x = NULL, K = NULL, y, gamma, lambda, kernel, kparam,
-                         weight = NULL, epsilon = 1e-4 * length(y) * length(unique(y)), warm = NULL) {
+                         weight = NULL, epsilon = 1e-4 * length(y) * length(unique(y)), warm = NULL,
+						 maxiter = 300) {
 
   if (is.null(K)) {
     K = kernelMat(x, x, kernel = kernel, kparam = kparam) + 1
@@ -80,7 +81,9 @@ SRAMSVM_solve = function(x = NULL, K = NULL, y, gamma, lambda, kernel, kparam,
             as.double(gamma),
             as.vector(y_train),
             as.double(epsilon),
-            outalpha_ij = as.vector(numeric(nobs * k)), PACKAGE = "GBFSMSVM")
+            outalpha_ij = as.vector(numeric(nobs * k)),
+			maxiter = as.integer(maxiter),
+			PACKAGE = "GBFSMSVM")
 
     warm = matrix(data = aa$outalpha_ij, nrow = nobs, ncol = k)
 
