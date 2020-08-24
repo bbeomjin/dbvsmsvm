@@ -37,7 +37,7 @@ double temp, temp2, yici, diff;
 
 double alphacheck[(nobs*k)];
 
-int iteration = *maxiter
+int iteration = *maxiter;
 
 for (i=0;i<(nobs*k);i++)
 {
@@ -84,42 +84,36 @@ fake[(i+nobs*j)] = yici;
 /*--update----------------------------------------------------*/
 
 
-    for (iter=0;iter<iteration;iter++)
-    {
-    	for (i=0;i<nobs;i++)
+for (iter=0;iter<iteration;iter++) {
+	for (i=0;i<nobs;i++)
 	{
-	    for (j=0;j<k;j++)
-	    {
-		if (ytrain[i]==(j+1))
-		{	
-
-yici = -(fake[(i+nobs*j)]/nobsdouble)/lambda - 2*erci[i]*alpha_ij[(i+nobs*j)] + kdouble-1;
-
-temp = -(yici/2)/erci[i];
-
-if (temp<0) {temp2=0;}
- 	else {
-		if (temp>(wweight[i]*gamma)) {temp2=(wweight[i]*gamma);}
-			else {temp2=temp;}
-		} 
-
-change = temp2-alpha_ij[(i+nobs*j)];
+		for (j=0;j<k;j++)
+		{
+			if (ytrain[i]==(j+1))
+			{	
+		yici = -(fake[(i+nobs*j)]/nobsdouble)/lambda - 2*erci[i]*alpha_ij[(i+nobs*j)] + kdouble-1;
+		temp = -(yici/2)/erci[i];
 		
-alpha_yi[i]=temp2;
-alpha_ij[(i+nobs*j)]=temp2;
+		if (temp<0) {temp2=0;}
+		else {
+			if (temp>(wweight[i]*gamma)) {temp2=(wweight[i]*gamma);}
+			else {temp2=temp;}
+			} 
+			change = temp2-alpha_ij[(i+nobs*j)];
+		
+		alpha_yi[i]=temp2;
+		alpha_ij[(i+nobs*j)]=temp2;
 
 /*--update fake[iii,jjj]-------------------------*/
-
 for (iii=0;iii<nobs;iii++)
 	{
 	    for (jjj=0;jjj<k;jjj++)
 	    {
-for (q=0;q<kminus;q++)
-{
-fake[(iii+nobs*jjj)] += change*my[(j+k*q)]*my[(jjj+k*q)]*xinner[(i+iii*nobs)];
-}
-	    }
-	}
+			for (q=0;q<kminus;q++) {
+				fake[(iii+nobs*jjj)] += change*my[(j+k*q)]*my[(jjj+k*q)]*xinner[(i+iii*nobs)];
+				}
+				}
+				}
 
 /*--update fake-------------------------*/
 		
