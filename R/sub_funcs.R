@@ -530,7 +530,7 @@ ddspline = function(x, y)
 #   return(dgd)
 # }
 
-gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "radial", "spline"),
+gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "radial", "spline", "anova_radial"),
                   kparam = list())
 {
   n = length(y)
@@ -567,7 +567,8 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
                    linear = dlinear,
                    poly = dpoly,
                    radial = drbf,
-                   spline = dspline)
+                   spline = dspline,
+				   anova_radial = drbf)
   
   
   W_mat = XI_gen(k, as.double(k))
