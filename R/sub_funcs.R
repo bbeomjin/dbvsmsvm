@@ -705,7 +705,6 @@ kernelMat = function(x, y, kernel = "radial", kparam = 1.0) {
       K2 = K2x %x% t(K2u) - ((b - 1 / 2)^4 - (b - 1 / 2)^2 / 2 + 7 / 240) / 24
       return(list(K1 = K1, K2 = K2))
     }
-    
     for(d in 1:p)
     {
       K_temp = spline_kernel(as.matrix(x[, d]), as.matrix(y[, d]))
@@ -714,6 +713,15 @@ kernelMat = function(x, y, kernel = "radial", kparam = 1.0) {
     obj = K
   } else if (kernel == "linear") {
     obj = tcrossprod(x, y)
+  } else if (kernel == "anova_radial") {
+      K = 0
+      for (d in 1:dimx)
+      {
+        A = as.matrix(x[,d])
+        B = as.matrix(u[,d])
+        K_temp =  = main_kernel(A, B, kernel)
+        K = K + K_temp
+      }
   } else {
     obj = NULL
   }
