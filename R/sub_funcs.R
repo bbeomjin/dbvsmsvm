@@ -547,7 +547,7 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
     }
   }
   
-  if (kernel == "radial") {
+  if ((kernel == "radial") | (kernel == "anova_radial")) {
     names(kparam) = "sigma"
     if (scale) {
       rbf = do.call(rbfdot, kparam)
