@@ -722,6 +722,7 @@ kernelMat = function(x, y, kernel = "radial", kparam = 1.0) {
         K_temp = main_kernel(A, B, kernel = list(type = "radial", par = kparam))
         K = K + K_temp
       }
+	obj = K
   } else {
     obj = NULL
   }
