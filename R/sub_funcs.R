@@ -715,11 +715,11 @@ kernelMat = function(x, y, kernel = "radial", kparam = 1.0) {
     obj = tcrossprod(x, y)
   } else if (kernel == "anova_radial") {
       K = 0
-      for (d in 1:dimx)
+      for (d in 1:NCOL(x))
       {
         A = as.matrix(x[,d])
         B = as.matrix(u[,d])
-        K_temp = main_kernel(A, B, kernel)
+        K_temp = main_kernel(A, B, kernel = list(type = "radial", par = kparam))
         K = K + K_temp
       }
   } else {
