@@ -719,7 +719,7 @@ kernelMat = function(x, y, kernel = "radial", kparam = 1.0) {
       {
         A = as.matrix(x[,d])
         B = as.matrix(u[,d])
-        K_temp =  = main_kernel(A, B, kernel)
+        K_temp = main_kernel(A, B, kernel)
         K = K + K_temp
       }
   } else {
