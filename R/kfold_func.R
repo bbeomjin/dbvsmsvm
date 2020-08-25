@@ -3,7 +3,7 @@
 ###########################################################################
 
 Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6),
-                      gamma = 0.5, kernel = c("linear", "radial", "poly", "spline"), kparam = c(1),
+                      gamma = 0.5, kernel = c("linear", "radial", "poly", "spline", "anova_radial"), kparam = c(1),
                       scale = FALSE, criterion = c("0-1", "loss"), gd_scale = TRUE, nCores = 1, ...)
 {
   call = match.call()
