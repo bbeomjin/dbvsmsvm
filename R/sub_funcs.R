@@ -718,7 +718,7 @@ kernelMat = function(x, y, kernel = "radial", kparam = 1.0) {
       for (d in 1:NCOL(x))
       {
         A = as.matrix(x[,d])
-        B = as.matrix(u[,d])
+        B = as.matrix(y[,d])
         K_temp = main_kernel(A, B, kernel = list(type = "radial", par = kparam))
         K = K + K_temp
       }
