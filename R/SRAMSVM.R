@@ -27,7 +27,7 @@ cstep_ram_cv = function(x, y, lambda, kernel, kernel_par = 1,
 
 sramsvm = function(x, y, kernel.type, kernel.par = 1, lambda,
                    lambda_theta,  criterion = "hinge", x_test = NULL, y_test = NULL,
-                   cv = FALSE, fold = 5, epsilon = 1e-3, epsilon.H = 1e-5, isCombined = TRUE)
+                   cv = FALSE, fold = 5, epsilon = 1e-3, isCombined = TRUE)
 {
   # initialize
   cat('----------\n')
@@ -47,7 +47,7 @@ sramsvm = function(x, y, kernel.type, kernel.par = 1, lambda,
   {
     cat("theta-step and c-step...", "\n")
     thetastepResult = thetastep_ram(x, y, opt_lambda, lambda_theta, kernel.type,
-                                    kernel.par, criterion, x_test, y_test, cv, fold, epsilon, epsilon.H, T)
+                                    kernel.par, criterion, x_test, y_test, cv, fold, epsilon, T)
 
     opt.theta = thetastepResult$opt.theta
     final.model = thetastepResult$model
@@ -70,7 +70,7 @@ sramsvm = function(x, y, kernel.type, kernel.par = 1, lambda,
   }
 }
 
-cstep_ram = function(x, y, lambda, gamma = 0.5, kernel, kernel_par = 1, theta = NULL, criterion = "hinge", cv = FALSE, fold = 5)
+cstep_ram = function(x, y, lambda, gamma = 0.5, kernel, kernel_par = 1, theta = NULL, criterion = "hinge", cv = FALSE, fold = 5, ...)
 {
   if((criterion != "0-1") && (criterion != "hinge"))
   {
@@ -116,7 +116,7 @@ cstep_ram = function(x, y, lambda, gamma = 0.5, kernel, kernel_par = 1, theta = 
       for(lam in lambda)
       {
         row_index = row_index + 1
-        model = SRAMSVM_solve(y = y_train, gamma = gamma, lambda = lam, kernel = kernel, kparam = kernel_par, K = subK)
+        model = SRAMSVM_solve(y = y_train, gamma = gamma, lambda = lam, kernel = kernel, kparam = kernel_par, K = subK, ...)
         # fit_test = predict(model, x_test, newK = subK_test)[[1]]
         # model = ramsvm(x_train, y = y_train, gamma = 0.5, lambda = lam, kernel = kernel_type_ramsvm, kparam = 1 / sqrt(kernel_par))
         # fit_test2 = predict(model, x_test)[[1]]
@@ -154,14 +154,14 @@ cstep_ram = function(x, y, lambda, gamma = 0.5, kernel, kernel_par = 1, theta = 
   cat("The optimal lambda on log2 scale:", opt_lambda,"\n\n")
 
   # opt_model = msvm.compact(K, y, 2^opt_lambda, epsilon, epsilon.H)
-  opt_model = SRAMSVM_solve(y = y, gamma = gamma, lambda = opt_lambda, kernel = kernel, kparam = kernel_par, K = K)
+  opt_model = SRAMSVM_solve(y = y, gamma = gamma, lambda = opt_lambda, kernel = kernel, kparam = kernel_par, K = K, ...)
   list(opt_lambda = opt_lambda, error = ERR, hinge = HIN, model = opt_model)
 }
 
 thetastep_ram = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
                          kernel_par = 1, criterion = "hinge",
                          cv = FALSE, fold = 5, isCombined = TRUE,
-                         pretheta = NULL, cv_type = "original")
+                         pretheta = NULL, cv_type = "original", ...)
 {
   if((criterion != "0-1") && (criterion != "hinge"))
   {
@@ -184,7 +184,7 @@ thetastep_ram = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
   }
   K = combine_kernel(anova_kernel, pretheta)
   # initial.model = msvm.compact(K, y, exp2.lambda, epsilon, epsilon.H)
-  initial_model = SRAMSVM_solve(K = K, y = y, gamma = gamma, lambda = opt_lambda, kernel = kernel, kparam = kernel_par)
+  initial_model = SRAMSVM_solve(K = K, y = y, gamma = gamma, lambda = opt_lambda, kernel = kernel, kparam = kernel_par, ...)
   # ramsvm(x, y, lambda = exp2.lambda, kernel = "linear")@beta0
   theta_seq = matrix(0, len_lambda_theta, anova_kernel$numK)
 
@@ -208,7 +208,7 @@ thetastep_ram = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
 
       # model.initial = msvm.compact(subK, y_train, exp2.lambda, epsilon, epsilon.H)
       model_initial = SRAMSVM_solve(K = subK, y = y_train, gamma = gamma, lambda = opt_lambda,
-                                    kernel = kernel, kparam = kernel_par)
+                                    kernel = kernel, kparam = kernel_par, ...)
 
       row_index = 0
       # cat("lambda_theta of length",len_lambda_theta,"|")
@@ -226,7 +226,7 @@ thetastep_ram = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
         # combined method
         if(isCombined == TRUE) {
           # model = msvm.compact(subK, y_train, exp2.lambda, epsilon, epsilon.H)
-          model = SRAMSVM_solve(K = subK, y = y_train, gamma = gamma, lambda = opt_lambda, kernel = kernel, kparam = kernel_par)
+          model = SRAMSVM_solve(K = subK, y = y_train, gamma = gamma, lambda = opt_lambda, kernel = kernel, kparam = kernel_par, ...)
         }
         subK_test = combine_kernel(subanova_kernel_test, theta)
 
@@ -299,7 +299,7 @@ thetastep_ram = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
   {
     # opt_model = msvm.compact(K, y, exp2.lambda, epsilon, epsilon.H)
     opt_model = SRAMSVM_solve(K = K, y = y, gamma = gamma, lambda = opt_lambda,
-                              kernel = kernel, kparam = kernel_par)
+                              kernel = kernel, kparam = kernel_par, ...)
   }
   list(lambda_theta = lambda_theta, opt_lambda_theta = opt_lambda_theta,
        error = ERR,  hinge = HIN, opt_theta = opt_theta, model = opt_model,
