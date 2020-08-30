@@ -207,6 +207,9 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
 
     fold_list = object$fold_ind
     nfolds = length(unique(fold_list))
+	gd_temp = unlist(object$opt_model_gd)
+	gd_vec = c(0, seq(min(gd_temp), max(gd_temp), length.out = thresh_Ngrid))
+	gd_vec = gd_vec[-c(length(gd_vec))]
     valid_err_mat = matrix(NA, nrow = nfolds, ncol = length(gd_vec))
     for (i in 1:nfolds) {
       cat(nfolds, "- fold CV :", i / nfolds * 100, "%", "\r")
