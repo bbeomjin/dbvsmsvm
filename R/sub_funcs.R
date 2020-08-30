@@ -680,6 +680,14 @@ data_split = function(y, fold, k = max(y), seed = length(y))
 
 kernelMat = function(x, y, kernel = "radial", kparam = 1.0) {
   
+  if (NCOL(x) == 0) {
+    x = matrix(1, nrow = nrow(x), ncol = 1)
+  }
+  
+  if (NCOL(y) == 0) {
+    y = matrix(1, nrow = nrow(y), ncol = 1)
+  }
+  
   if( kernel == "poly" ) {
     obj = (x %*% t(y) + 1.0)^kparam
   } else if(kernel == "radial" | kernel == "radial2") {
