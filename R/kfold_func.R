@@ -59,7 +59,7 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
                         }, mc.cores = nCores)
     valid_err = sapply(fold_err, "[[", "error")
     gd_list[[1]] = lapply(fold_err, "[[", "gd")
-    opt_ind = max(which(valid_err == min(valid_err)))
+    opt_ind = min(which(valid_err == min(valid_err)))
     opt_param = params[opt_ind, ]
     opt_valid_err = min(valid_err)
   } else {
@@ -102,7 +102,7 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
       gd_list[[i]] = lapply(fold_err, "[[", "gd")
     }
     valid_err = colMeans(valid_err_mat, na.rm = TRUE)
-    opt_ind = max(which(valid_err == min(valid_err)))
+    opt_ind = min(which(valid_err == min(valid_err)))
     opt_param = params[opt_ind, ]
     opt_valid_err = min(valid_err)
   }
