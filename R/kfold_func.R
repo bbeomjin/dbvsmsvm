@@ -113,7 +113,6 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
   out$kernel = kernel
   out$gamma = gamma
   out$scale = scale
-  out$gd_scale = gd_scale
   if (optModel) {
     opt_model = SRAMSVM_solve(x = x, y = y, gamma = gamma,
                               lambda = opt_param$lambda, kernel = kernel, kparam = opt_param$kparam, ...)
