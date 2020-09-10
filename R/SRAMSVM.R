@@ -35,7 +35,7 @@ sramsvm = function(x, y, lambda, lambda_theta, kernel, kparam, theta = NULL, isC
   cat("c-step...\n")
   
   cstepResult = cstep_ram(x = x, y = y, lambda = lambda, kernel = kernel, kparam = kparam,
-                          theta = NULL, criterion = criterion, cv = cv, fold = fold, gamma = gamma, ...)
+                          theta = theta, criterion = criterion, cv = cv, fold = fold, gamma = gamma, ...)
   opt_lambda = cstepResult$opt_lambda
 
   # first update
@@ -49,7 +49,6 @@ sramsvm = function(x, y, lambda, lambda_theta, kernel, kparam, theta = NULL, isC
                                     kparam = kparam, criterion = criterion, cv = cv, cv_type = cv_type, 
                                     fold = fold, isCombined = isCombined, 
                                     pretheta = theta, gamma = gamma, ...)
-
     opt_theta = thetastepResult$opt_theta
     final_model = thetastepResult$model
     return(list(cstep0 = cstepResult, thetastep1 = thetastepResult,
