@@ -4,7 +4,7 @@
 
 Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6),
                       gamma = 0.5, kernel = c("linear", "radial", "poly", "spline", "anova_radial"), kparam = c(1),
-                      scale = FALSE, criterion = c("0-1", "loss"), gd_scale = TRUE, nCores = 1, ...)
+                      scale = FALSE, criterion = c("0-1", "loss"), gd = TRUE, gd_scale = TRUE, OptModel = FALSE, nCores = 1, ...)
 {
   call = match.call()
   kernel = match.arg(kernel)
@@ -46,16 +46,20 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
                           pred_val = predict(msvm_fit, newx = valid_x)
 
                           # Compute the gradient with respect to x
-                          gd = gradient(alpha = msvm_fit$beta[[1]], x = x, y = y, scale = gd_scale,
-                                        kernel = kernel, kparam = list(kparam))
-
+                          if (gd) {
+                            gd_x = gradient(alpha = msvm_fit$beta[[1]], x = x, y = y, scale = gd_scale,
+                                            kernel = kernel, kparam = list(kparam))
+                          } else {
+                            gd_x = NULL
+                          }
+                          
                           if (criterion == "0-1") {
                             acc = sum(valid_y == pred_val[[1]][[1]]) / length(valid_y)
                             err = 1 - acc
                           } else {
                             err = ramsvm_hinge(valid_y, pred_val$inner_prod, k = k, gamma = gamma)
                           }
-                          return(list(error = err, gd = gd))
+                          return(list(error = err, gd = gd_x))
                         }, mc.cores = nCores)
     valid_err = sapply(fold_err, "[[", "error")
     gd_list[[1]] = lapply(fold_err, "[[", "gd")
@@ -87,16 +91,20 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
                             pred_val = predict(msvm_fit, newx = x_valid)
 
                             # Compute the gradient with respect to x
-                            gd = gradient(alpha = msvm_fit$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
-                                          kernel = kernel, kparam = list(kparam))
-
+                            if (gd) {
+                              gd_x = gradient(alpha = msvm_fit$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
+                                              kernel = kernel, kparam = list(kparam))
+                            } else {
+                              gd_x = NULL
+                            }
+                            
                             if (criterion == "0-1") {
                               acc = sum(y_valid == pred_val[[1]][[1]]) / length(y_valid)
                               err = 1 - acc
                             } else {
                               err = ramsvm_hinge(y_valid, pred_val$inner_prod, k = k, gamma = gamma)
                             }
-                            return(list(error = err, gd = gd))
+                            return(list(error = err, gd = gd_x))
                           }, mc.cores = nCores)
       valid_err_mat[i, ] = sapply(fold_err, "[[", "error")
       gd_list[[i]] = lapply(fold_err, "[[", "gd")
@@ -122,6 +130,11 @@ Kfold_msvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
   out$gamma = gamma
   out$scale = scale
   out$gd_scale = gd_scale
+  if (optModel) {
+    opt_model = SRAMSVM_solve(x = x, y = y, gamma = gamma,
+                              lambda = opt_param$lambda, kernel = kernel, kparam = opt_param$kparam, ...)
+    out$opt_model = opt_model
+  }
   out$call = call
   class(out) = "GBFSMSVM"
   return(out)
