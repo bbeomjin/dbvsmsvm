@@ -26,7 +26,7 @@ cstep_ram_cv = function(x, y, lambda, kernel, kernel_par = 1,
 }
 
 sramsvm = function(x, y, lambda, lambda_theta, kernel, kparam, theta = NULL, isCombined = FALSE, gamma = 0.5, 
-                   criterion = "hinge", cv = FALSE, fold = 5, ...)
+                   criterion = "hinge", cv = FALSE, cv_type = "original", fold = 5, ...)
 {
   # initialize
   cat('----------\n')
