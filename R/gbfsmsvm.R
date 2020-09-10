@@ -4,7 +4,7 @@
 
 gbfsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6),
                     thresh_Ngrid = 10, kernel = "linear", kparam = 1, scale = FALSE, criterion = "0-1", cv_type = "original", interaction = FALSE,
-                    gd_scale = TRUE, gamma = 0.5, OptModel = FALSE, nCores = 1, ...)
+                    gd_scale = TRUE, gamma = 0.5, optModel = FALSE, nCores = 1, ...)
 {
   # Find a optimal lambda in first step
   initial_fit = Kfold_msvm(x = x, y = y, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds, lambda_seq = lambda_seq,
@@ -33,7 +33,7 @@ gbfsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_se
     out$opt_thresh = select_fit$inter_opt_thresh
   }
   
-  if (OptModel) {
+  if (optModel) {
     if (!is.null(valid_x)) {
       selected_valid_x = valid_x[, selected == 1, drop = FALSE]
     } else {
