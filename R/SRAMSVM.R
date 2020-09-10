@@ -47,7 +47,7 @@ sramsvm = function(x, y, lambda, lambda_theta, kernel, kparam, theta = NULL, isC
     cat("theta-step and c-step...", "\n")
     thetastepResult = thetastep_ram(x = x, y = y, opt_lambda = opt_lambda, lambda_theta = lambda_theta, kernel = kernel,
                                     kparam = kparam, criterion = criterion, cv = cv, cv_type = cv_type, 
-                                    fold = fold, isCombinded = isCombinded, 
+                                    fold = fold, isCombined = isCombined, 
                                     pretheta = theta, gamma = gamma, ...)
 
     opt_theta = thetastepResult$opt_theta
@@ -60,7 +60,7 @@ sramsvm = function(x, y, lambda, lambda_theta, kernel, kparam, theta = NULL, isC
     cat("theta-step...", "\n")
     thetastepResult = thetastep_ram(x = x, y = y, opt_lambda = opt_lambda, lambda_theta = lambda_theta, kernel = kernel,
                                     kparam = kparam, criterion = criterion, cv = cv, cv_type = cv_type, 
-                                    fold = fold, isCombinded = isCombinded, 
+                                    fold = fold, isCombined = isCombined, 
                                     pretheta = theta, gamma = gamma, ...)
     opt_theta = thetastepResult$opt_theta
 
