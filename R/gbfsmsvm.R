@@ -4,16 +4,16 @@
 
 gbfsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6),
                     thresh_Ngrid = 10, kernel = "linear", kparam = 1, scale = FALSE, criterion = "0-1", cv_type = "original", interaction = FALSE,
-                    gd_scale = TRUE, gamma = 0.5, optModel = FALSE, nCores = 1, ...)
+                    gd_scale = FALSE, gamma = 0.5, optModel = FALSE, nCores = 1, ...)
 {
   # Find a optimal lambda in first step
   initial_fit = Kfold_msvm(x = x, y = y, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds, lambda_seq = lambda_seq,
                            gamma = gamma, kernel = kernel, kparam = kparam, scale = scale, criterion = criterion,
-                           gd = TRUE, gd_scale = gd_scale, optModel = FALSE, nCores = nCores, ...)
+                           optModel = FALSE, nCores = nCores, ...)
   
   
   # Find a relevant variable for optimal lambda in second step
-  select_fit = threshold_fun(initial_fit, thresh_Ngrid = thresh_Ngrid, cv_type = cv_type, criterion = criterion,
+  select_fit = threshold_fun(initial_fit, thresh_Ngrid = thresh_Ngrid, cv_type = cv_type, criterion = criterion, gd_scale = gd_scale,
                              interaction = interaction, nCores = nCores, ...)
   selected = select_fit$selected
   
@@ -44,11 +44,10 @@ gbfsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_se
     # opt_sigma = kernlab::sigest(y ~ selected_x, frac = 1, scaled = FALSE)[3]
     final_fit = Kfold_msvm(x = selected_x, y = y, valid_x = selected_valid_x, valid_y = valid_y,
                            nfolds = nfolds, lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = kparam,
-                           scale = scale, criterion = criterion, gd = FALSE, gd_scale = gd_scale, optModel = TRUE, nCores = nCores, ...)
+                           scale = scale, criterion = criterion, optModel = TRUE, nCores = nCores, ...)
     out$opt_model = final_fit$opt_model
     out$valid_err = final_fit$valid_err
     out$opt_valid_err = final_fit$opt_valid_err
-    
   }
   
   out$cv_type = select_fit$cv_type

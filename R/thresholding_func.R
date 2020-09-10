@@ -146,7 +146,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
 
 
 threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("original", "osr"), criterion = c("0-1", "loss"),
-                                  interaction = FALSE, nCores = 1, ...)
+                                  gd_scale = FALSE, interaction = FALSE, nCores = 1, ...)
 {
   call = match.call()
   cv_type = match.arg(cv_type)
@@ -174,7 +174,7 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
   fit = SRAMSVM_solve(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
   # Compute the gradient with respect to x
-  gd = gradient(alpha = fit$beta[[1]], x = x, y = y, scale = object$gd_scale,
+  gd = gradient(alpha = fit$beta[[1]], x = x, y = y, scale = gd_scale,
                 kernel = kernel, kparam = list(kparam))
 
   # Compute thresholding path
@@ -220,7 +220,9 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
       fold_err = mclapply(gd_vec,
                          function(thresh) {
                            # Pre-computed gradient
-                           fold_gd = object$opt_model_gd[[i]]
+                           fold_model = object$fold_models[[i]]
+                           fold_gd = gradient(alpha = fold_model$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
+                                              kernel = kernel, kparam = list(kparam))
 
                            msvm_fit = SRAMSVM_solve(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
                                                    lambda = lambda, kernel = kernel, kparam = kparam, ...)
