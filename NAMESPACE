@@ -1,4 +1,4 @@
-export(Kfold_msvm, threshold_fun, cstep_ram, thetastep_ram, gbfsmsvm)
+export(Kfold_msvm, threshold_fun, cstep_ram, thetastep_ram, gbfsmsvm, sramsvm)
 exportClasses("GBFSMSVM")
 
 # Load dynamic libraries (shared object files)
