@@ -41,9 +41,9 @@ gbfsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_se
     }
     
     # temporary estimates sigma
-    opt_sigma = kernlab::sigest(y ~ selected_x, frac = 1, scaled = FALSE)[3]
+    # opt_sigma = kernlab::sigest(y ~ selected_x, frac = 1, scaled = FALSE)[3]
     final_fit = Kfold_msvm(x = selected_x, y = y, valid_x = selected_valid_x, valid_y = valid_y,
-                           nfolds = nfolds, lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = opt_sigma,
+                           nfolds = nfolds, lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = kparam,
                            scale = scale, criterion = criterion, gd = FALSE, gd_scale = gd_scale, optModel = TRUE, nCores = nCores, ...)
     out$opt_model = final_fit$opt_model
     out$valid_err = final_fit$valid_err

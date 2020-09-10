@@ -246,14 +246,15 @@ threshold_fun2 = function (object, thresh_Ngrid = 10, cv_type = c("original", "o
         model = object$opt_models[[i]]
         
         fold_gd = gradient(model$beta[[1]], x_fold, y = y_fold, scale = gd_scale, kernel = kernel, kparam = list(kparam))
-        test_K = kernelMat(x_valid[, fold_gd > thresh, drop = FALSE], x_fold[, fold_gd > thresh, drop = FALSE],
-                                      kernel = kernel, kparam = kparam)
+        model$x = x_fold[, fold_gd > thresh, drop = FALSE]
+        # test_K = kernelMat(x_valid[, fold_gd > thresh, drop = FALSE], x_fold[, fold_gd > thresh, drop = FALSE],
+        #                               kernel = kernel, kparam = kparam)
         
         # msvm_fit = SRAMSVM_solve(x = x_fold[, fold_gd > 
         #                                       thresh, drop = FALSE], y = y_fold, gamma = gamma, 
         #                          lambda = lambda, kernel = kernel, kparam = kparam, 
         #                          ...)
-        pred_val = predict(model, newx = x_valid[, fold_gd > thresh, drop = FALSE], test_K)
+        pred_val = predict(model, newx = x_valid[, fold_gd > thresh, drop = FALSE])
         if (criterion == "0-1") {
           acc = sum(y_valid == pred_val[[1]][[1]])/length(y_valid)
           err = 1 - acc
