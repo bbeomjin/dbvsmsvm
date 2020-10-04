@@ -11,6 +11,7 @@ import("kernlab")
 import("quadprog")
 import("lpSolve")
 import("parallel")
+import("igraph")
 
 S3method(threshold_fun, default)
 S3method(threshold_fun, GBFSMSVM)
