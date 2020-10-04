@@ -785,10 +785,10 @@ interaction_kernel = function(x, u, kernel, active_set, clique_list)
   u = as.matrix(u)
   dimx = ncol(x)
   
-  scaler = function(x, u, kernel, index)
+  scaler = function(x, u, kernel, active_set, index)
   {
-    X1 = matrix(rowSums(x^2), nrow = nrow(x), ncol = nrow(u))
-    U1 = matrix(rowSums(u^2), nrow = nrow(x), ncol = nrow(u), byrow = TRUE)
+    X1 = matrix(rowSums(x[, active_set, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u))
+    U1 = matrix(rowSums(u[, active_set, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u), byrow = TRUE)
     X2 = matrix(rowSums(x[, index, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u))
     U2 = matrix(rowSums(u[, index, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u), byrow = TRUE)
     K = exp(-kernel$par * ((X1 + U1) - (X2 + U2)))
@@ -806,7 +806,7 @@ interaction_kernel = function(x, u, kernel, active_set, clique_list)
   if (length(clique_list) != 0) {
     for (d in 1:length(clique_list)) {
       ind = sort(as.vector(clique_list[[d]]))
-      scale_const = scaler(x[, active_set, drop = FALSE], u[, active_set, drop = FALSE], kernel, ind)
+      scale_const = scaler(x, u, kernel, active_set, ind)
       anova_kernel[[d]] = scale_const$K * (main_kernel(x[, ind, drop = FALSE], u[, ind, drop = FALSE], kernel))
     }
   }
@@ -814,7 +814,7 @@ interaction_kernel = function(x, u, kernel, active_set, clique_list)
   if (length(diff_set) != 0) {
     main_ind = sort(diff_set)
     for (j in 1:length(main_ind)) {
-      scale_const = scaler(x[, active_set, drop = FALSE], u[, active_set, drop = FALSE], kernel, main_ind[j])
+      scale_const = scaler(x, u, kernel, active_set, main_ind[j])
       anova_kernel[[length(clique_list) + j]] = scale_const$K * (main_kernel(x[, main_ind[j], drop = FALSE], u[, main_ind[j], drop = FALSE], kernel))
     }
   }
