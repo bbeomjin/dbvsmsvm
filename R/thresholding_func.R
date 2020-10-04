@@ -249,7 +249,6 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
     } else {
       opt_thresh = gd_vec[opt_ind]
     }
-
     opt_valid_err = min(valid_err)
     selected = as.integer(gd > opt_thresh)
   }
@@ -266,12 +265,85 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
   }
   out$opt_ind = opt_ind
   out$valid_err = valid_err
+  
   if (interaction) {
-    out$inter_selected_var = inter_selected_var
-    out$gd_inter = gd_inter
-    out$opt_thresh = inter_opt_thresh
+    active_set = which(selected == 1)
+    comb_set = combn(1:p, 2)
+    temp = combn(active_set, 2)
+    gd_interaction = gradient_interaction(alpha = fit$beta[[1]], x = x, y = y, scale = gd_scale, 
+                                          kernel = kernel, kparam = list(kparam), active_set = active_set)
+    if (length(active_set) == 1 | length(active_set) == 0) {
+      int_selected = rep(0, choose(ncol(x), 2))
+      gd_interaction = rep(0, choose(ncol(x), 2))
+      opt_thresh_int = NULL
+      int_opt_valid_err = NULL
+      int_valid_err = NULL
+    } else {
+      gd_vec_int = seq(0, max(gd_interaction), length.out = thresh_Ngrid)
+      # gd_vec_int = gd_vec_int[-c(length(gd_vec_int))]
+      int_valid_err_mat = matrix(NA, nrow = nfolds, ncol = length(gd_vec_int))
+      
+      for (i in 1:nfolds) {
+        cat(nfolds, "- fold CV (interaction) :", i / nfolds * 100, "%", "\r")
+        fold = which(fold_list == i)
+        y_fold = y[-fold]
+        x_fold = x[-fold, , drop = FALSE]
+        y_valid = y[fold]
+        x_valid = x[fold, , drop = FALSE]
+        
+        fold_err_int = mclapply(gd_vec_int,
+                                function(thresh) {
+                                  # Pre-computed gradient
+                                  fold_model = object$fold_models[[i]]
+                                  fold_gd_int = gradient_interaction(alpha = fold_model$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
+                                                                 kernel = kernel, kparam = list(kparam), active_set = active_set)
+                                  
+                                  clique_list = interaction_graph(temp[, fold_gd_int > thresh, drop = FALSE], p)
+                                  
+                                  KK = interaction_kernel(x_fold, x_fold, kernel = list(type = kernel, par = kparam), active_set, clique_list)
+                                  
+                                  msvm_fit = SRAMSVM_solve(K = KK, y = y_fold, gamma = gamma,
+                                                           lambda = lambda, kernel = kernel, kparam = kparam, ...)
+                                  
+                                  valid_KK = interaction_kernel(x_valid, x_fold, kernel = list(type = kernel, par = kparam), active_set, clique_list)
+                                  pred_val = predict(msvm_fit, newK = valid_KK)
+                                  
+                                  if (criterion == "0-1") {
+                                    acc = sum(y_valid == pred_val[[1]][[1]]) / length(y_valid)
+                                    err = 1 - acc
+                                  } else {
+                                    err = ramsvm_hinge(y_valid, pred_val$inner_prod, k = k, gamma = gamma)
+                                  }
+                                  return(err)
+                                }, mc.cores = nCores)
+        int_valid_err_mat[i, ] = unlist(fold_err_int)
+      }
+      int_valid_err = colMeans(int_valid_err_mat, na.rm = TRUE)
+      int_valid_se = apply(int_valid_err_mat, 2, sd) / sqrt(nfolds)
+      int_opt_ind = max(which(int_valid_err == min(int_valid_err)))
+      int_opt_ind_osr = max(which(int_valid_err <= (int_valid_err[int_opt_ind] + int_valid_se[int_opt_ind])))
+      
+      if (cv_type == "osr") {
+        int_opt_thresh = gd_vec_int[int_opt_ind_osr]
+      } else {
+        int_opt_thresh = gd_vec_int[int_opt_ind]
+      }
+      int_selected = as.integer(gd_interaction > int_opt_thresh)
+    }
+    out$int_selected = int_selected
+    out$gd_interaction = gd_interaction
+    out$opt_thresh_int = int_opt_thresh
+    out$int_opt_valid_err = min(int_valid_err)
+    out$int_valid_err = int_valid_err
   }
   out$cv_type = cv_type
   out$call = call
   return(out)
 }
+
+
+
+
+
+
+

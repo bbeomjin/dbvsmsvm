@@ -1,3 +1,4 @@
+require(igraph)
 main_kernel = function(x, u, kernel)
 {
   x = as.matrix(x)
@@ -8,10 +9,10 @@ main_kernel = function(x, u, kernel)
     K = (1 + x %*% t(u))^kernel$par
   if (kernel$type == "radial" | kernel$type == "radial2")
   {
-    a = as.matrix(apply(x^2, 1, 'sum'))
-    b = as.matrix(apply(u^2, 1, 'sum'))
-    one.a = matrix(1, ncol=length(b))   
-    one.b = matrix(1, ncol=length(a))
+    a = as.matrix(rowSums(x^2))
+    b = as.matrix(rowSums(u^2))
+    one.a = matrix(1, ncol = length(b))   
+    one.b = matrix(1, ncol = length(a))
     K1 = one.a %x% a
     K2 = x %*% t(u)
     K3 = t(one.b %x% b)
@@ -202,6 +203,7 @@ combine_kernel = function(anova_kernel, theta = rep(1, anova_kernel$numK))
   }
   return(K)
 }
+
 
 find_theta = function(y, anova_kernel, gamma = 0.5, cmat, bvec, lambda, lambda_theta) 
 {
@@ -601,30 +603,36 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
 }
 
 
-gl_fun_interaction = function(alpha, X, y, scale = TRUE, kernel = c("linear", "poly", "radial"),
-                              kernel_par = list(), active_set = NULL)
+gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "radial"),
+                              kparam = list(), active_set = NULL)
 {
   n = length(y)
+  k = length(unique(y))
   
   if (kernel == "linear") {
-    if (scale) scale_const = sum(drop(crossprod(alpha, X))^2)
+    if (scale) {scale_const = sapply(1:NCOL(alpha), FUN = function(i) sum(crossprod(alpha[, i], x)^2))}
   }
   
-  if (kernel == "poly" | kernel == "poly2") {
+  if (kernel == "poly") {
     if (scale) {
-      poly = do.call(polydot, kernel_par)
-      scale_const = drop(crossprod(alpha, kernelMatrix(poly, X)) %*% alpha)
+      poly = do.call(polydot, kparam)
+      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], kernelMatrix(poly, x)) %*% alpha[, i]))
     }
   }
   
-  if (kernel == "radial" | kernel == "radial2") {
-    names(kernel_par) = "sigma"
+  if ((kernel == "radial") | (kernel == "anova_radial")) {
+    names(kparam) = "sigma"
     if (scale) {
-      rbf = do.call(rbfdot, kernel_par)
-      scale_const = drop(crossprod(alpha, kernelMatrix(rbf, X) + 1) %*% alpha)
-      scale_const = diag(scale_const)
+      rbf = do.call(rbfdot, kparam)
+      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], kernelMatrix(rbf, x)) %*% alpha[, i]))
       # scale_const = drop(t(alpha) %*% kernelMatrix(rbf, X) %*% alpha)
       # system.time((a = sum(sapply(1:n, FUN = function(i) K_rbf(alpha, X, X[i, ], sigma = sigma)) * alpha)))
+    }
+  }
+  
+  if (kernel == "spline") {
+    if (scale) {
+      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], kernelMatrix_spline(x, x)) %*% alpha[, i]))
     }
   }
   
@@ -635,16 +643,19 @@ gl_fun_interaction = function(alpha, X, y, scale = TRUE, kernel = c("linear", "p
                     radial = ddrbf,
                     radial2 = ddrbf)
   
+  W_mat = XI_gen(k, as.double(k))
+  
   comb_set = combn(active_set, 2)
-  gd = lapply(1:ncol(comb_set), function(k) {
-    gd_res = sapply(1:n, FUN = function(i) {return(crossprod(alpha, ddkernel(X, X[i, ], kernel_par, comb_set[1, k], comb_set[2, k])))})
+  
+  gd = sapply(1:ncol(comb_set), function(k) {
+    gd_res = rowMeans(sapply(1:n, FUN = function(i) {return(crossprod(alpha, ddkernel(x, x[i, ], kparam, comb_set[1, k], comb_set[2, k]))^2)}))
     return(gd_res)
   })
   if (scale) {
     # res = sapply(gd, function(x) return(mean(x^2) / scale_const))
-    res = sapply(1:ncol(comb_set), function(x) rowMeans(gd[[x]]^2) / scale_const)
+    res = colSums(gd) / k
   } else {
-    res = sapply(1:ncol(comb_set), function(x) rowMeans(gd[[x]]^2))
+    res = colSums(gd) / k
   }
   
   # if (scale) {res = rowMeans(gd^2) / scale_const} else {res = rowMeans(gd^2)}
@@ -751,4 +762,66 @@ interaction_svmfs = function(main_effect, interaction)
   }
   res = c(main_effect, interaction)
   return(res)
+}
+
+
+interaction_graph = function(comb, p)
+{
+  int_mat = matrix(0, nrow = p * (p - 1) / 2, ncol = p * (p - 1) / 2)
+  int_mat[t(comb)] = 1
+  int_mat = t(int_mat) + int_mat
+  g = graph_from_adjacency_matrix(int_mat, mode = "undirected")
+  cliques_list = max_cliques(g, min = 2)
+  return(cliques_list)
+}
+
+interaction_kernel = function(x, u, kernel, active_set, clique_list)
+{
+  if (!is.matrix(x)) {
+    x = as.matrix(x)
+  } else {
+    x = as.matrix(x)
+  }
+  u = as.matrix(u)
+  dimx = ncol(x)
+  
+  scaler = function(x, u, kernel, index)
+  {
+    X1 = matrix(rowSums(x^2), nrow = nrow(x), ncol = nrow(u))
+    U1 = matrix(rowSums(u^2), nrow = nrow(x), ncol = nrow(u), byrow = TRUE)
+    X2 = matrix(rowSums(x[, index, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u))
+    U2 = matrix(rowSums(u[, index, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u), byrow = TRUE)
+    K = exp(-kernel$par * ((X1 + U1) - (X2 + U2)))
+    K1 = exp(-kernel$par * (X1 + U1))
+    K2 = exp(-kernel$par * (X2 + U2))
+    return(list(K = K, K1 = K1, K2 = K2))
+  }
+  
+  # numK = dimx * (dimx - 1) / 2
+  # anova_kernel_temp = vector(mode = "list", dimx)
+  diff_set = base::setdiff(active_set, unique(unlist(clique_list)))
+  anova_kernel = vector(mode = "list", length(clique_list) + length(diff_set))
+  # kernelCoord = vector(mode = "list", numK)
+  
+  if (length(clique_list) != 0) {
+    for (d in 1:length(clique_list)) {
+      ind = sort(as.vector(clique_list[[d]]))
+      scale_const = scaler(x, u, kernel, ind)
+      anova_kernel[[d]] = scale_const$K * (main_kernel(x[, ind, drop = FALSE], u[, ind, drop = FALSE], kernel))
+    }
+  }
+  
+  if (length(diff_set) != 0) {
+    main_ind = sort(diff_set)
+    for (j in 1:length(main_ind)) {
+      scale_const = scaler(x, u, kernel, main_ind[j])
+      anova_kernel[[length(clique_list) + j]] = scale_const$K * (main_kernel(x[, main_ind[j], drop = FALSE], u[, main_ind[j], drop = FALSE], kernel))
+    }
+  }
+  
+  K = 0
+  for (i in 1:length(anova_kernel)) {
+    K = K + anova_kernel[[i]]
+  }
+  return(K)
 }

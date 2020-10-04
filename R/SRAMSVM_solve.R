@@ -1,5 +1,5 @@
 # dyn.load("./alpha_update2.dll")
-SRAMSVM_solve = function(x = NULL, K = NULL, y, gamma, lambda, kernel, kparam,
+SRAMSVM_solve = function(x = NULL, K = NULL, y, gamma = 0.5, lambda, kernel, kparam,
                          weight = NULL, epsilon = 1e-4 * length(y) * length(unique(y)), warm = NULL,
                          maxiter = 300) {
 
