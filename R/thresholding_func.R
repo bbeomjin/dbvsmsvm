@@ -225,7 +225,7 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
                                               kernel = kernel, kparam = list(kparam))
 
                            msvm_fit = SRAMSVM_solve(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
-                                                   lambda = lambda, kernel = kernel, kparam = kparam, ...)
+                                                   lambda = lambda, kernel = kernel, kparam = kparam, )
 
                            pred_val = predict(msvm_fit, newx = x_valid[, fold_gd > thresh, drop = FALSE])
 
@@ -287,9 +287,9 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
         cat(nfolds, "- fold CV (interaction) :", i / nfolds * 100, "%", "\r")
         fold = which(fold_list == i)
         y_fold = y[-fold]
-        x_fold = x[-fold, , drop = FALSE]
+        x_fold = x[-fold, drop = FALSE]
         y_valid = y[fold]
-        x_valid = x[fold, , drop = FALSE]
+        x_valid = x[fold, drop = FALSE]
         
         fold_err_int = mclapply(gd_vec_int,
                                 function(thresh) {

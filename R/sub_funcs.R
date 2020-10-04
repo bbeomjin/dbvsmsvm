@@ -806,7 +806,7 @@ interaction_kernel = function(x, u, kernel, active_set, clique_list)
   if (length(clique_list) != 0) {
     for (d in 1:length(clique_list)) {
       ind = sort(as.vector(clique_list[[d]]))
-      scale_const = scaler(x, u, kernel, ind)
+      scale_const = scaler(x[, active_set, drop = FALSE], u[, active_set, drop = FALSE], kernel, ind)
       anova_kernel[[d]] = scale_const$K * (main_kernel(x[, ind, drop = FALSE], u[, ind, drop = FALSE], kernel))
     }
   }
@@ -814,7 +814,7 @@ interaction_kernel = function(x, u, kernel, active_set, clique_list)
   if (length(diff_set) != 0) {
     main_ind = sort(diff_set)
     for (j in 1:length(main_ind)) {
-      scale_const = scaler(x, u, kernel, main_ind[j])
+      scale_const = scaler(x[, active_set, drop = FALSE], u[, active_set, drop = FALSE], kernel, main_ind[j])
       anova_kernel[[length(clique_list) + j]] = scale_const$K * (main_kernel(x[, main_ind[j], drop = FALSE], u[, main_ind[j], drop = FALSE], kernel))
     }
   }
