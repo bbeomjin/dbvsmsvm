@@ -31,9 +31,11 @@ gbfsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_se
   out$opt_valid_err = select_fit$opt_valid_err
   out$valid_err = select_fit$valid_err
   if (interaction) {
-    out$inter_selected_var = select_fit$inter_selected_var
-    out$gd_inter = select_fit$gd_inter
-    out$opt_thresh = select_fit$inter_opt_thresh
+    out$int_selected = select_fit$int_selected
+    out$gd_interaction = select_fit$gd_interaction
+    out$opt_thresh_int = select_fit$opt_thresh_int
+    out$int_opt_valid_err = select_fit$int_opt_valid_err
+    out$int_valid_err = select_fit$int_valid_err
   }
   
   if (optModel) {
