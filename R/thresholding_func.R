@@ -268,9 +268,7 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
   
   if (interaction) {
     active_set = which(selected == 1)
-    comb_set = combn(1:p, 2)
-    gd_interaction = gradient_interaction(alpha = fit$beta[[1]], x = x, y = y, scale = gd_scale, 
-                                          kernel = kernel, kparam = list(kparam), active_set = active_set)
+    comb_set = combn(1:length(selected), 2)
     if (length(active_set) == 1 | length(active_set) == 0) {
       int_selected = rep(0, choose(ncol(x), 2))
       gd_interaction = rep(0, choose(ncol(x), 2))
@@ -278,6 +276,8 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
       int_opt_valid_err = NULL
       int_valid_err = NULL
     } else {
+      gd_interaction = gradient_interaction(alpha = fit$beta[[1]], x = x, y = y, scale = gd_scale, 
+                                            kernel = kernel, kparam = list(kparam), active_set = active_set)
       temp = combn(active_set, 2)
       gd_vec_int = seq(0, max(gd_interaction), length.out = thresh_Ngrid)
       # gd_vec_int = gd_vec_int[-c(length(gd_vec_int))]
