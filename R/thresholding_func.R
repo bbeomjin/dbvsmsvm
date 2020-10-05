@@ -324,15 +324,15 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
       int_opt_ind_osr = max(which(int_valid_err <= (int_valid_err[int_opt_ind] + int_valid_se[int_opt_ind])))
       
       if (cv_type == "osr") {
-        int_opt_thresh = gd_vec_int[int_opt_ind_osr]
+        opt_thresh_int = gd_vec_int[int_opt_ind_osr]
       } else {
-        int_opt_thresh = gd_vec_int[int_opt_ind]
+        opt_thresh_int = gd_vec_int[int_opt_ind]
       }
-      int_selected = as.integer(gd_interaction > int_opt_thresh)
+      int_selected = as.integer(gd_interaction > opt_thresh_int)
     }
     out$int_selected = int_selected
     out$gd_interaction = gd_interaction
-    out$opt_thresh_int = int_opt_thresh
+    out$opt_thresh_int = opt_thresh_int
     out$int_opt_valid_err = min(int_valid_err)
     out$int_valid_err = int_valid_err
   }
