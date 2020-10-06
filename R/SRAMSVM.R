@@ -93,6 +93,7 @@ cstep_ram = function(x, y, lambda, gamma = 0.5, kernel, kparam = 1, theta = NULL
   if (is.null(theta))
   { theta = matrix(1, anova_kernel$numK, 1)}
   K = combine_kernel(anova_kernel, theta)
+  K = K / norm(K, "f")
 
   if (cv)  # cross-validation
   {
@@ -111,9 +112,12 @@ cstep_ram = function(x, y, lambda, gamma = 0.5, kernel, kparam = 1, theta = NULL
 
       subanova_kernel = make_anovaKernel(x_train, x_train, kernel_list)
       subK = combine_kernel(subanova_kernel, theta)
+      subK = subK / norm(subK, "f")
+      
       subanova_kernel_test = make_anovaKernel(x_test, x_train, kernel_list)
       subK_test = combine_kernel(subanova_kernel_test, theta)
-
+      subK_test = subK_test / norm(subK_test, "f")
+      
       # cat("lambda of length",len_lambda,"|")
       for(lam in lambda)
       {
@@ -185,6 +189,7 @@ thetastep_ram = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
     pretheta = matrix(1, anova_kernel$numK, 1)
   }
   K = combine_kernel(anova_kernel, pretheta)
+  K = K / norm(K, "f")
   # initial.model = msvm.compact(K, y, exp2.lambda, epsilon, epsilon.H)
   initial_model = SRAMSVM_solve(K = K, y = y, gamma = gamma, lambda = opt_lambda, kernel = kernel, kparam = kparam, ...)
   # ramsvm(x, y, lambda = exp2.lambda, kernel = "linear")@beta0
@@ -207,7 +212,8 @@ thetastep_ram = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
       subanova_kernel = make_anovaKernel(x_train, x_train, kernel_list)
       subanova_kernel_test = make_anovaKernel(x_test, x_train, kernel_list)
       subK = combine_kernel(subanova_kernel, pretheta)
-
+      subK = subK / norm(subK, "f")
+      
       # model.initial = msvm.compact(subK, y_train, exp2.lambda, epsilon, epsilon.H)
       model_initial = SRAMSVM_solve(K = subK, y = y_train, gamma = gamma, lambda = opt_lambda,
                                     kernel = kernel, kparam = kparam, ...)
@@ -224,14 +230,16 @@ thetastep_ram = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
                            lambda = opt_lambda, lambda_theta = lam_theta)
         # combine kernels
         subK = combine_kernel(subanova_kernel, theta)
-
+        subK = subK / norm(subK, "f")
+        
         # combined method
         if(isCombined == TRUE) {
           # model = msvm.compact(subK, y_train, exp2.lambda, epsilon, epsilon.H)
           model = SRAMSVM_solve(K = subK, y = y_train, gamma = gamma, lambda = opt_lambda, kernel = kernel, kparam = kparam, ...)
         }
         subK_test = combine_kernel(subanova_kernel_test, theta)
-
+        subK_test = subK_test / norm(subK_test, "f")
+        
         fit_test = predict(object = model, newK = subK_test)
         if (criterion == "0-1") {
           ERR[row_index] = (ERR[row_index] + (1 - (sum(y_test == fit_test[[1]][[1]]) / length(y_test))) / fold)
@@ -297,6 +305,7 @@ thetastep_ram = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
   cat("The average shrinkage factor:", shrinkage, "\n\n")
 
   K = combine_kernel(anova_kernel, opt_theta)
+  K = K / norm(K, "f")
   if(isCombined == TRUE) #combined method
   {
     # opt_model = msvm.compact(K, y, exp2.lambda, epsilon, epsilon.H)
