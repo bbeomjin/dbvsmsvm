@@ -229,7 +229,6 @@ thetastep_ram = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
         # combine kernels
         subK = combine_kernel(subanova_kernel, theta)
         
-        
         # combined method
         if(isCombined == TRUE) {
           # model = msvm.compact(subK, y_train, exp2.lambda, epsilon, epsilon.H)
