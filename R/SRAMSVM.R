@@ -124,7 +124,7 @@ cstep_ram = function(x, y, lambda, gamma = 0.5, kernel, kparam = 1, theta = NULL
         # model = ramsvm(x_train, y = y_train, gamma = 0.5, lambda = lam, kernel = kernel_type_ramsvm, kparam = 1 / sqrt(kparam))
         # fit_test2 = predict(model, x_test)[[1]]
 
-        fit_test = predict.sramsvm(object = model, newdata = x_test, newK = subK_test)
+        fit_test = predict(object = model, newdata = x_test, newK = subK_test)
         if (criterion == "0-1") {
           ERR[row_index] = (ERR[row_index] + (1 - (sum(y_test == fit_test[[1]][[1]]) / length(y_test))) / fold)
         } else {
