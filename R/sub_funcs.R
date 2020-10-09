@@ -831,10 +831,13 @@ interaction_kernel = function(x, u, kernel, active_set, interaction_set, clique_
     }
   }
   
-  interaction_kernel = lapply(1:ncol(interaction_set), FUN = function(i) {
-    ind = interaction_set[, i]
-    return(((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1)
-  })
+  interaction_kernel = list(0)
+  if (ncol(interaction_set) != 0) {
+    interaction_kernel = lapply(1:ncol(interaction_set), FUN = function(i) {
+      ind = interaction_set[, i]
+      return(((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1)
+    })
+  }
   
   if (length(clique_list) != 0) {
     K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + Reduce("+", interaction_kernel) + Reduce("+", high_order_kernel)
