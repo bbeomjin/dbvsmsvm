@@ -225,7 +225,7 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
                                               kernel = kernel, kparam = list(kparam))
 
                            msvm_fit = SRAMSVM_solve(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
-                                                   lambda = lambda, kernel = kernel, kparam = kparam, )
+                                                   lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
                            pred_val = predict(msvm_fit, newx = x_valid[, fold_gd > thresh, drop = FALSE])
 
@@ -298,14 +298,16 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
                                   fold_gd_int = gradient_interaction(alpha = fold_model$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
                                                                  kernel = kernel, kparam = list(kparam), active_set = active_set)
                                   
-                                  clique_list = interaction_graph(temp[, fold_gd_int > thresh, drop = FALSE], p)
+                                  clique_list = interaction_graph(temp[, fold_gd_int > thresh, drop = FALSE], p, min = 3)
                                   
-                                  KK = interaction_kernel(x_fold, x_fold, kernel = list(type = kernel, par = kparam), active_set, clique_list)
+                                  KK = interaction_kernel(x_fold, x_fold, kernel = list(type = kernel, par = kparam), 
+                                                          active_set, temp[, fold_gd_int > thresh, drop = FALSE], clique_list)
                                   
                                   msvm_fit = SRAMSVM_solve(K = KK, y = y_fold, gamma = gamma,
                                                            lambda = lambda, kernel = kernel, kparam = kparam, ...)
                                   
-                                  valid_KK = interaction_kernel(x_valid, x_fold, kernel = list(type = kernel, par = kparam), active_set, clique_list)
+                                  valid_KK = interaction_kernel(x_valid, x_fold, kernel = list(type = kernel, par = kparam), 
+                                                                active_set, temp[, fold_gd_int > thresh, drop = FALSE], clique_list)
                                   pred_val = predict(msvm_fit, newK = valid_KK)
                                   
                                   if (criterion == "0-1") {

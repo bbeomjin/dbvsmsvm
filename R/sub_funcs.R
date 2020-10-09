@@ -765,17 +765,17 @@ interaction_svmfs = function(main_effect, interaction)
 }
 
 
-interaction_graph = function(comb, p)
+interaction_graph = function(comb, p, min = 3)
 {
   int_mat = matrix(0, nrow = p * (p - 1) / 2, ncol = p * (p - 1) / 2)
   int_mat[t(comb)] = 1
   int_mat = t(int_mat) + int_mat
   g = graph_from_adjacency_matrix(int_mat, mode = "undirected")
-  cliques_list = max_cliques(g, min = 2)
+  cliques_list = max_cliques(g, min = 3)
   return(cliques_list)
 }
 
-interaction_kernel = function(x, u, kernel, active_set, clique_list)
+interaction_kernel = function(x, u, kernel, active_set, interaction_set, clique_list)
 {
   if (!is.matrix(x)) {
     x = as.matrix(x)
@@ -785,7 +785,7 @@ interaction_kernel = function(x, u, kernel, active_set, clique_list)
   u = as.matrix(u)
   dimx = ncol(x)
   
-  scaler = function(x, u, kernel, active_set, index)
+  scaled_kernel = function(x, u, kernel, active_set, index)
   {
     X1 = matrix(rowSums(x[, active_set, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u))
     U1 = matrix(rowSums(u[, active_set, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u), byrow = TRUE)
@@ -794,34 +794,52 @@ interaction_kernel = function(x, u, kernel, active_set, clique_list)
     K = exp(-kernel$par * ((X1 + U1) - (X2 + U2)))
     K1 = exp(-kernel$par * (X1 + U1))
     K2 = exp(-kernel$par * (X2 + U2))
-    return(list(K = K, K1 = K1, K2 = K2))
+    K_mat = main_kernel(x[, index, drop = FALSE], u[, index, drop = FALSE], kernel)
+    res = K * K_mat - K1
+    return(list(res = res, K = K, K1 = K1, K2 = K2))
   }
   
   # numK = dimx * (dimx - 1) / 2
   # anova_kernel_temp = vector(mode = "list", dimx)
-  diff_set = base::setdiff(active_set, unique(unlist(clique_list)))
-  anova_kernel = vector(mode = "list", length(clique_list) + length(diff_set))
+  main_effects = vector(mode = "list", dimx)
+  high_order_kernel = vector(mode = "list", length(clique_list))
+  # const_term = vector(mode = "list", dimx)
   # kernelCoord = vector(mode = "list", numK)
+  
+  
+  for (j in 1:length(active_set)) {
+    temp_kernel = scaled_kernel(x, u, kernel, active_set, active_set[j])
+    main_effects[[active_set[j]]] = temp_kernel$res
+    # const_term[[active_set[j]]] = temp_kernel[-1]
+  }
+  
   
   if (length(clique_list) != 0) {
     for (d in 1:length(clique_list)) {
       ind = sort(as.vector(clique_list[[d]]))
-      scale_const = scaler(x, u, kernel, active_set, ind)
-      anova_kernel[[d]] = scale_const$K * (main_kernel(x[, ind, drop = FALSE], u[, ind, drop = FALSE], kernel))
+      # scale_const = scaler(x, u, kernel, active_set, ind)
+      # anova_kernel[[d]] = scale_const$K * (main_kernel(x[, ind, drop = FALSE], u[, ind, drop = FALSE], kernel))
+      clique_kernel = scaled_kernel(x, u, kernel, active_set, ind)$res
+      temp_comb = combn(ind, 2)
+      interaction_effects = lapply(1:ncol(temp_comb), FUN = function(i) {
+        ind = temp_comb[, i]
+        return(((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1)
+      })
+      sum_interaction = Reduce("+", interaction_effects)
+      sum_main = Reduce("+", main_effects[ind])
+      high_order_kernel[[d]] = clique_kernel - sum_main - sum_interaction
     }
   }
   
-  if (length(diff_set) != 0) {
-    main_ind = sort(diff_set)
-    for (j in 1:length(main_ind)) {
-      scale_const = scaler(x, u, kernel, active_set, main_ind[j])
-      anova_kernel[[length(clique_list) + j]] = scale_const$K * (main_kernel(x[, main_ind[j], drop = FALSE], u[, main_ind[j], drop = FALSE], kernel))
-    }
-  }
+  interaction_kernel = lapply(1:ncol(interaction_set), FUN = function(i) {
+    ind = interaction_set[, i]
+    return(((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1)
+  })
   
-  K = 0
-  for (i in 1:length(anova_kernel)) {
-    K = K + anova_kernel[[i]]
+  if (length(clique_list) != 0) {
+    K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + Reduce("+", interaction_kernel) + Reduce("+", high_order_kernel)
+  } else {
+    K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + Reduce("+", interaction_kernel)
   }
   return(K)
 }
