@@ -471,15 +471,32 @@ drbf = function(X, xp, kernel_par = list(sigma = NULL))
 # }
 
 
-ddrbf = function(X, xp, kernel_par = list(sigma = NULL), ind1, ind2)
+# ddrbf = function(X, xp, kernel_par = list(sigma = NULL), ind1, ind2)
+# {
+#   gamma = kernel_par$sigma
+#   np = dim(X)
+#   diff_mat = X - matrix(xp, nrow = np[1], ncol = np[2], byrow = TRUE)
+#   tmp = exp(-rowSums(diff_mat^2) * gamma) * (2 * gamma * diff_mat[, ind1]) * (2 * gamma * diff_mat[, ind2])
+#   # dgd = drop(crossprod(alpha, tmp))
+#   return(tmp)
+# }
+
+
+ddrbf = function(X, xp, kernel_par = list(sigma = NULL), comb_set)
 {
   gamma = kernel_par$sigma
   np = dim(X)
   diff_mat = X - matrix(xp, nrow = np[1], ncol = np[2], byrow = TRUE)
-  tmp = exp(-rowSums(diff_mat^2) * gamma) * (2 * gamma * diff_mat[, ind1]) * (2 * gamma * diff_mat[, ind2])
+  # diff_mat2 = diff_mat[, comb_set]
+  
+  diff_mat2 = sapply(1:ncol(comb_set), function(i) diff_mat[, comb_set[, i][1]] * diff_mat[, comb_set[, i][2]])
+  
+  # tmp = exp(-rowSums(diff_mat^2) * gamma) * 4 * gamma^2 * (diff_mat[, ind1]) * (diff_mat[, ind2])
+  tmp = exp(-rowSums(diff_mat^2) * gamma) * 4 * gamma^2 * diff_mat2
   # dgd = drop(crossprod(alpha, tmp))
   return(tmp)
 }
+
 
 
 dlinear = function(X, xp, kernel_par = list())
@@ -647,13 +664,24 @@ gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", 
   
   comb_set = combn(active_set, 2)
   
-  gd = sapply(1:ncol(comb_set), function(k) {
-    gd_res = rowMeans(sapply(1:n, FUN = function(i) {return(crossprod(alpha, ddkernel(x, x[i, ], kparam, comb_set[1, k], comb_set[2, k]))^2)}))
-    return(gd_res)
-  })
+  
+  # system.time({
+  #   gd = sapply(1:ncol(comb_set), function(k) {
+  #     gd_res = rowMeans(sapply(1:n, FUN = function(i) {return(crossprod(alpha, ddkernel(x, x[i, ], kparam, comb_set[1, k], comb_set[2, k]))^2)}))
+  #     return(gd_res)
+  #   })
+  # })
+  
+  grad_mat = 0
+  for (i in 1:n) {
+    dK_sq = crossprod(alpha, ddkernel(x, x[i, ], kparam, comb_set))^2
+    # gd_mat = gd_mat + crossprod(W_mat, dK)^2 / n
+    grad_mat = grad_mat + dK_sq / n
+  }
+  
   if (scale) {
     # res = sapply(gd, function(x) return(mean(x^2) / scale_const))
-    res = colSums(gd) / k
+    res = colSums(grad_mat) / k
   } else {
     res = colSums(gd) / k
   }
