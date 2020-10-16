@@ -169,7 +169,8 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
 
   # The number of classes
   k = length(unique(y))
-
+  p = NCOL(x)
+  
   # Initial fitting
   fit = SRAMSVM_solve(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
