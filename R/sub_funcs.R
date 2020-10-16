@@ -795,9 +795,9 @@ interaction_svmfs = function(main_effect, interaction)
 
 interaction_graph = function(comb, p, min = 3)
 {
-  int_mat = matrix(0, nrow = p * (p - 1) / 2, ncol = p * (p - 1) / 2)
+  int_mat = Matrix::Matrix(0, nrow = p, ncol = p)
   int_mat[t(comb)] = 1
-  int_mat = t(int_mat) + int_mat
+  int_mat = Matrix::t(int_mat) + int_mat
   g = graph_from_adjacency_matrix(int_mat, mode = "undirected")
   cliques_list = max_cliques(g, min = 3)
   return(cliques_list)
