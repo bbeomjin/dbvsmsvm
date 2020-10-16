@@ -216,14 +216,15 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
       x_fold = x[-fold, , drop = FALSE]
       y_valid = y[fold]
       x_valid = x[fold, , drop = FALSE]
-
+      
+      fold_model = object$fold_models[[i]]
+      fold_gd = gradient(alpha = fold_model$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
+                         kernel = kernel, kparam = list(kparam))
+      
       fold_err = mclapply(gd_vec,
                          function(thresh) {
-                           # Pre-computed gradient
-                           fold_model = object$fold_models[[i]]
-                           fold_gd = gradient(alpha = fold_model$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
-                                              kernel = kernel, kparam = list(kparam))
-
+                           
+                           # Fit model under the fold set
                            msvm_fit = SRAMSVM_solve(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
                                                    lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
@@ -268,7 +269,7 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
   
   if (interaction) {
     active_set = which(selected == 1)
-    comb_set = combn(1:length(selected), 2)
+    # comb_set = combn(1:NCOL(x), 2)
     if (length(active_set) == 1 | length(active_set) == 0) {
       int_selected = rep(0, choose(ncol(x), 2))
       gd_interaction = rep(0, choose(ncol(x), 2))
@@ -291,18 +292,20 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
         y_valid = y[fold]
         x_valid = x[fold, , drop = FALSE]
         
+        # Pre-computed gradient
+        fold_model = object$fold_models[[i]]
+        fold_gd_int = gradient_interaction(alpha = fold_model$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
+                                           kernel = kernel, kparam = list(kparam), active_set = active_set)
+        
         fold_err_int = mclapply(gd_vec_int,
                                 function(thresh) {
-                                  # Pre-computed gradient
-                                  fold_model = object$fold_models[[i]]
-                                  fold_gd_int = gradient_interaction(alpha = fold_model$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
-                                                                 kernel = kernel, kparam = list(kparam), active_set = active_set)
                                   
                                   clique_list = interaction_graph(temp[, fold_gd_int > thresh, drop = FALSE], p, min = 3)
                                   
                                   KK = interaction_kernel(x_fold, x_fold, kernel = list(type = kernel, par = kparam), 
                                                           active_set, temp[, fold_gd_int > thresh, drop = FALSE], clique_list)
                                   
+                                  # Fit model under the fold set
                                   msvm_fit = SRAMSVM_solve(K = KK, y = y_fold, gamma = gamma,
                                                            lambda = lambda, kernel = kernel, kparam = kparam, ...)
                                   
