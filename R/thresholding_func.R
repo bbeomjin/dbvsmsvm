@@ -227,7 +227,7 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
                            
                            # Fit model under the fold set
                            msvm_fit = SRAMSVM_solve(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
-                                                   lambda = lambda, kernel = kernel, kparam = kparam)#, ...)
+                                                   lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
                            pred_val = predict(msvm_fit, newx = x_valid[, fold_gd > thresh, drop = FALSE])
 

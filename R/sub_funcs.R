@@ -849,11 +849,18 @@ interaction_kernel = function(x, u, kernel, active_set, interaction_set, clique_
       # anova_kernel[[d]] = scale_const$K * (main_kernel(x[, ind, drop = FALSE], u[, ind, drop = FALSE], kernel))
       clique_kernel = scaled_kernel(x, u, kernel, active_set, ind)$res
       temp_comb = combn(ind, 2)
-      interaction_effects = lapply(1:ncol(temp_comb), FUN = function(i) {
+      # interaction_effects = lapply(1:ncol(temp_comb), FUN = function(i) {
+      #   ind = temp_comb[, i]
+      #   return(((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1)
+      # })
+      # sum_interaction = Reduce("+", interaction_effects)
+      
+      sum_interaction = 0
+      for (i in 1:ncol(temp_comb)) {
         ind = temp_comb[, i]
-        return(((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1)
-      })
-      sum_interaction = Reduce("+", interaction_effects)
+        sum_interaction = sum_interaction + ((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1
+      }
+      
       sum_main = Reduce("+", main_effects[ind])
       high_order_kernel[[d]] = clique_kernel - sum_main - sum_interaction
     }
@@ -861,16 +868,24 @@ interaction_kernel = function(x, u, kernel, active_set, interaction_set, clique_
   
   interaction_kernel = list(0)
   if (ncol(interaction_set) != 0) {
-    interaction_kernel = lapply(1:ncol(interaction_set), FUN = function(i) {
-      ind = interaction_set[, i]
-      return(((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1)
-    })
+    # interaction_kernel = lapply(1:ncol(interaction_set), FUN = function(i) {
+    #   ind = interaction_set[, i]
+    #   return(((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1)
+    # })
+    
+    interaction_kernel = 0
+    for (i in 1:ncol(interaction_set)) {
+      interaction_kernel = interaction_kernel + ((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1
+    }
+    
   }
   
   if (length(clique_list) != 0) {
-    K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + Reduce("+", interaction_kernel) + Reduce("+", high_order_kernel)
+    # K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + Reduce("+", interaction_kernel) + Reduce("+", high_order_kernel)
+    K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + interaction_kernel + Reduce("+", high_order_kernel)
   } else {
-    K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + Reduce("+", interaction_kernel)
+    # K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + Reduce("+", interaction_kernel)
+    K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + interaction_kernel
   }
   return(K)
 }
