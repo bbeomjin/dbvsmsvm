@@ -885,8 +885,8 @@ interaction_kernel = function(x, u, kernel, active_set, interaction_set, clique_
   #   K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + interaction_kernel + Reduce("+", high_order_kernel)
   # } else {
     # K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + Reduce("+", interaction_kernel)
-    K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + interaction_kernel
-  }
+  K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + interaction_kernel
+  # }
   return(K)
 }
 
