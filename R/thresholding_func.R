@@ -304,10 +304,9 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
                                   # clique_list = interaction_graph(temp[, fold_gd_int > thresh, drop = FALSE], p, min = 3)
                                   clique_list = list()
                                   
-                                  system.time({
-                                    KK = interaction_kernel(x_fold, x_fold, kernel = list(type = kernel, par = kparam), 
-                                                            active_set, temp[, fold_gd_int > thresh, drop = FALSE], clique_list)
-                                  })
+                                  
+                                  KK = interaction_kernel(x_fold, x_fold, kernel = list(type = kernel, par = kparam), 
+                                                          active_set, temp[, fold_gd_int > thresh, drop = FALSE], clique_list)
                                   
                                   
                                   # Fit model under the fold set
