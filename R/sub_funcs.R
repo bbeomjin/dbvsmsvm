@@ -875,6 +875,7 @@ interaction_kernel = function(x, u, kernel, active_set, interaction_set, clique_
     
     interaction_kernel = 0
     for (i in 1:ncol(interaction_set)) {
+      ind = interaction_set[, i]
       interaction_kernel = interaction_kernel + ((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1
     }
     
