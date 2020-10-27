@@ -342,8 +342,10 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
     out$int_selected = int_selected
     out$gd_interaction = gd_interaction
     out$opt_thresh_int = opt_thresh_int
+    out$thresh_path_int = gd_vec_int
     out$int_opt_valid_err = min(int_valid_err)
     out$int_valid_err = int_valid_err
+    out$se_int = int_valid_se
   }
   out$cv_type = cv_type
   out$call = call
