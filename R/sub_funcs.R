@@ -570,7 +570,7 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
     names(kparam) = "sigma"
     if (scale) {
       rbf = do.call(rbfdot, kparam)
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], kernelMatrix(rbf, x) + 1) %*% alpha[, i]))
+      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], kernelMatrix(rbf, x)) %*% alpha[, i]))
       # scale_const = drop(t(alpha) %*% kernelMatrix(rbf, X) %*% alpha)
       # system.time((a = sum(sapply(1:n, FUN = function(i) K_rbf(alpha, X, X[i, ], sigma = sigma)) * alpha)))
     }
@@ -680,8 +680,9 @@ gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", 
   }
   
   if (scale) {
+    scaler = sum(drop(crossprod(W_mat, sqrt(scale_const)))^2)
     # res = sapply(gd, function(x) return(mean(x^2) / scale_const))
-    res = colSums(grad_mat) / k
+    res = colSums(grad_mat) / k / scaler
   } else {
     res = colSums(gd) / k
   }
