@@ -422,6 +422,7 @@ ramsvm_hinge = function(y, fit, k, gamma = 0.5)
 
 kernelMatrix_spline = function(X, Y) {
   K = 0
+  p = ncol(X)
   spline_kernel = function(x, u)
   {
     x = as.matrix(x)
