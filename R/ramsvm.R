@@ -337,7 +337,7 @@ Kfold_ramsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambd
                           pred_val = predict.ramsvm(msvm_fit, newx = valid_x)
                           
                           if (criterion == "0-1") {
-                            acc = sum(valid_y == pred_val[[1]][[1]]) / length(valid_y)
+                            acc = sum(valid_y == pred_val$class) / length(valid_y)
                             err = 1 - acc
                           } else {
                             err = ramsvm_hinge(valid_y, pred_val$pred_value, k = k, gamma = gamma)
@@ -373,7 +373,7 @@ Kfold_ramsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambd
                             pred_val = predict(msvm_fit, newx = x_valid)
                             
                             if (criterion == "0-1") {
-                              acc = sum(y_valid == pred_val[[1]][[1]]) / length(y_valid)
+                              acc = sum(y_valid == pred_val$class) / length(y_valid)
                               err = 1 - acc
                             } else {
                               err = ramsvm_hinge(y_valid, pred_val$pred_value, k = k, gamma = gamma)
