@@ -50,8 +50,8 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
                           lambda = lambda)
 
 
-  cmat = cmat_list$beta
-  c0vec = cmat_list$beta0
+  cmat = cmat_list$cmat
+  c0vec = cmat_list$c0vec
   
   Kcmat = (K %*% cmat) %*% W
   W_c0vec = drop(t(c0vec) %*% W)
