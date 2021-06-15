@@ -891,3 +891,30 @@ interaction_kernel = function(x, u, kernel, active_set, interaction_set, clique_
   return(K)
 }
 
+code_ramsvm = function(y)
+{
+  n_class = length(unique(y))
+  n = length(y)
+  yyi = Y_matrix_gen(k = n_class, nobs = n, y = y)
+  W = XI_gen(n_class)
+  
+  y_index = cbind(1:n, y)
+  index_mat = matrix(-1, nrow = n, ncol = n_class)
+  index_mat[y_index] = 1
+  
+  Hmatj = list()
+  Lmatj = list()
+  for (j in 1:(n_class - 1)) {
+    Hmatj_temp = NULL
+    Lmatj_temp = NULL
+    for (i in 1:n_class) {
+      temp = diag(n) * W[j, i]
+      diag(temp) = diag(temp) * index_mat[, i]
+      Hmatj_temp = rbind(Hmatj_temp, temp)
+      Lmatj_temp = c(Lmatj_temp, diag(temp))
+    }
+    Hmatj[[j]] = Hmatj_temp
+    Lmatj[[j]] = Lmatj_temp
+  }
+  return(list(yyi = yyi, W = W, Hmatj = Hmatj, Lmatj = Lmatj, y_index = y_index))
+}
