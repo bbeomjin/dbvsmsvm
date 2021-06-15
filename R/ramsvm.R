@@ -262,7 +262,7 @@ predict.ramsvm = function(object, newx = NULL, newK = NULL, ...) {
   W = XI_gen(n_class)
   
   W_c0 = drop(t(c0vec) %*% W)
-  fit = matrix(W_c0, nrow = nrow(newK), ncol = n_class, byrow = T) + ((newK %*% beta) %*% W)
+  fit = matrix(W_c0, nrow = nrow(newK), ncol = n_class, byrow = T) + ((newK %*% cmat) %*% W)
   pred_y = apply(fit, 1, which.max)
   
   for(i in 1:object$n_class) {
