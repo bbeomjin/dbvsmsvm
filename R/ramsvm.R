@@ -5,13 +5,12 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
   out = list()
   n_class = length(unique(y))
   n = length(y)
-  if (is.null(weight)) weight = numeric(n) + 1
+  if (is.null(weight)) weight = numeric(n) + 1.0
   
   #------------------------------------------------------------------#
   # Create k-vertex simplex.                                         #
   #------------------------------------------------------------------#
   W = XI_gen(k = n_class)
-
   yyi = Y_matrix_gen(k = n_class,
                      n = n,
                      y = y)
@@ -206,10 +205,10 @@ ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALS
   
   if (type == "type1") {
     K = kernelMat(x, x, kernel = kernel, kparam = kparam) + 1
-    solutions = ramsvm_solver(K = K, y = y, gamma = gamma, lambda = lambda, ...)
+    solutions = ramsvm_solver(K = K, y = y_int, gamma = gamma, lambda = lambda, ...)
   } else {
     K = kernelMat(x, x, kernel = kernel, kparam = kparam)
-    solutions = ramsvm_compact(K = K, y = y, gamma = gamma, lambda = lambda, ...)
+    solutions = ramsvm_compact(K = K, y = y_int, gamma = gamma, lambda = lambda, ...)
   }
   
   out$x = x
