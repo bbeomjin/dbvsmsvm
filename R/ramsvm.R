@@ -294,8 +294,8 @@ coef_kernel = function(y, k, W, alpha, lambda){
       }
     }
     
-    cmat[, q] = temp / nobs / lambda
-    c0vec[q] = temp0 / nobs / lambda
+    cmat[, q] = temp / n / lambda
+    c0vec[q] = temp0 / n / lambda
   }
   return(list(cmat = cmat, c0vec = c0vec))
 }
