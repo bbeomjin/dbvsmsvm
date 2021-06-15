@@ -380,30 +380,29 @@ find_intercept = function(y, K, gamma = 0.5, cmat, lambda)
 
 
 
-XI_gen = function(k, kd) {
+XI_gen = function(k) {
   
-  tempA = - (1.0 + sqrt(kd)) / ((kd - 1.0)^(1.5))
-  tempB = tempA + sqrt(kd / (kd - 1.0))
+  tempA = - (1.0 + sqrt(k)) / ((k - 1.0)^(1.5))
+  tempB = tempA + sqrt(k / (k - 1.0))
   
   XI = matrix(data = tempA, nrow = k - 1L, ncol = k)
   
-  XI[, 1L] = 1.0 / sqrt(kd - 1.0)
+  XI[, 1L] = 1.0 / sqrt(k - 1.0)
   
   for( ii in 2L:k ) XI[ii - 1L, ii] = tempB
   
   return(XI)
 }
 
-Y_matrix_gen = function(k, kd, nobs, y_train) {
+Y_matrix_gen = function(k, nobs, y) {
   
-  XI = XI_gen(k = k, kd = kd)
+  XI = XI_gen(k = k)
   
-  Y_matrix = matrix(data = 0.0, nrow = nobs, ncol = k - 1L)
+  Y_matrix = matrix(data = 0.0, nrow = nobs, ncol = k - 1)
   
-  for( ii in 1L:nobs ) Y_matrix[ii, ] = XI[, y_train[ii]]
+  for (ii in 1:nobs) {Y_matrix[ii, ] = XI[, y[ii]]}
   
-  return( Y_matrix )
-  
+  return(Y_matrix)
 }
 
 
@@ -732,12 +731,13 @@ kernelMat = function(x, y, kernel = "radial", kparam = 1.0) {
   if( kernel == "poly" ) {
     obj = (x %*% t(y) + 1.0)^kparam
   } else if(kernel == "radial" | kernel == "radial2") {
-    # normx = drop((x^2) %*% rep(1.0, ncol(x)))
+    normx = rowSums(x^2)
     # normy = drop((y^2) %*% rep(1.0, ncol(y)))
-    # temp = x %*% t(y)
-    # temp = (-2.0 * temp + normx) + outer(rep(1.0, nrow(x)), normy, "*")
-    # obj = exp(-temp * kparam)
-    obj = kernelMatrix(rbfdot(sigma = kparam), x, y)
+    normy = rowSums(y^2)
+    temp = x %*% t(y)
+    temp = (-2.0 * temp) + outer(normx, rep(1.0, nrow(y)), "*") + outer(rep(1.0, nrow(x)), normy, "*")
+    obj = exp(-temp * kparam)
+    # obj = kernelMatrix(rbfdot(sigma = kparam), x, y)
   } else if (kernel == "spline") {
     K = 0
     spline_kernel = function(x, u)

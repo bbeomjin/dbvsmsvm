@@ -1,10 +1,4 @@
-###########################################################################
-# SMSVM v1.2.1: R functions written by SangJun Lee, Yuwon Kim, Yoonkyung
-# Lee, and Ja-Yong Koo.
-###########################################################################
 # SMSVM using ramsvm
-
-
 # library(quadprog)
 # library(lpSolve)
 

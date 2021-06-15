@@ -29,13 +29,15 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
   # The number of classes
   k = length(unique(y))
 
-  if (!is.numeric(lambda)) {
-    lambda = as.numeric(lambda)
-  }
-
-  if (!is.numeric(kparam)) {
-    kparam = as.numeric(kparam)
-  }
+  lambda = as.numeric(lambda)
+  kparam = as.numeric(kparam)
+  # if (!is.numeric(lambda)) {
+  #   lambda = as.numeric(lambda)
+  # }
+  # 
+  # if (!is.numeric(kparam)) {
+  #   kparam = as.numeric(kparam)
+  # }
 
   # Initial fitting
   fit = SRAMSVM_solve(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
