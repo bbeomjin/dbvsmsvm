@@ -213,7 +213,7 @@ ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALS
   
   out$x = x
   out$y = y
-  out$y_name
+  out$y_name = y_name
   out$gamma = gamma
   out$n_class = n_class
   out$lambda = lambda
