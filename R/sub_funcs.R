@@ -918,3 +918,42 @@ code_ramsvm = function(y)
   }
   return(list(yyi = yyi, W = W, Hmatj = Hmatj, Lmatj = Lmatj, y_index = y_index))
 }
+
+find_nonzero = function(Amat)
+{
+  nr = nrow(Amat)
+  nc = ncol(Amat)
+  Amat_compact = matrix(0, nr, nc)
+  Aind = matrix(0, nr + 1, nc)
+  for (j in 1:nc) {
+    index = (1:nr)[Amat[, j] != 0]
+    number = length(index)
+    Amat_compact[1:number, j] = Amat[index, j]
+    Aind[1, j] = number
+    Aind[2:(number+1), j] = index
+  }
+  max_number = max(Aind[1, ])
+  Amat_compact = Amat_compact[1:max_number, ]
+  Aind = Aind[1:(max_number + 1), ]
+  return(list(Amat_compact = Amat_compact, Aind = Aind))
+}
+
+fixit = function(A, epsilon = .Machine$double.eps, is_diag = FALSE)
+{
+  if (is_diag) {
+    d = diag(A)
+    tol = epsilon
+    eps = max(tol * max(d), 0)
+    d[d < eps] = eps
+    Q = diag(d)
+  } else {
+    eig = eigen(A, symmetric = TRUE)
+    tol = epsilon
+    eps = max(tol * abs(eig$values[1]), 0)
+    eig$values[eig$values < eps] = eps
+    Q = eig$vectors %*% diag(eig$values) %*% t(eig$vectors)
+    # positive = eig$values > eps
+    # Q = eig$vectors[, positive, drop = FALSE] %*% diag(eig$values[positive]) %*% t(eig$vectors[, positive, drop = FALSE])
+  }
+  return(Q)
+}
