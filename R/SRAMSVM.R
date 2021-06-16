@@ -130,7 +130,7 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
         subK = combine_kernel(subanova_K, theta)
         
         subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel_list)
-        subK_valid = combine_kernel(subanova_K_test, theta)
+        subK_valid = combine_kernel(subanova_K_valid, theta)
         
         fold_err = mclapply(1:length(lambda_seq),
                             function(j) {
