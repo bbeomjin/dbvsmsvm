@@ -88,9 +88,9 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
   lambda_seq = as.numeric(lambda_seq)
   kparam = as.numeric(kparam)
   
-  if (is.null(theta)) {
-    theta = rep(1, p)
-  }
+  # if (is.null(theta)) {
+  #   theta = rep(1, p)
+  # }
   
   lambda_seq = sort(lambda_seq, decreasing = FALSE)
   kparam = sort(kparam, decreasing = TRUE)

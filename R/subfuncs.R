@@ -691,28 +691,26 @@ gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", 
   return(res)
 }
 
-data_split = function(y, fold, k = max(y), seed = length(y))
+data_split = function(y, nfolds, seed = length(y))
 {
   # k: the number of classes
   n_data = length(y)
+  n_class = length(unique(y))
   class_size = table(y)
   ran = rep(0, n_data) 
-  if ( (min(class_size) < fold) & (fold != n_data) )
+  if ((min(class_size) < nfolds) & (nfolds != n_data))
   {
     warning(' The given fold is bigger than the smallest class size. \n Only a fold size smaller than the minimum class size \n or the same as the sample size (LOOCV) is supported.\n')
     return(NULL)
   }
   
-  if ( min(class_size) >= fold )
-  {
+  if (min(class_size) >= nfolds) {
     set.seed(seed)
-    for (j in 1:k)
-    {  
-      ran[y == j] = ceiling(sample(class_size[j]) / (class_size[j] + 1) * fold) 
+    for (j in 1:n_class) {  
+      ran[y == j] = ceiling(sample(class_size[j]) / (class_size[j] + 1) * nfolds) 
     }
   }
-  else if ( fold == n_data)
-  {
+  else if (nfolds == n_data) {
     ran = 1:n_data
   }
   return(ran)
