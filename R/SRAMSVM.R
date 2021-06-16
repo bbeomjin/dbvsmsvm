@@ -23,7 +23,7 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
                    lambda_seq = 2^{seq(-10, 10, length.out = 100)},
                    lambda_theta = 2^{seq(-10, 10, length.out = 100)},
                    kernel, kparam, scale = FALSE, criterion = c("0-1", "loss"),
-                   isCombined = FALSE, cv_type = "original", nCores = 1, ...)
+                   isCombined = FALSE, cv_type = "original", nCores = 1, verbose = 1, ...)
 {
   # initialize
   out = list()
@@ -41,6 +41,12 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
   opt_cstep_fit = cstep.sramsvm(x = x, y = y, gamma = gamma, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds,
                             lambda_seq = lambda_seq, theta = theta_step_fit$opt_theta, kernel = kernel, kparam = kparam,
                             scale = scale, criterion = criterion, optModel = TRUE, nCores = nCores, ...)  
+  
+  if (verbose == 1) {
+    cat("CV-error(cstep):", cstep_fit$opt_valid_err, "\n")
+    cat("CV-error(theta-step):", theta_step_fit$opt_valid_err, "\n")
+    cat("CV-error(cstep):", opt_cstep_fit$opt_valid_err, "\n")
+  }
   
   out$opt_param = opt_cstep_fit$opt_param
   out$opt_valid_err = opt_cstep_fit$opt_valid_err
