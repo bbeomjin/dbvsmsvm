@@ -23,7 +23,7 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
                    lambda_seq = 2^{seq(-10, 10, length.out = 100)},
                    lambda_theta_seq = 2^{seq(-10, 10, length.out = 100)},
                    kernel, kparam, scale = FALSE, criterion = c("0-1", "loss"),
-                   isCombined = FALSE, cv_type = "original", nCores = 1, verbose = 1, ...)
+                   isCombined = FALSE, cv_type = "original", type = c("type1", "type2"), nCores = 1, verbose = 1, ...)
 {
   # initialize
   out = list()
@@ -31,7 +31,7 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
   
   cstep_fit = cstep.sramsvm(x = x, y = y, gamma = gamma, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds,
                             lambda_seq = lambda_seq, theta = NULL, kernel = kernel, kparam = kparam,
-                            scale = scale, criterion = criterion, optModel = FALSE, nCores = nCores, ...)
+                            scale = scale, criterion = criterion, optModel = FALSE, type = type, nCores = nCores, ...)
   
   cat("Fit theta-step \n")
   
@@ -40,7 +40,7 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
   cat("Fit c-step \n")
   opt_cstep_fit = cstep.sramsvm(x = x, y = y, gamma = gamma, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds,
                             lambda_seq = lambda_seq, theta = theta_step_fit$opt_theta, kernel = kernel, kparam = kparam,
-                            scale = scale, criterion = criterion, optModel = TRUE, nCores = nCores, ...)  
+                            scale = scale, criterion = criterion, optModel = TRUE, type = type, nCores = nCores, ...)  
   
   if (verbose == 1) {
     cat("CV-error(cstep):", cstep_fit$opt_valid_err, "\n")
@@ -224,7 +224,6 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
   x = object$x
   y = object$y
   gamma = object$gamma
-  pretheta = object$theta
   
   valid_x = object$valid_x
   valid_y = object$valid_y
@@ -246,7 +245,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
   # valid_anova_K = make_anovaKernel(valid_x, x, kernel_list)
   
   if (is.null(object$opt_model)) {
-    K = combine_kernel(anova_K, pretheta)
+    K = combine_kernel(anova_K, object$theta)
     opt_model = ramsvm_fun(K = K, y = y, gamma = gamma, lambda = lambda, ...)
   } else {
     opt_model = object$opt_model
