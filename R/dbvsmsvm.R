@@ -16,8 +16,8 @@ dbvsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_se
   
   # Find a relevant variable for optimal lambda in second step
   cat("Step 2 : ")
-  select_fit = threshold_fun(initial_fit, thresh_Ngrid = thresh_Ngrid, cv_type = cv_type, criterion = criterion, gd_scale = gd_scale,
-                             interaction = interaction, nCores = nCores, ...)
+  select_fit = threshold_fun.dbvsmsvm(initial_fit, thresh_Ngrid = thresh_Ngrid, cv_type = cv_type, criterion = criterion, gd_scale = gd_scale,
+                                      interaction = interaction, nCores = nCores, ...)
   selected = select_fit$selected
   
   # Find a optimal lambda under the selected variable in third step  

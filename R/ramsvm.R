@@ -203,7 +203,7 @@ ramsvm_compact = function(K, y, gamma = 0.5, lambda, epsilon = 1e-6, eig_tol_D =
 ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1", "type2"), ...)
 {
   out = list()
-  
+  type = match.arg(type)
   # y_temp = as.factor(y)
   # y_name = levels(y_temp)
   n_class = length(unique(y))

@@ -498,7 +498,7 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
 				   anova_radial = drbf)
   
   
-  W_mat = XI_gen(k, as.double(k))
+  W_mat = XI_gen(k)
   
   grad_mat = 0
   for (i in 1:n) {
@@ -568,7 +568,7 @@ gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", 
                     radial = ddrbf,
                     radial2 = ddrbf)
   
-  W_mat = XI_gen(k, as.double(k))
+  W_mat = XI_gen(k)
   
   comb_set = combn(active_set, 2)
   
