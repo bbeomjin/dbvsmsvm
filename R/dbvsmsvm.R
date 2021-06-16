@@ -50,14 +50,13 @@ dbvsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_se
     cat("Find optimal model : ")
     # temporary estimates sigma
     # opt_sigma = kernlab::sigest(y ~ selected_x, frac = 1, scaled = FALSE)[3]
-    final_fit = Kfold_msvm(x = selected_x, y = y, valid_x = selected_valid_x, valid_y = valid_y,
+    final_fit = Kfold_ramsvm(x = selected_x, y = y, valid_x = selected_valid_x, valid_y = valid_y,
                            nfolds = nfolds, lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = kparam,
                            scale = scale, criterion = criterion, optModel = TRUE, nCores = nCores, ...)
     out$opt_model = final_fit$opt_model
     out$valid_err = final_fit$valid_err
     out$opt_valid_err = final_fit$opt_valid_err
   }
-  
   out$cv_type = select_fit$cv_type
   out$call = call
   class(out) = "dbvsmsvm"  
