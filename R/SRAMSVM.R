@@ -56,7 +56,7 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
   out$kernel = kernel
   out$kparam = opt_cstep_fit$opt_param["kparam"]
   out$opt_theta = theta_step_fit$opt_theta
-  out$theta = theta_step_fit$theta
+  out$theta = theta_step_fit$theta_seq
   out$x = x
   out$y = y
   out$n_class = opt_cstep_fit$n_class
@@ -326,7 +326,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
                            theta = findtheta.sramsvm(y = y, anova_kernel = anova_K, gamma = gamma, cmat = opt_model$cmat, c0vec = opt_model$c0vec,
                                                      lambda = lambda, lambda_theta = lambda_theta_seq[j])
                          })
-                         if (!inherits(error, "try-error")) {
+                         if (inherits(error, "try-error")) {
                            theta = rep(0, anova_K$numK)
                          }
                          return(theta)
@@ -338,6 +338,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
   out$opt_lambda_theta = opt_lambda_theta
   out$opt_ind = opt_ind
   out$opt_theta = opt_theta
+  out$theta_seq = theta_seq
   out$opt_valid_err = opt_valid_err
   out$valid_err = valid_err
   return(out)
