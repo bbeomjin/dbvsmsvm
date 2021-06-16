@@ -236,7 +236,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
   
   kernel_list = list(type = kernel, par = kparam)
   anova_K = make_anovaKernel(x, x, kernel = kernel_list)
-  valid_anova_K = make_anovaKernel(valid_x, x, kernel_list)
+  # valid_anova_K = make_anovaKernel(valid_x, x, kernel_list)
   
   if (is.null(object$opt_model)) {
     K = combine_kernel(anova_K, pretheta)
