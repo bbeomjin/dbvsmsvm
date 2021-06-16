@@ -1,5 +1,5 @@
-export(Kfold_ramsvm, threshold_fun, cstep.sramsvm, thetastep.sramsvm, gbfsmsvm, ramsvm)
-exportClasses("GBFSMSVM")
+export(Kfold_ramsvm, threshold_fun, cstep.sramsvm, thetastep.sramsvm, dbvsmsvm, ramsvm)
+exportClasses("dbvsmsvm")
 exportClasses("ramsvm")
 
 # Load dynamic libraries (shared object files)
@@ -15,4 +15,4 @@ import("parallel")
 import("igraph")
 
 S3method(threshold_fun, default)
-S3method(threshold_fun, GBFSMSVM)
+S3method(threshold_fun, dbvsmsvm)
