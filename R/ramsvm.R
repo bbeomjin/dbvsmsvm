@@ -4,6 +4,8 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
 {
   out = list()
   
+  K = K + 1
+  
   y_temp = as.factor(y)
   y_name = levels(y_temp)
   n_class = length(y_name)
@@ -222,11 +224,10 @@ ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALS
     scaled = attr(x, "scaled:scale")
   }
   
+  K = kernelMat(x, x, kernel = kernel, kparam = kparam)
   if (type == "type1") {
-    K = kernelMat(x, x, kernel = kernel, kparam = kparam) + 1
     solutions = ramsvm_solver(K = K, y = y, gamma = gamma, lambda = lambda, ...)
   } else {
-    K = kernelMat(x, x, kernel = kernel, kparam = kparam)
     solutions = ramsvm_compact(K = K, y = y, gamma = gamma, lambda = lambda, ...)
   }
   
