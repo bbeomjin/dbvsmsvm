@@ -294,7 +294,7 @@ XI_gen = function(k) {
   
   XI[, 1L] = 1.0 / sqrt(k - 1.0)
   
-  for( ii in 2L:k ) XI[ii - 1L, ii] = tempB
+  for (ii in 2:k) XI[ii - 1, ii] = tempB
   
   return(XI)
 }

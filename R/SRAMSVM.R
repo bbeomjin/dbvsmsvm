@@ -68,7 +68,7 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
                          lambda_seq = 2^{seq(-10, 10, length.out = 100)}, theta = NULL,
                          kernel = c("linear", "radial", "poly"), kparam = c(1),
                          scale = FALSE, criterion = c("0-1", "loss"), optModel = FALSE, nCores = 1,
-                         type = "type1", ...)
+                         type = c("type1", "type2"), ...)
 {
   call = match.call()
   kernel = match.arg(kernel)
@@ -391,13 +391,13 @@ findtheta.sramsvm = function(y, anova_kernel, gamma = 0.5, cmat, c0vec, lambda, 
   for (d in 1:anova_kernel$numK) {
     K = anova_kernel$K[[d]]
     for (j in 1:n_class) {
-      if(j == 1) {
-        temp_N = matrix(rowSums(K %*% cmat * matrix(Y_code[, j], nrow = nrow(K), ncol = ncol(cmat), byrow = TRUE)))
+      if (j == 1) {
+        temp_N = matrix(rowSums(K %*% cmat * matrix(Y_code[, j], nrow = n, ncol = ncol(cmat), byrow = TRUE)))
       } else {
-        temp_N = rbind(temp_N, matrix(rowSums(K %*% cmat * matrix(Y_code[, j], nrow = nrow(K), ncol = ncol(cmat), byrow = TRUE))))
+        temp_N = rbind(temp_N, matrix(rowSums(K %*% cmat * matrix(Y_code[, j], nrow = n, ncol = ncol(cmat), byrow = TRUE))))
       }
     }
-    if(d == 1) {
+    if (d == 1) {
       N = temp_N
     } else {
       N = cbind(N, temp_N)
