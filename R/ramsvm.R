@@ -1,11 +1,11 @@
 # dyn.load("./alpha_update2.dll")
 ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, 
-                         weight = NULL, control = list(epsilon = 1e-4 * length(y) * length(unique(y)), maxiter = 300))
+                         weight = NULL, control = list(epsilon = 1e-4 * length(y) * length(unique(y)), maxit = 300))
 {
   out = list()
   
   if (is.null(control)) {
-    control = list(epsilon = 1e-4 * length(y) * length(unique(y)), maxiter = 300)
+    control = list(epsilon = 1e-4 * length(y) * length(unique(y)), maxit = 300)
   }
   
   if (is.null(control$epsilon)) {
@@ -60,7 +60,7 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
           as.vector(y_int),
           as.double(epsilon),
           outalpha_ij = as.vector(numeric(n * n_class)),
-          maxiter = as.integer(maxiter),
+          maxiter = as.integer(maxit),
           PACKAGE = "GBFSMSVM")
 
   alpha = matrix(data = aa$outalpha_ij, nrow = n, ncol = n_class)
