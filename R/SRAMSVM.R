@@ -21,7 +21,7 @@ cstep_ram_cv = function(x, y, lambda, kernel, kernel_par = 1,
 
 sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 5,
                    lambda_seq = 2^{seq(-10, 10, length.out = 100)},
-                   lambda_theta = 2^{seq(-10, 10, length.out = 100)},
+                   lambda_theta_seq = 2^{seq(-10, 10, length.out = 100)},
                    kernel, kparam, scale = FALSE, criterion = c("0-1", "loss"),
                    isCombined = FALSE, cv_type = "original", nCores = 1, verbose = 1, ...)
 {
