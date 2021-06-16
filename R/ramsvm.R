@@ -204,7 +204,7 @@ ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALS
   
   # y_temp = as.factor(y)
   # y_name = levels(y_temp)
-  # n_class = length(y_name)
+  n_class = length(unique(y))
   # 
   # y_int = integer(length(y))
   # for(j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
