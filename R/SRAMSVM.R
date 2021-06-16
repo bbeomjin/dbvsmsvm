@@ -270,7 +270,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
                           function(j) {
                             error = try({
                               theta = findtheta.sramsvm(y = train_y, anova_kernel = subanova_K, gamma = gamma, cmat = cmat, c0vec = c0vec,
-                                                        lambda = lambda, lambda_theta = lambda_theta_seq[j], ...)
+                                                        lambda = lambda, lambda_theta = lambda_theta_seq[j])
                               if (isCombined) {
                                 subK = combine_kernel(anova_K, theta)
                                 init_model = ramsvm_fun(K = subK, y = y, gamma = gamma, lambda = lambda, ...)
@@ -317,7 +317,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
                        function(j) {
                          error = try({
                            theta = findtheta.sramsvm(y = y, anova_kernel = anova_K, gamma = gamma, cmat = opt_model$cmat, c0vec = opt_model$c0vec,
-                                                     lambda = lambda, lambda_theta = lambda_theta_seq[j], ...)
+                                                     lambda = lambda, lambda_theta = lambda_theta_seq[j])
                          })
                          if (!inherits(error, "try-error")) {
                            theta = rep(0, anova_K$numK)
