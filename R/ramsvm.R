@@ -3,8 +3,16 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
                          weight = NULL, epsilon = 1e-4 * length(y) * length(unique(y)), maxiter = 300)
 {
   out = list()
-  n_class = length(unique(y))
-  n = length(y)
+  
+  y_temp = as.factor(y)
+  y_name = levels(y_temp)
+  n_class = length(y_name)
+  
+  y_int = integer(length(y))
+  for(j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
+  if (is(y, "numeric")) {y_name = as.numeric(y_name)}
+  
+  n = length(y_int)
   if (is.null(weight)) weight = numeric(n) + 1.0
   
   #------------------------------------------------------------------#
@@ -13,7 +21,7 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
   W = XI_gen(k = n_class)
   yyi = Y_matrix_gen(k = n_class,
                      n = n,
-                     y = y)
+                     y = y_int)
 
   alpha_ij = matrix(data = 0.0, nrow = n, ncol = n_class)
   alpha_yi = numeric(n)
@@ -34,7 +42,7 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
           as.double(n_class),
           as.vector(erci),
           as.double(gamma),
-          as.vector(y),
+          as.vector(y_int),
           as.double(epsilon),
           outalpha_ij = as.vector(numeric(n * n_class)),
           maxiter = as.integer(maxiter),
@@ -42,7 +50,7 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
 
   alpha = matrix(data = aa$outalpha_ij, nrow = n, ncol = n_class)
 
-  cmat_list = coef_kernel(y = y,
+  cmat_list = coef_kernel(y = y_int,
                           k = n_class,
                           W = W,
                           alpha = alpha,
@@ -58,6 +66,8 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
   fit = (matrix(W_c0vec, nrow = n, ncol = n_class, byrow = T) + Kcmat)
   fit_class = apply(fit, 1, which.max)
   
+  out$y = y
+  out$y_name = y_name
   out$alpha = alpha
   out$cmat = cmat
   out$c0vec = c0vec
@@ -75,11 +85,18 @@ ramsvm_compact = function(K, y, gamma = 0.5, lambda, epsilon = 1e-6, eig_tol_D =
 {
   out = list()
   
-  n_class = length(unique(y))
-  n = length(y)
+  y_temp = as.factor(y)
+  y_name = levels(y_temp)
+  n_class = length(y_name)
+  
+  y_int = integer(length(y))
+  for(j in 1:n_class) {y_int[which(y_temp %in% y_name[j])] = j}
+  if (is(y, "numeric")) {y_name = as.numeric(y_name)}
+  
+  n = length(y_int)
   qp_dim = n * n_class
   
-  code_mat = code_ramsvm(y)
+  code_mat = code_ramsvm(y_int)
   yyi = code_mat$yyi
   W = code_mat$W
   y_index = code_mat$y_index
@@ -165,6 +182,8 @@ ramsvm_compact = function(K, y, gamma = 0.5, lambda, epsilon = 1e-6, eig_tol_D =
   # table(y, fit_class)
   
   # Return the output
+  out$y = y
+  out$y_name = y_name
   out$alpha = alpha_mat
   out$cmat = cmat
   out$c0vec = c0vec
@@ -183,13 +202,13 @@ ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALS
 {
   out = list()
   
-  y_temp = as.factor(y)
-  y_name = levels(y_temp)
-  n_class = length(y_name)
-  
-  y_int = integer(length(y))
-  for(j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
-  if (is(y, "numeric")) {y_name = as.numeric(y_name)}
+  # y_temp = as.factor(y)
+  # y_name = levels(y_temp)
+  # n_class = length(y_name)
+  # 
+  # y_int = integer(length(y))
+  # for(j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
+  # if (is(y, "numeric")) {y_name = as.numeric(y_name)}
   
   n = NROW(x)
   p = ncol(x)
@@ -205,15 +224,15 @@ ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALS
   
   if (type == "type1") {
     K = kernelMat(x, x, kernel = kernel, kparam = kparam) + 1
-    solutions = ramsvm_solver(K = K, y = y_int, gamma = gamma, lambda = lambda, ...)
+    solutions = ramsvm_solver(K = K, y = y, gamma = gamma, lambda = lambda, ...)
   } else {
     K = kernelMat(x, x, kernel = kernel, kparam = kparam)
-    solutions = ramsvm_compact(K = K, y = y_int, gamma = gamma, lambda = lambda, ...)
+    solutions = ramsvm_compact(K = K, y = y, gamma = gamma, lambda = lambda, ...)
   }
   
   out$x = x
   out$y = y
-  out$y_name = y_name
+  out$y_name = solutions$y_name
   out$gamma = gamma
   out$n_class = n_class
   out$lambda = lambda
@@ -232,7 +251,7 @@ ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALS
 }
 
 
-predict.ramsvm_compact = function(object, newK = NULL) {
+predict.ramsvm_core = function(object, newK = NULL) {
   
   cmat = object$cmat
   c0vec = object$c0vec
@@ -243,6 +262,10 @@ predict.ramsvm_compact = function(object, newK = NULL) {
   
   fit = matrix(W_c0, nrow = nrow(newK), ncol = n_class, byrow = T) + ((newK %*% cmat) %*% W)
   pred_y = apply(fit, 1, which.max)
+  
+  for(i in 1:object$n_class) {
+    pred_y[pred_y == i] = object$y_name[i]
+  }
   
   # return(list(class = pred_y, inner_prod = inner_prod))
   return(list(class = pred_y, pred_value = fit))
@@ -292,7 +315,6 @@ coef_kernel = function(y, k, W, alpha, lambda){
         temp0 = temp0 + t2 * t1
       }
     }
-    
     cmat[, q] = temp / n / lambda
     c0vec[q] = temp0 / n / lambda
   }
@@ -318,6 +340,8 @@ Kfold_ramsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambd
   
   lambda_seq = as.numeric(lambda_seq)
   kparam = as.numeric(kparam)
+  lambda_seq = sort(lambda_seq, decreasing = FALSE)
+  kparam = sort(kparam, decreasing = TRUE)
   
   # The number of classes
   k = length(unique(y))
