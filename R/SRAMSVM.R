@@ -274,7 +274,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
                                                         lambda = lambda, lambda_theta = lambda_theta_seq[j])
                               if (isCombined) {
                                 subK = combine_kernel(subanova_K, theta)
-                                init_model = ramsvm_fun(K = subK, y = y, gamma = gamma, lambda = lambda, ...)
+                                init_model = ramsvm_fun(K = subK, y = train_y, gamma = gamma, lambda = lambda, ...)
                               }
                             })
                             
