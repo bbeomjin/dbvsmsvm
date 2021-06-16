@@ -114,7 +114,7 @@ Kfold_msvm2 = function (x, y, valid_x = NULL, valid_y = NULL, nfolds = 10,
     opt_valid_err = min(valid_err)
   }
   else {
-    fold_list = data_split(y, nfolds, k = k)
+    fold_list = data_split(y, nfolds)
     valid_err_mat = matrix(NA, nrow = nfolds, ncol = nrow(params))
     model_list = vector("list", nfolds)
     for (i in 1:nfolds) {

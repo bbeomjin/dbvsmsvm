@@ -218,7 +218,7 @@ find_intercept = function(y, K, gamma = 0.5, cmat, lambda)
   # bvec = as.matrix(bvec)
   
   # convert y into ramsvm class code
-  trans_Y = Y_matrix_gen(n_class, as.double(n_class), nobs = n_data, y_train = y)
+  trans_Y = Y_matrix_gen(n_class, nobs = n_data, y = y)
   
   # calculate the 'a' matrix 
   # a_tmp = matrix((1 - gamma) / n_data, nrow = n_data, ncol = n_class)
@@ -228,7 +228,7 @@ find_intercept = function(y, K, gamma = 0.5, cmat, lambda)
   a = matrix(a_tmp, ncol = 1)
   a = rbind(a, matrix(rep(0, n_class - 1)))
   
-  Y_code = Y_matrix_gen(n_class, as.double(n_class), nobs = n_class, y_train = 1:n_class)
+  Y_code = Y_matrix_gen(n_class, nobs = n_class, y = 1:n_class)
   
   sign_mat = matrix(1, n_data, n_class)
   sign_mat[cbind(1:n_data, y)] = -1
