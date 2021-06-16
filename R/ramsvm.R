@@ -1,23 +1,8 @@
 # dyn.load("./alpha_update2.dll")
 ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, 
-                         weight = NULL, control = list(epsilon = 1e-4 * length(y) * length(unique(y)), maxit = 300))
+                         weight = NULL, epsilon = 1e-4 * length(y) * length(unique(y)), maxit = 300)
 {
   out = list()
-  
-  if (is.null(control)) {
-    control = list(epsilon = 1e-4 * length(y) * length(unique(y)), maxit = 300)
-  }
-  
-  if (is.null(control$epsilon)) {
-    control$epsilon = 1e-4 * length(y) * length(unique(y))
-  }
-  
-  if (is.null(control$maxit)) {
-    control$maxit = 300
-  }
-  
-  epsilon = control$epsilon
-  maxit = control$maxit
   
   y_temp = as.factor(y)
   y_name = levels(y_temp)
@@ -96,29 +81,9 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
   return(out)
 }
 
-ramsvm_compact = function(K, y, gamma = 0.5, lambda, control = list(epsilon = 1e-6, eig_tol_D = 0, epsilon_D = 1e-6))
+ramsvm_compact = function(K, y, gamma = 0.5, lambda, epsilon = 1e-6, eig_tol_D = 0, epsilon_D = 1e-6)
 {
   out = list()
-  
-  if (is.null(control)) {
-    control = list(epsilon = 1e-6, eig_tol_D = 0, epsilon_D = 1e-6)
-  }
-  
-  if (is.null(control$epsilon)) {
-    control$epsilon = 1e-6
-  }
-  
-  if (is.null(control$eig_tol_D)) {
-    control$eig_tol_D = 0
-  }
-  
-  if (is.null(control$epsilon_D)) {
-    control$epsilon_D = 1e-6
-  }
-  
-  epsilon = control$epsilon
-  eig_tol_D = control$eig_tol_D
-  epsilon_D = control$epsilon_D
   
   y_temp = as.factor(y)
   y_name = levels(y_temp)
