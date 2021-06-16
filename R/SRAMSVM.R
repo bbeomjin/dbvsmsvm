@@ -164,6 +164,8 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
     opt_ind = opt_ind[nrow(opt_ind), ]
     opt_param = c(lambda = lambda_seq[opt_ind[2]], kparam = kparam[opt_ind[1]])
     opt_valid_err = min(valid_err_list)
+    valid_x = NULL
+    valid_y = NULL
   }
   
   out$opt_param = opt_param
