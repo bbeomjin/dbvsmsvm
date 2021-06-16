@@ -1,4 +1,4 @@
-export(Kfold_msvm, threshold_fun, cstep_ram, thetastep_ram, gbfsmsvm, ramsvm)
+export(Kfold_ramsvm, threshold_fun, cstep.sramsvm, thetastep.sramsvm, gbfsmsvm, ramsvm)
 exportClasses("GBFSMSVM")
 exportClasses("ramsvm")
 
