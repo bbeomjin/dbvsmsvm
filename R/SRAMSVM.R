@@ -135,7 +135,7 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
         fold_err = mclapply(1:length(lambda_seq),
                             function(j) {
                               error = try({
-                                msvm_fit = ramsvm_fun(K = subK, y = train_y, gamma = gamma, lambda = lambda_sq[j], ...)
+                                msvm_fit = ramsvm_fun(K = subK, y = train_y, gamma = gamma, lambda = lambda_seq[j], ...)
                               })
                               
                               if (!inherits(error, "try-error")) {
