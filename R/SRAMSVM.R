@@ -265,7 +265,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
       valid_y = y[omit]
       
       subanova_K = make_anovaKernel(train_x, train_x, kernel_list)
-      subK = combine_kernel(subanova_K, pretheta)
+      subK = combine_kernel(subanova_K, object$theta)
       subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel_list)
       
       init_model = ramsvm_fun(K = subK, y = train_y, gamma = gamma, lambda = lambda, ...)
