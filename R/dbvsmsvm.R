@@ -1,16 +1,16 @@
 ###########################################################################
-# GBFSMSVM v1.0.0: R functions written by Beomjin Park
+# DBVSMSVM v1.0.0: R functions written by Beomjin Park
 ###########################################################################
 
-gbfsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6),
+dbvsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6),
                     thresh_Ngrid = 10, kernel = "linear", kparam = 1, scale = FALSE, criterion = "0-1", cv_type = "original", interaction = FALSE,
                     gd_scale = FALSE, gamma = 0.5, optModel = FALSE, nCores = 1, ...)
 {
   # Find a optimal lambda in first step
   cat("Step 1 : ")
-  initial_fit = Kfold_msvm(x = x, y = y, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds, lambda_seq = lambda_seq,
-                           gamma = gamma, kernel = kernel, kparam = kparam, scale = scale, criterion = criterion,
-                           optModel = FALSE, nCores = nCores, ...)
+  initial_fit = Kfold_ramsvm(x = x, y = y, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds, 
+                             lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = kparam,
+                             scale = scale, criterion = criterion, optModel = FALSE, nCores = nCores, ...)
   
   cat("\n")
   
@@ -60,7 +60,7 @@ gbfsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_se
   
   out$cv_type = select_fit$cv_type
   out$call = call
-  class(out) = "GBFSMSVM"  
+  class(out) = "dbvsmsvm"  
   return(out)  
 }
   

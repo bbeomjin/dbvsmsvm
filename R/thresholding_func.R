@@ -40,10 +40,10 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
   # }
 
   # Initial fitting
-  fit = SRAMSVM_solve(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
+  fit = ramsvm(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
   # Compute the gradient with respect to x
-  gd = gradient(alpha = fit$beta[[1]], x = x, y = y, scale = gd_scale, kernel = kernel, kparam = list(kparam))
+  gd = gradient(alpha = fit$cmat, x = x, y = y, scale = gd_scale, kernel = kernel, kparam = list(kparam))
 
   # Compute thresholding path
   gd_vec = c(0, seq(min(gd), max(gd), length.out = thresh_Ngrid))
@@ -53,13 +53,13 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
 
     fold_err = mclapply(gd_vec,
                        function(thresh) {
-                         msvm_fit = SRAMSVM_solve(x = x[, gd > thresh, drop = FALSE], y = y, gamma = gamma,
+                         msvm_fit = ramsvm(x = x[, gd > thresh, drop = FALSE], y = y, gamma = gamma,
                                                  lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
-                         pred_val = predict(msvm_fit, newx = valid_x[, gd > thresh, drop = FALSE])
+                         pred_val = predict.ramsvm(msvm_fit, newx = valid_x[, gd > thresh, drop = FALSE])
 
                          if (criterion == "0-1") {
-                           acc = sum(valid_y == pred_val[[1]][[1]]) / length(valid_y)
+                           acc = sum(valid_y == pred_val$class) / length(valid_y)
                            err = 1 - acc
                          } else {
                            err = ramsvm_hinge(valid_y, pred_val$inner_prod, k = k, gamma = gamma)
@@ -74,7 +74,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
 
   } else {
 
-    fold_list = data_split(y, nfolds, k = k)
+    fold_list = data_split(y, nfolds)
     valid_err_mat = matrix(NA, nrow = nfolds, ncol = length(gd_vec))
 
     for (i in 1:nfolds) {
@@ -89,18 +89,18 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
       fold_err = mclapply(gd_vec,
                          function(thresh) {
                            # Initial fitting RAMSVM for computing the gradients
-                           init_fit = SRAMSVM_solve(x = x_fold, y = y_fold, gamma = gamma, lambda = lambda,
+                           init_fit = ramsvm(x = x_fold, y = y_fold, gamma = gamma, lambda = lambda,
                                                     kernel = kernel, kparam = kparam, ...)
-                           init_gd = gradient(alpha = init_fit$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
+                           init_gd = gradient(alpha = init_fit$cmat, x = x_fold, y = y_fold, scale = gd_scale,
                                               kernel = kernel, kparam = list(kparam))
 
-                           msvm_fit = SRAMSVM_solve(x = x_fold[, init_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
+                           msvm_fit = ramsvm(x = x_fold[, init_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
                                                    lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
-                           pred_val = predict(msvm_fit, newx = x_valid[, init_gd > thresh, drop = FALSE])
+                           pred_val = predict.ramsvm(msvm_fit, newx = x_valid[, init_gd > thresh, drop = FALSE])
 
                            if (criterion == "0-1") {
-                             acc = sum(y_valid == pred_val[[1]][[1]]) / length(y_valid)
+                             acc = sum(y_valid == pred_val$class) / length(y_valid)
                              err = 1 - acc
                            } else {
                              err = ramsvm_hinge(y_valid, pred_val$inner_prod, k = k, gamma = gamma)
@@ -147,7 +147,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
 }
 
 
-threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("original", "osr"), criterion = c("0-1", "loss"),
+threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("original", "osr"), criterion = c("0-1", "loss"),
                                   gd_scale = FALSE, interaction = FALSE, nCores = 1, ...)
 {
   call = match.call()
@@ -158,8 +158,8 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
   y = object$y
   valid_x = object$valid_x
   valid_y = object$valid_y
-  lambda = object$opt_param$lambda
-  kparam = object$opt_param$kparam
+  lambda = object$opt_param["lambda"]
+  kparam = object$opt_param["kparam"]
   gamma = object$gamma
   kernel = object$kernel
 
@@ -174,10 +174,10 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
   p = NCOL(x)
   
   # Initial fitting
-  fit = SRAMSVM_solve(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
+  fit = ramsvm(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
   # Compute the gradient with respect to x
-  gd = gradient(alpha = fit$beta[[1]], x = x, y = y, scale = gd_scale,
+  gd = gradient(alpha = fit$cmat, x = x, y = y, scale = gd_scale,
                 kernel = kernel, kparam = list(kparam))
 
   # Compute thresholding path
@@ -188,13 +188,13 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
 
     fold_err = mclapply(gd_vec,
                         function(thresh) {
-                          msvm_fit = SRAMSVM_solve(x = x[, gd > thresh, drop = FALSE], y = y, gamma = gamma,
+                          msvm_fit = ramsvm(x = x[, gd > thresh, drop = FALSE], y = y, gamma = gamma,
                                                    lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
-                          pred_val = predict(msvm_fit, newx = valid_x[, gd > thresh, drop = FALSE])
+                          pred_val = predict.ramsvm(msvm_fit, newx = valid_x[, gd > thresh, drop = FALSE])
 
                           if (criterion == "0-1") {
-                            acc = sum(valid_y == pred_val[[1]][[1]]) / length(valid_y)
+                            acc = sum(valid_y == pred_val$class) / length(valid_y)
                             err = 1 - acc
                           } else {
                             err = ramsvm_hinge(valid_y, pred_val$inner_prod, k = k, gamma = gamma)
@@ -206,6 +206,7 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
     opt_thresh = gd_vec[opt_ind]
     opt_valid_err = min(valid_err)
     selected = as.integer(gd > opt_thresh)
+    
   } else {
 
     fold_list = object$fold_ind
@@ -221,20 +222,20 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
       x_valid = x[fold, , drop = FALSE]
       
       fold_model = object$fold_models[[i]]
-      fold_gd = gradient(alpha = fold_model$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
+      fold_gd = gradient(alpha = fold_model$cmat, x = x_fold, y = y_fold, scale = gd_scale,
                          kernel = kernel, kparam = list(kparam))
       
       fold_err = mclapply(gd_vec,
                          function(thresh) {
                            
                            # Fit model under the fold set
-                           msvm_fit = SRAMSVM_solve(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
+                           msvm_fit = ramsvm(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
                                                    lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
-                           pred_val = predict(msvm_fit, newx = x_valid[, fold_gd > thresh, drop = FALSE])
+                           pred_val = predict.ramsvm(msvm_fit, newx = x_valid[, fold_gd > thresh, drop = FALSE])
 
                            if (criterion == "0-1") {
-                             acc = sum(y_valid == pred_val[[1]][[1]]) / length(y_valid)
+                             acc = sum(y_valid == pred_val$class) / length(y_valid)
                              err = 1 - acc
                            } else {
                              err = ramsvm_hinge(y_valid, pred_val$inner_prod, k = k, gamma = gamma)
@@ -280,7 +281,7 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
       int_opt_valid_err = NULL
       int_valid_err = NULL
     } else {
-      gd_interaction = gradient_interaction(alpha = fit$beta[[1]], x = x, y = y, scale = gd_scale, 
+      gd_interaction = gradient_interaction(alpha = fit$cmat, x = x, y = y, scale = gd_scale, 
                                             kernel = kernel, kparam = list(kparam), active_set = active_set)
       temp = combn(active_set, 2)
       gd_vec_int = seq(0, max(gd_interaction), length.out = thresh_Ngrid)
@@ -297,7 +298,7 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
         
         # Pre-computed gradient
         fold_model = object$fold_models[[i]]
-        fold_gd_int = gradient_interaction(alpha = fold_model$beta[[1]], x = x_fold, y = y_fold, scale = gd_scale,
+        fold_gd_int = gradient_interaction(alpha = fold_model$cmat, x = x_fold, y = y_fold, scale = gd_scale,
                                            kernel = kernel, kparam = list(kparam), active_set = active_set)
         
         fold_err_int = mclapply(gd_vec_int,
@@ -312,15 +313,15 @@ threshold_fun.GBFSMSVM = function(object, thresh_Ngrid = 10, cv_type = c("origin
                                   
                                   
                                   # Fit model under the fold set
-                                  msvm_fit = SRAMSVM_solve(K = KK, y = y_fold, gamma = gamma,
+                                  msvm_fit = ramsvm(K = KK, y = y_fold, gamma = gamma,
                                                            lambda = lambda, kernel = kernel, kparam = kparam, ...)
                                   
                                   valid_KK = interaction_kernel(x_valid, x_fold, kernel = list(type = kernel, par = kparam), 
                                                                 active_set, temp[, fold_gd_int > thresh, drop = FALSE], clique_list)
-                                  pred_val = predict(msvm_fit, newK = valid_KK)
+                                  pred_val = predict.ramsvm(msvm_fit, newK = valid_KK)
                                   
                                   if (criterion == "0-1") {
-                                    acc = sum(y_valid == pred_val[[1]][[1]]) / length(y_valid)
+                                    acc = sum(y_valid == pred_val$class) / length(y_valid)
                                     err = 1 - acc
                                   } else {
                                     err = ramsvm_hinge(y_valid, pred_val$inner_prod, k = k, gamma = gamma)
