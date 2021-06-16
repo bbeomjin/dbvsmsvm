@@ -224,6 +224,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
   valid_y = object$valid_y
   
   ramsvm_fun = object$classifier
+  nfolds = object$nfolds
   
   # y_temp = as.factor(y)
   # y_name = levels(y_temp)
