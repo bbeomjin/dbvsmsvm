@@ -284,7 +284,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
                               
                               if (criterion == "0-1") {
                                 acc = sum(valid_y == pred_val$class) / length(valid_y)
-                                acc = 1 - acc
+                                err = 1 - acc
                               } else {
                                 # 수정 필요 valid_y가 factor나 character일 경우
                                 err = ramsvm_hinge(valid_y, pred_val$pred_value, k = k, gamma = gamma)
