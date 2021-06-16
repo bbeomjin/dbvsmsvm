@@ -113,7 +113,7 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
       # K = combine_kernel(anova_kernel, theta)
       
       ran = data_split(y, nfolds)
-      valid_err_mat = matrix(NA, nrow = length(nfolds), ncol = length(lambda_seq))
+      valid_err_mat = matrix(NA, nrow = nfolds, ncol = length(lambda_seq))
       
       for (i_cv in 1:nfolds) {
         
