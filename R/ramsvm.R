@@ -9,7 +9,7 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda,
   n_class = length(y_name)
   
   y_int = integer(length(y))
-  for(j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
+  for (j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
   if (is(y, "numeric")) {y_name = as.numeric(y_name)}
   
   n = length(y_int)
@@ -90,7 +90,7 @@ ramsvm_compact = function(K, y, gamma = 0.5, lambda, epsilon = 1e-6, eig_tol_D =
   n_class = length(y_name)
   
   y_int = integer(length(y))
-  for(j in 1:n_class) {y_int[which(y_temp %in% y_name[j])] = j}
+  for (j in 1:n_class) {y_int[which(y_temp %in% y_name[j])] = j}
   if (is(y, "numeric")) {y_name = as.numeric(y_name)}
   
   n = length(y_int)
@@ -376,7 +376,7 @@ Kfold_ramsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambd
   } else {
     # set.seed(y[1])
     # fold_list = createFolds(y, k = nfolds, list = TRUE)
-    fold_list = data_split(y, nfolds, k = k)
+    fold_list = data_split(y, nfolds)
     valid_err_mat = matrix(NA, nrow = nfolds, ncol = nrow(params))
     model_list = vector("list", nfolds)
     

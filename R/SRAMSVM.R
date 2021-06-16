@@ -181,7 +181,8 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
   out$kparam = opt_param["kparam"]
   out$scale = scale
   out$criterion = criterion
-  
+  out$nfolds = nfolds
+  out$classifier = ramsvm_fun
   if (optModel) {
     kernel_list = list(type = kernel, par = opt_param["kparam"])
     anova_K = make_anovaKernel(x, x, kernel_list)
@@ -197,156 +198,235 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
   return(out)
 }
 
-thetastep.sramsvm = function(x, y, opt_lambda, gamma = 0.5, lambda_theta, kernel,
-                         kparam = 1, criterion = "hinge",
-                         cv = FALSE, fold = 5, isCombined = TRUE,
-                         pretheta = NULL, cv_type = "original", ...)
+thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.out = 100)}, isCombined = TRUE, cv_type = "original", nCores = 1, ...)
 {
+  out = list()
+  call = match.call()
+  lambda_theta_seq = sort(as.numeric(lambda_theta_seq), decreasing = FALSE)
+  lambda = object$opt_param["lambda"]
+  criterion = object$criterion
   if((criterion != "0-1") && (criterion != "hinge"))
   {
     cat("Only 0-1 and hinge can be used as criterion!", "\n")
     return(NULL)
   }
-  y = as.integer(y)
-  k = length(unique(y))
-
-  len_lambda_theta = length(lambda_theta)
-  ERR = matrix(0, len_lambda_theta, 1)
-  HIN = matrix(0, len_lambda_theta, 1)
-
+  kernel = object$kernel
+  kparam = object$opt_param["kparam"]
+  n_class = object$n_class
+  x = object$x
+  y = object$y
+  gamma = object$gamma
+  pretheta = object$theta
+  
+  valid_x = object$valid_x
+  valid_y = object$valid_y
+  
+  ramsvm_fun = object$classifier
+  
+  # y_temp = as.factor(y)
+  # y_name = levels(y_temp)
+  # n_class = length(y_name)
+  
+  # y_int = integer(length(y))
+  # for(j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
+  # if (is(y, "numeric")) {y_name = as.numeric(y_name)}
+  
+  
   kernel_list = list(type = kernel, par = kparam)
-  x = as.matrix(x)
-  anova_kernel = make_anovaKernel(x, x, kernel_list)
-
-  if (is.null(pretheta)){
-    pretheta = matrix(1, anova_kernel$numK, 1)
-  }
-  K = combine_kernel(anova_kernel, pretheta)
+  anova_K = make_anovaKernel(x, x, kernel = kernel_list)
+  valid_anova_K = make_anovaKernel(valid_x, x, kernel_list)
   
-  # initial.model = msvm.compact(K, y, exp2.lambda, epsilon, epsilon.H)
-  initial_model = SRAMSVM_solve(K = K, y = y, gamma = gamma, lambda = opt_lambda, kernel = kernel, kparam = kparam, ...)
-  # ramsvm(x, y, lambda = exp2.lambda, kernel = "linear")@beta0
-  theta_seq = matrix(0, len_lambda_theta, anova_kernel$numK)
-
-  if (cv)  # cross-validation
-  {
-    ran = data_split(y, fold)
-    ERR_mat = HIN_mat = matrix(NA, fold, len_lambda_theta)
-    for(i.cv in 1:fold)
-    {
-      # cat("Leaving subset[", i.cv,"] out in",fold,"fold CV:","\n")
-      omit = (ran == i.cv)
-      x_train = x[!omit,]
-      y_train = y[!omit]
-
-      x_test = x[omit,]
-      y_test = y[omit]
-
-      subanova_kernel = make_anovaKernel(x_train, x_train, kernel_list)
-      subanova_kernel_test = make_anovaKernel(x_test, x_train, kernel_list)
-      subK = combine_kernel(subanova_kernel, pretheta)
+  if (is.null(object$opt_model)) {
+    K = combine_kernel(anova_K, pretheta)
+    opt_model = ramsvm_fun(K = K, y = y, gamma = gamma, lambda = lambda, ...)
+  } else {
+    opt_model = object$opt_model
+  }
+  
+  if (!is.null(valid_x) & !is.null(valid_y)) {
+    
+  } else {
+    valid_err_mat = matrix(NA, nrow = nfolds, ncol = length(lambda_theta_seq))
+    ran = data_split(y, nfolds)
+    
+    for (i_cv in 1:nfolds) {
+      omit = ran == i_cv
+      train_x = x[!omit, ]
+      train_y = y[!omit]
+      valid_x = x[omit, ]
+      valid_y = y[omit]
       
+      subanova_K = make_anovaKernel(train_x, train_x, kernel_list)
+      subK = combine_kernel(subanova_K, pretheta)
+      subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel_list)
       
-      # model.initial = msvm.compact(subK, y_train, exp2.lambda, epsilon, epsilon.H)
-      model_initial = SRAMSVM_solve(K = subK, y = y_train, gamma = gamma, lambda = opt_lambda,
-                                    kernel = kernel, kparam = kparam, ...)
-
-      row_index = 0
-      # cat("lambda_theta of length",len_lambda_theta,"|")
-
-      for(lam_theta in lambda_theta)
-      {
-        row_index = (row_index + 1)
-        model = model_initial
-        
-        # find the optimal theta vector
-        theta = find_theta(y = y_train, anova_kernel = subanova_kernel, gamma = gamma, cmat = model$beta[[1]], bvec = model$beta0[[1]],
-                           lambda = opt_lambda, lambda_theta = lam_theta)
-        # combine kernels
-        subK = combine_kernel(subanova_kernel, theta)
-        
-        # combined method
-        if(isCombined == TRUE) {
-          # model = msvm.compact(subK, y_train, exp2.lambda, epsilon, epsilon.H)
-          model = SRAMSVM_solve(K = subK, y = y_train, gamma = gamma, lambda = opt_lambda, kernel = kernel, kparam = kparam, ...)
-        }
-        subK_test = combine_kernel(subanova_kernel_test, theta)
-        
-        fit_test = predict(object = model, newK = subK_test)
-        if (criterion == "0-1") {
-          ERR[row_index] = (ERR[row_index] + (1 - (sum(y_test == fit_test[[1]][[1]]) / length(y_test))) / fold)
-          ERR_mat[i.cv, row_index] = (1 - (sum(y_test == fit_test[[1]][[1]]) / length(y_test)))
-        } else {
-          HIN[row_index] = (HIN[row_index] + ramsvm_hinge(y_test, fit_test$inner_prod, k = k, gamma = gamma) / fold)
-          HIN_mat[i.cv, row_index] = ramsvm_hinge(y_test, fit_test$inner_prod, k = k, gamma = gamma)
-        }
-
-        # cat('*')
-      }
-      # cat('|\n')
+      init_model = ramsvm_fun(K = subK, y = train_y, gamma = gamma, lambda = lambda, ...)
+      cmat = init_model$cmat
+      c0vec = init_model$c0vec
+      
+      fold_err = mclapply(1:length(lambda_theta_seq),
+                          function(j) {
+                            error = try({
+                              theta = findtheta.sramsvm(y = train_y, anova_kernel = subanova_K, gamma = gamma, cmat = cmat, c0vec = c0vec,
+                                                        lambda = lambda, lambda_theta = lambda_theta_seq[j], ...)
+                              if (isCombined) {
+                                subK = combine_kernel(anova_K, theta)
+                                init_model = ramsvm_fun(K = subK, y = y, gamma = gamma, lambda = lambda, ...)
+                              }
+                            })
+                            
+                            if (!inherits(error, "try-error")) {
+                              subK_valid = combine_kernel(subanova_K_valid, theta)
+                              pred_val = predict.ramsvm_core(init_model, newK = subK_valid)
+                              
+                              if (criterion == "0-1") {
+                                acc = sum(valid_y == pred_val$class) / length(valid_y)
+                                acc = 1 - acc
+                              } else {
+                                # 수정 필요 valid_y가 factor나 character일 경우
+                                err = ramsvm_hinge(valid_y, pred_val$pred_value, k = k, gamma = gamma)
+                              }
+                            } else {
+                              err = Inf
+                              theta = rep(0, anova_K$numK)
+                            }
+                            return(list(error = err, theta = theta))
+                          }, mc.cores = nCores)
+      valid_err_mat[i_cv, ] = sapply(fold_err, "[[", "error")
     }
-    cat("The minimum of average", fold, "fold cross-validated", criterion,
-        "loss:","\n")
+    valid_err = colMeans(valid_err_mat)
+    
+    # if the optimal values are not unique, choose the largest value
+    # assuming that lambda_theta is in increasing order.
+    if (cv_type == "original") {
+      opt_ind = max(which(valid_err == min(valid_err)))
+    } else {
+      cv_se = (apply(valid_err, 2, sd) / sqrt(nfolds))
+      opt_ind = max(which(valid_err == min(valid_err)))
+      opt_ind = max(which(valid_err <= (min(valid_err) + cv_se[opt_ind])))
+    }
+    opt_lambda_theta = lambda_theta_seq[opt_ind]
+    opt_valid_err = min(valid_err)
+    # opt_theta = findtheta.sramsvm(y = y, anova_kernel = anova_K, gamma = gamma, cmat = opt_model$cmat, c0vec = opt_model$c0vec,
+    #                               lambda = lambda, lambda_theta = opt_lambda_theta)
+    
     # generate a sequence of theta vectors
-    model = initial_model
-    row_index = 0
-    for(lam_theta in lambda_theta)
-    {
-      row_index = (row_index + 1)
-      theta = find_theta(y, anova_kernel, gamma = gamma, model$beta[[1]], model$beta0[[1]],
-                         opt_lambda, lam_theta)
-      theta_seq[row_index,] = theta
-    }
+    theta_seq_list = mclapply(1:length(lambda_theta_seq),
+                       function(j) {
+                         error = try({
+                           theta = findtheta.sramsvm(y = y, anova_kernel = anova_K, gamma = gamma, cmat = opt_model$cmat, c0vec = opt_model$c0vec,
+                                                     lambda = lambda, lambda_theta = opt_lambda_theta)
+                         })
+                         if (!inherits(error, "try-error")) {
+                           theta = rep(0, anova_K$numK)
+                         }
+                         return(theta)
+                       }, mc.cores = nCores)
+    theta_seq = do.call(cbind, theta_seq_list)
+    opt_theta = theta_seq[, opt_ind]
   }
-
-  # if the optimal values are not unique, choose the largest value
-  # assuming that lambda_theta is in increasing order.
-  if(criterion == "0-1")
-  {
-    if (cv_type == "original") {
-      optIndex = (len_lambda_theta:1)[which.min(ERR[len_lambda_theta:1])]
-    } else {
-      err_cv_se = (apply(ERR_mat, 2, sd) / sqrt(fold))
-
-      optIndex = (len_lambda_theta:1)[which.min(ERR[len_lambda_theta:1])]
-      optIndex = max(which(ERR <= (min(ERR) + err_cv_se[optIndex])))
-    }
-    cat(min(ERR),"\n")
-
-  } else if(criterion == "hinge") {
-    if (cv_type == "original") {
-      optIndex = (len_lambda_theta:1)[which.min(HIN[len_lambda_theta:1])]
-    } else {
-      hin_cv_se = (apply(HIN_mat, 2, sd) / sqrt(fold))
-
-      optIndex = (len_lambda_theta:1)[which.min(HIN[len_lambda_theta:1])]
-      optIndex = max(which(HIN <= (min(HIN) + hin_cv_se[optIndex])))
-    }
-
-    cat(min(HIN),"\n")
-  }
-  opt_lambda_theta = lambda_theta[optIndex]
-  cat("The optimal lambda_theta on log2 scale:", opt_lambda_theta,"\n")
-
-  opt_model = initial_model
-  opt_theta = find_theta(y, anova_kernel, gamma = gamma, opt_model$beta[[1]], opt_model$beta0[[1]],
-                         opt_lambda, opt_lambda_theta)
-  nsel = sum(opt_theta > 0)
-  shrinkage = mean(opt_theta)
-  cat("The number of selected features out of", anova_kernel$numK, ":", nsel, "\n")
-  cat("The average shrinkage factor:", shrinkage, "\n\n")
-
-  K = combine_kernel(anova_kernel, opt_theta)
   
-  if(isCombined == TRUE) #combined method
-  {
-    # opt_model = msvm.compact(K, y, exp2.lambda, epsilon, epsilon.H)
-    opt_model = SRAMSVM_solve(K = K, y = y, gamma = gamma, lambda = opt_lambda,
-                              kernel = kernel, kparam = kparam, ...)
-  }
-  list(lambda_theta = lambda_theta, opt_lambda_theta = opt_lambda_theta,
-       error = ERR,  hinge = HIN, opt_theta = opt_theta, model = opt_model,
-       nsel = nsel, shrinkage = shrinkage, theta_seq = theta_seq)
+  out$opt_lambda_theta = opt_lambda_theta
+  out$opt_ind = opt_ind
+  out$opt_theta = opt_theta
+  out$opt_valid_err = opt_valid_err
+  out$valid_err = valid_err
+  return(out)
 }
+
+findtheta.sramsvm = function(y, anova_kernel, gamma = 0.5, cmat, c0vec, lambda, lambda_theta) 
+{
+  if (anova_kernel$numK == 1)
+  {
+    cat("Only one kernel", "\n")
+    return(c(1))
+  }
+  
+  # standard LP form :
+  # min a^T x , subject to A1x <= a1
+  y_temp = as.factor(y)
+  y_name = levels(y_temp)
+  n_class = length(y_name)
+  
+  y_int = integer(length(y))
+  for (j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
+  if (is(y, "numeric")) {y_name = as.numeric(y_name)}
+  
+  n = length(y_int)
+  y_index = cbind(1:n, y_int)
+  
+  # convert y into ramsvm class code
+  trans_Y = Y_matrix_gen(n_class, nobs = n, y = y_int)
+  
+  # calculate the 'a' matrix 
+  a_tmp = matrix(gamma / n, nrow = n, ncol = n_class)
+  a_tmp[y_index] = (1 - gamma) / n
+  a = matrix(a_tmp, ncol = 1)
+  
+  # initialize M 
+  M = matrix(rep(0, anova_kernel$numK), ncol = 1)
+  
+  # calculate M
+  for (d in 1:anova_kernel$numK) {
+    for (j in 1:(n_class - 1)) {
+      M[d] = (M[d] + t(cmat[, j]) %*% anova_kernel$K[[d]] %*% cmat[, j])
+    }
+    M[d] = (lambda / 2 * M[d] + (lambda_theta))
+  }
+  a = rbind(a, M)
+  
+  Y_code = XI_gen(n_class)
+  
+  # calculate N matrix
+  for (d in 1:anova_kernel$numK) {
+    K = anova_kernel$K[[d]]
+    for (j in 1:n_class) {
+      if(j == 1) {
+        temp_N = matrix(rowSums(K %*% cmat * matrix(Y_code[, j], nrow = nrow(K), ncol = ncol(cmat), byrow = TRUE)))
+      } else {
+        temp_N = rbind(temp_N, matrix(rowSums(K %*% cmat * matrix(Y_code[, j], nrow = nrow(K), ncol = ncol(cmat), byrow = TRUE))))
+      }
+    }
+    if(d == 1) {
+      N = temp_N
+    } else {
+      N = cbind(N, temp_N)
+    }
+  }
+  
+  sign_mat = matrix(1, n, n_class)
+  sign_mat[y_index] = -1
+  
+  # constraints
+  # A matrix
+  I_nonzeroIndex = diag(1, n * n_class)
+  N_nonzeroIndex = as.matrix(N) * as.vector(sign_mat)
+  A_theta = cbind(matrix(0, anova_kernel$numK, n * n_class),
+                  diag(-1, anova_kernel$numK))
+  A_ineq = rbind(cbind(I_nonzeroIndex, -N_nonzeroIndex), A_theta)
+  
+  bb = rowSums(sapply(1:(n_class - 1), function(x) trans_Y[, x] * c0vec[x]))
+  bb_yi = (n_class - 1) - bb
+  bb_j = 1 + matrix(rowSums(t(Y_code) * matrix(c0vec, nrow = ncol(Y_code), ncol = nrow(Y_code), byrow = TRUE)), nrow = n, ncol = n_class, byrow = TRUE)
+  bb_j[y_index] = bb_yi
+  
+  b_nonzeroIndex = as.vector(bb_j)
+  b_ineq = rbind(as.matrix(b_nonzeroIndex), matrix(-1, anova_kernel$numK, 1))
+  
+  # constraint directions
+  const_dir = matrix(rep(">=", nrow(matrix(b_ineq))))
+  
+  # find solution by LP
+  
+  lp = lp("min", objective.in = a, const.mat = A_ineq, const.dir = const_dir,
+          const.rhs = b_ineq)$solution
+  
+  # find the theta vector only from the solution
+  theta = cbind(matrix(0, anova_kernel$numK, n * n_class),
+                diag(1, anova_kernel$numK)) %*% matrix(lp, ncol = 1)
+  return(as.vector(theta))
+}
+
+
 
 
