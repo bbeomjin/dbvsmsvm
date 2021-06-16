@@ -309,7 +309,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
     if (cv_type == "original") {
       opt_ind = max(which(valid_err == min(valid_err)))
     } else {
-      cv_se = (apply(valid_err, 2, sd) / sqrt(nfolds))
+      cv_se = (apply(valid_err_mat, 2, sd) / sqrt(nfolds))
       opt_ind = max(which(valid_err == min(valid_err)))
       opt_ind = max(which(valid_err <= (min(valid_err) + cv_se[opt_ind])))
     }
