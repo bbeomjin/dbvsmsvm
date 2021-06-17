@@ -199,7 +199,7 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
     }
     K = combine_kernel(anova_K, theta)
     opt_model = ramsvm_fun(K = K, y = y, gamma = gamma, lambda = opt_param["lambda"], ...)
-    out$opt_model
+    out$opt_model = opt_model
   }
   out$call = call
   class(out) = "sramsvm"
