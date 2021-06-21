@@ -602,9 +602,11 @@ gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", 
 data_split = function(y, nfolds, seed = length(y))
 {
   # k: the number of classes
+  y = as.factor(y)
   n_data = length(y)
-  n_class = length(unique(y))
+  n_class = length(levels(y))
   class_size = table(y)
+  classname = names(class_size)
   ran = rep(0, n_data) 
   if ((min(class_size) < nfolds) & (nfolds != n_data))
   {
@@ -615,7 +617,7 @@ data_split = function(y, nfolds, seed = length(y))
   if (min(class_size) >= nfolds) {
     set.seed(seed)
     for (j in 1:n_class) {  
-      ran[y == j] = ceiling(sample(class_size[j]) / (class_size[j] + 1) * nfolds) 
+      ran[y == classname[j]] = ceiling(sample(class_size[j]) / (class_size[j] + 1) * nfolds) 
     }
   }
   else if (nfolds == n_data) {
