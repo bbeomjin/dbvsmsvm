@@ -335,17 +335,24 @@ thetastep_m.ssvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.ou
       
       fold_err = mclapply(1:length(lambda_theta_seq),
                           function(j) {
-                            theta_mat = findtheta_m.ssvm(y = train_y, x = train_x, models = init_model$models, 
-                                                         lambda = lambda, lambda_theta = lambda_theta_seq[j], kernel = kernel, kparam = kparam, 
-                                                         type = type)
-                            
-                            if (isCombined) {
-                              init_model = cstep_m_core.ssvm(x = train_x, y = train_y, lambda = lambda, theta_mat = theta_mat, 
-                                                             kernel = kernel, kparam = kparam, type = type, ...)
+                            error = try({
+                              theta_mat = findtheta_m.ssvm(y = train_y, x = train_x, models = init_model$models, 
+                                                           lambda = lambda, lambda_theta = lambda_theta_seq[j], kernel = kernel, kparam = kparam, 
+                                                           type = type)
+                              
+                              if (isCombined) {
+                                init_model = cstep_m_core.ssvm(x = train_x, y = train_y, lambda = lambda, theta_mat = theta_mat, 
+                                                               kernel = kernel, kparam = kparam, type = type, ...)
+                              }
+                            })
+                            if (!inherits(error, "try-error")) {
+                              pred_val = predict.cstep_m_core(init_model, valid_x, theta_mat = theta_mat)
+                              acc = sum(pred_val == valid_y) / length(valid_y)
+                              err = 1 - acc
+                            } else {
+                              err = Inf
+                              theta_mat[] = 0
                             }
-                            pred_val = predict.cstep_m_core(init_model, valid_x, theta_mat = theta_mat)
-                            acc = sum(pred_val == valid_y) / length(valid_y)
-                            err = 1 - acc
                             return(list(error = err, theta_mat = theta_mat))
                           }, mc.cores = nCores)
       
