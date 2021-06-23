@@ -13,6 +13,7 @@ import("quadprog")
 import("lpSolve")
 import("parallel")
 import("igraph")
+import("mlbench")
 
 S3method(threshold_fun, default)
 S3method(threshold_fun, dbvsmsvm)
