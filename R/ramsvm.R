@@ -409,7 +409,8 @@ Kfold_ramsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambd
       model_list[[i]] = lapply(fold_err, "[[", "fit_model")
     }
     valid_err = colMeans(valid_err_mat, na.rm = TRUE)
-    opt_ind = max(which(valid_err == min(valid_err)))
+    # opt_ind = max(which(valid_err == min(valid_err)))
+	opt_ind = min(which(valid_err == min(valid_err)))
     opt_param = params[opt_ind, ]
     opt_valid_err = min(valid_err)
   }
