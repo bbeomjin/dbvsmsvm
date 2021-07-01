@@ -462,7 +462,7 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   n = length(y)
   k = length(unique(y))
   
-  K = kernelMat(x, y, kernel = kernel, kparam = kparam)
+  K = kernelMat(x, x, kernel = kernel, kparam = kparam)
   if (kernel == "linear") {
     if (scale) {
 	  # scale_const = sapply(1:NCOL(alpha), FUN = function(i) sum(crossprod(alpha[, i], x)^2))
