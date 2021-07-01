@@ -464,13 +464,18 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   k = length(unique(y))
   
   if (kernel == "linear") {
-    if (scale) {scale_const = sapply(1:NCOL(alpha), FUN = function(i) sum(crossprod(alpha[, i], x)^2))}
+    if (scale) {
+	  # scale_const = sapply(1:NCOL(alpha), FUN = function(i) sum(crossprod(alpha[, i], x)^2))
+	  K = x %*% t(x) + 1
+	  scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
+	}
   }
   
   if (kernel == "poly") {
     if (scale) {
       poly = do.call(polydot, kparam)
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], kernelMatrix(poly, x)) %*% alpha[, i]))
+	  K = kernelMatrix(poly, x) + 1
+      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
     }
   }
   
@@ -478,7 +483,8 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
     names(kparam) = "sigma"
     if (scale) {
       rbf = do.call(rbfdot, kparam)
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], kernelMatrix(rbf, x)) %*% alpha[, i]))
+	  K = kernelMatrix(rbf, x) + 1
+      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
       # scale_const = drop(t(alpha) %*% kernelMatrix(rbf, X) %*% alpha)
       # system.time((a = sum(sapply(1:n, FUN = function(i) K_rbf(alpha, X, X[i, ], sigma = sigma)) * alpha)))
     }
@@ -486,7 +492,8 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   
   if (kernel == "spline") {
     if (scale) {
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], kernelMatrix_spline(x, x)) %*% alpha[, i]))
+	  K = kernelMatrix_spline(x, x) + 
+      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
     }
   }
   
