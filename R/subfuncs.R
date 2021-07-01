@@ -355,9 +355,9 @@ kernelMatrix_spline = function(X, Y) {
 }
 
 
-drbf = function(X, xp, kernel_par = list(sigma = NULL))
+drbf = function(X, xp, kparam = 1)
 {
-  gamma = kernel_par$sigma
+  gamma = kparam
   # diff_mat = sweep(X, xp, MARGIN = 2)
   # diff_mat = t(t(X) - xp)
   np = dim(X)
@@ -390,9 +390,9 @@ drbf = function(X, xp, kernel_par = list(sigma = NULL))
 # }
 
 
-ddrbf = function(X, xp, kernel_par = list(sigma = NULL), comb_set)
+ddrbf = function(X, xp, kparam = 1, comb_set)
 {
-  gamma = kernel_par$sigma
+  gamma = kparam
   np = dim(X)
   diff_mat = X - matrix(xp, nrow = np[1], ncol = np[2], byrow = TRUE)
   # diff_mat2 = diff_mat[, comb_set]
@@ -407,10 +407,9 @@ ddrbf = function(X, xp, kernel_par = list(sigma = NULL), comb_set)
 
 
 
-dlinear = function(X, xp, kernel_par = list())
+dlinear = function(X, xp, kparam = 1)
 {
-  tmp = X
-  return(tmp)
+  return(X)
 }
 
 # dlinear_mul = function(alpha, X, xp, kernel_par = list())
@@ -418,12 +417,12 @@ dlinear = function(X, xp, kernel_par = list())
 #   return(drop(crossprod(alpha, X)))
 # }
 
-dpoly = function(alpha, X, xp, kernel_par = list(degree = NULL))
+dpoly = function(alpha, X, xp, kparam = 1)
 {
   # degree = kernel_par$degree
   # scale = kernel_par$scale
   # offset = kernel_par$offset
-  degree = kernel_par[[1]]
+  degree = kparam
   scale = 1
   offset = 0
   tmp = degree * (scale * drop(X %*% xp) + offset)^{degree - 1} * scale * X
@@ -458,32 +457,27 @@ ddspline = function(x, y)
 # }
 
 gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "radial", "spline", "anova_radial"),
-                  kparam = list())
+                    kparam = 1)
 {
   n = length(y)
   k = length(unique(y))
   
+  K = kernelMat(x, y, kernel = kernel, kparam = kparam)
   if (kernel == "linear") {
     if (scale) {
 	  # scale_const = sapply(1:NCOL(alpha), FUN = function(i) sum(crossprod(alpha[, i], x)^2))
-	  K = x %*% t(x) + 1
 	  scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
 	}
   }
   
   if (kernel == "poly") {
     if (scale) {
-      poly = do.call(polydot, kparam)
-	  K = kernelMatrix(poly, x) + 1
       scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
     }
   }
   
   if ((kernel == "radial") | (kernel == "anova_radial")) {
-    names(kparam) = "sigma"
     if (scale) {
-      rbf = do.call(rbfdot, kparam)
-	  K = kernelMatrix(rbf, x) + 1
       scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
       # scale_const = drop(t(alpha) %*% kernelMatrix(rbf, X) %*% alpha)
       # system.time((a = sum(sapply(1:n, FUN = function(i) K_rbf(alpha, X, X[i, ], sigma = sigma)) * alpha)))
@@ -492,7 +486,6 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   
   if (kernel == "spline") {
     if (scale) {
-	  K = kernelMatrix_spline(x, x) + 
       scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
     }
   }
@@ -502,7 +495,7 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
                    poly = dpoly,
                    radial = drbf,
                    spline = dspline,
-				   anova_radial = drbf)
+				           anova_radial = drbf)
   
   
   W_mat = XI_gen(k)
