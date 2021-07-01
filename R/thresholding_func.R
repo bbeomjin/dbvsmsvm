@@ -43,7 +43,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
   fit = ramsvm(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
   # Compute the gradient with respect to x
-  gd = gradient(alpha = fit$cmat, x = x, y = y, scale = gd_scale, kernel = kernel, kparam = list(kparam))
+  gd = gradient(alpha = fit$cmat, x = x, y = y, scale = gd_scale, kernel = kernel, kparam = kparam)
 
   # Compute thresholding path
   gd_vec = c(0, seq(min(gd), max(gd), length.out = thresh_Ngrid))
@@ -85,15 +85,16 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
       x_fold = x[-fold, , drop = FALSE]
       y_valid = y[fold]
       x_valid = x[fold, , drop = FALSE]
-
+      
+      # Initial fitting RAMSVM for computing the gradients
+      init_fit = ramsvm(x = x_fold, y = y_fold, gamma = gamma, lambda = lambda,
+                        kernel = kernel, kparam = kparam, ...)
+      
+      init_gd = gradient(alpha = init_fit$cmat, x = x_fold, y = y_fold, scale = gd_scale,
+                         kernel = kernel, kparam = kparam)
+      
       fold_err = mclapply(gd_vec,
                          function(thresh) {
-                           # Initial fitting RAMSVM for computing the gradients
-                           init_fit = ramsvm(x = x_fold, y = y_fold, gamma = gamma, lambda = lambda,
-                                                    kernel = kernel, kparam = kparam, ...)
-                           init_gd = gradient(alpha = init_fit$cmat, x = x_fold, y = y_fold, scale = gd_scale,
-                                              kernel = kernel, kparam = list(kparam))
-
                            msvm_fit = ramsvm(x = x_fold[, init_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
                                                    lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
@@ -177,8 +178,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
   fit = ramsvm(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
   # Compute the gradient with respect to x
-  gd = gradient(alpha = fit$cmat, x = x, y = y, scale = gd_scale,
-                kernel = kernel, kparam = list(kparam))
+  gd = gradient(alpha = fit$cmat, x = x, y = y, scale = gd_scale, kernel = kernel, kparam = kparam)
 
   # Compute thresholding path
   gd_vec = c(0, seq(min(gd), max(gd), length.out = thresh_Ngrid))
@@ -212,6 +212,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
     fold_list = object$fold_ind
     nfolds = length(unique(fold_list))
     valid_err_mat = matrix(NA, nrow = nfolds, ncol = length(gd_vec))
+    
     for (i in 1:nfolds) {
       cat(nfolds, "- fold CV :", i / nfolds * 100, "%", "\r")
       # fold = fold_list[[i]]
@@ -223,11 +224,10 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       
       fold_model = object$fold_models[[i]]
       fold_gd = gradient(alpha = fold_model$cmat, x = x_fold, y = y_fold, scale = gd_scale,
-                         kernel = kernel, kparam = list(kparam))
+                         kernel = kernel, kparam = kparam)
       
       fold_err = mclapply(gd_vec,
                          function(thresh) {
-                           
                            # Fit model under the fold set
                            msvm_fit = ramsvm(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
                                                    lambda = lambda, kernel = kernel, kparam = kparam, ...)
@@ -282,7 +282,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       int_valid_err = NULL
     } else {
       gd_interaction = gradient_interaction(alpha = fit$cmat, x = x, y = y, scale = gd_scale, 
-                                            kernel = kernel, kparam = list(kparam), active_set = active_set)
+                                            kernel = kernel, kparam = kparam, active_set = active_set)
       temp = combn(active_set, 2)
       gd_vec_int = seq(0, max(gd_interaction), length.out = thresh_Ngrid)
       # gd_vec_int = gd_vec_int[-c(length(gd_vec_int))]
@@ -299,7 +299,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
         # Pre-computed gradient
         fold_model = object$fold_models[[i]]
         fold_gd_int = gradient_interaction(alpha = fold_model$cmat, x = x_fold, y = y_fold, scale = gd_scale,
-                                           kernel = kernel, kparam = list(kparam), active_set = active_set)
+                                           kernel = kernel, kparam = kparam, active_set = active_set)
         
         fold_err_int = mclapply(gd_vec_int,
                                 function(thresh) {
