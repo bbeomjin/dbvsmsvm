@@ -96,7 +96,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
       fold_err = mclapply(gd_vec,
                          function(thresh) {
                            msvm_fit = ramsvm(x = x_fold[, init_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
-                                                   lambda = lambda, kernel = kernel, kparam = kparam, ...)
+                                             lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
                            pred_val = predict.ramsvm(msvm_fit, newx = x_valid[, init_gd > thresh, drop = FALSE])
 
@@ -223,6 +223,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       x_valid = x[fold, , drop = FALSE]
       
       fold_model = object$fold_models[[i]]
+      print(sum(fold_model$x != x_fold)) # just test
       fold_gd = gradient(alpha = fold_model$cmat, x = x_fold, y = y_fold, scale = gd_scale,
                          kernel = kernel, kparam = kparam)
       
@@ -230,7 +231,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
                          function(thresh) {
                            # Fit model under the fold set
                            msvm_fit = ramsvm(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
-                                                   lambda = lambda, kernel = kernel, kparam = kparam, ...)
+                                             lambda = lambda, kernel = kernel, kparam = kparam, ...)
 
                            pred_val = predict.ramsvm(msvm_fit, newx = x_valid[, fold_gd > thresh, drop = FALSE])
 

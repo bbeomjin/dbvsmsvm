@@ -93,7 +93,7 @@ svm = function(x = NULL, y, lambda, kernel, kparam, scale = FALSE, epsilon = 1e-
     scaled = attr(x, "scaled:scale")
   }
   
-  K = kernelMat(x, x, kernel = kernel, kparam = kparam)
+  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam)
   solutions = svm_compact(K = K, y = y, lambda = lambda, epsilon = epsilon, epsilon_D = epsilon_D)
   
   out$x = x
@@ -134,7 +134,7 @@ predict.svm = function(object, newx = NULL, newK = NULL)
   }
   
   if (is.null(newK)) {
-    newK = kernelMat(newx, object$x, kernel = object$kernel, kparam = object$kparam)
+    newK = kernelMatrix(newx, object$x, kernel = object$kernel, kparam = object$kparam)
   }
   
   pred_y = object$bias + as.vector(newK %*% (object$y * object$alpha))

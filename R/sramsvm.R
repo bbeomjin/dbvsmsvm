@@ -109,8 +109,7 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
     
     for (i in 1:length(kparam)) {
       par = kparam[i]
-      kernel_list = list(type = kernel, par = par)
-      # anova_kernel = make_anovaKernel(x, x, kernel_list)
+      # anova_kernel = make_anovaKernel(x, x, kernel, par)
       # 
       # if (is.null(theta)) {
       #   theta = rep(1, anova_kernel$numK)
@@ -129,13 +128,13 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
         valid_x = x[omit, ]
         valid_y = y[omit]
         
-        subanova_K = make_anovaKernel(train_x, train_x, kernel_list)
+        subanova_K = make_anovaKernel(train_x, train_x, kernel, par)
         if (is.null(theta)) {
           theta = rep(1, subanova_K$numK)
         }
         subK = combine_kernel(subanova_K, theta)
         
-        subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel_list)
+        subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel, par)
         subK_valid = combine_kernel(subanova_K_valid, theta)
         
         fold_err = mclapply(1:length(lambda_seq),
@@ -192,8 +191,7 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
   out$nfolds = nfolds
   out$classifier = ramsvm_fun
   if (optModel) {
-    kernel_list = list(type = kernel, par = opt_param["kparam"])
-    anova_K = make_anovaKernel(x, x, kernel_list)
+    anova_K = make_anovaKernel(x, x, kernel, opt_param["kparam"])
     if (is.null(theta)) {
       theta = rep(1, anova_K$numK)
     }
@@ -239,10 +237,8 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
   # for(j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
   # if (is(y, "numeric")) {y_name = as.numeric(y_name)}
   
-  
-  kernel_list = list(type = kernel, par = kparam)
-  anova_K = make_anovaKernel(x, x, kernel = kernel_list)
-  # valid_anova_K = make_anovaKernel(valid_x, x, kernel_list)
+  anova_K = make_anovaKernel(x, x, kernel, kparam)
+  # valid_anova_K = make_anovaKernel(valid_x, x, kernel, kparam)
   
   if (is.null(object$opt_model)) {
     K = combine_kernel(anova_K, object$theta)
@@ -264,9 +260,9 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
       valid_x = x[omit, ]
       valid_y = y[omit]
       
-      subanova_K = make_anovaKernel(train_x, train_x, kernel_list)
+      subanova_K = make_anovaKernel(train_x, train_x, kernel, kparam)
       subK = combine_kernel(subanova_K, object$theta)
-      subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel_list)
+      subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel, kparam)
       
       init_model = ramsvm_fun(K = subK, y = train_y, gamma = gamma, lambda = lambda, ...)
       cmat = init_model$cmat

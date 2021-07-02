@@ -1,26 +1,45 @@
-# require(igraph)
-main_kernel = function(x, y, kernel)
-{
+kernelMatrix = function(x, y, kernel = "radial", kparam = 1.0) {
+  
   x = as.matrix(x)
   y = as.matrix(y)
-  if (kernel$type == "linear")
-    K = (x %*% t(y))
-  if (kernel$type == "poly")
-    K = (1 + x %*% t(y))^kernel$par
-  if (kernel$type == "radial" | kernel$type == "radial2")
-  {
-    # normx = drop((x^2) %*% rep(1.0, ncol(x)))
+  p = ncol(x)
+  
+  if (NCOL(x) == 0) {
+    x = matrix(1, nrow = nrow(x), ncol = 1)
+  }
+  
+  if (NCOL(y) == 0) {
+    y = matrix(1, nrow = nrow(y), ncol = 1)
+  }
+  
+  if (kernel == "poly") {
+    K = (x %*% t(y) + 1.0)^kparam
+  } else if(kernel == "radial" | kernel == "radial2") {
     normx = rowSums(x^2)
-    # normy = drop((y^2) %*% rep(1.0, ncol(y)))
     normy = rowSums(y^2)
     temp = x %*% t(y)
     temp = (-2.0 * temp) + outer(normx, rep(1.0, nrow(y)), "*") + outer(rep(1.0, nrow(x)), normy, "*")
-    K = exp(-temp * kernel$par)
-    # K_temp = kernlab::kernelMatrix(rbfdot(sigma = kernel$par), as.matrix(x), as.matrix(y))
+    K = exp(-temp * kparam)
+    # obj = kernelMatrix(rbfdot(sigma = kparam), x, y)
+  } else if (kernel == "spline") {
+    K = 0
+    for (d in 1:p) {
+      K_temp = spline_kernel(x[, d, drop = FALSE], y[, d, drop = FALSE])
+      K = K + K_temp$K1 + K_temp$K2
+    }
+  } else if (kernel == "linear") {
+    K = tcrossprod(x, y)
+  } else if (kernel == "anova_radial") {
+    K = 0
+    for (d in 1:p) {
+      A = x[, d, drop = FALSE]
+      B = y[, d, drop = FALSE]
+      K_temp = kernelMatrix(A, B, kernel = "radial", kparam = kparam)
+      K = K + K_temp
+    }
+  } else {
+    K = NULL
   }
-  # if (sym) {
-  #   K = (K + t(K)) / 2
-  # }
   return(K)
 }
 
@@ -41,121 +60,107 @@ spline_kernel = function(x, y)
 }
 
 
-make_anovaKernel = function(x, y, kernel)
+make_anovaKernel = function(x, y, kernel, kparam)
 {
-  if (!is.matrix(x))  # degenerate case: x is a row vector  
-  { x = t(as.matrix(x))}
-  else { x = as.matrix(x)}
-  
+  x = as.matrix(x)
   y = as.matrix(y)
   dimx = ncol(x)
   
   # calculate anova kernels for main effects
-  if(kernel$type == "spline")
-  {
+  if (kernel == "spline") {
     # assign the number of anova kernels
-    numK = 2*dimx
+    numK = 2 * dimx
     # list of kernel matrices
-    anova_kernel = vector(mode="list", numK)
+    anova_kernel = vector(mode = "list", numK)
     # list of kernel coordinate indices
-    kernelCoord = vector(mode="list", numK)
+    kernelCoord = vector(mode = "list", numK)
     index = 0
-    for (d in 1:dimx)
-    {
+    
+    for (d in 1:dimx) {
       index = index + 1
-      A = as.matrix(x[, d])
-      B = as.matrix(y[, d])
+      A = x[, d, drop = FALSE]
+      B = y[, d, drop = FALSE]
       K_temp = spline_kernel(A, B)
       anova_kernel[[index]] = K_temp$K1
       kernelCoord[[index]] = paste("x", d, " linear", sep="")
       index = index + 1
       anova_kernel[[index]] = K_temp$K2
       kernelCoord[[index]] = paste("x", d, " smooth", sep="")
-    }  
-  }
-  else if (kernel$type == 'spline2')
-  {
-    numK = (2*dimx) + (2*dimx*(2*dimx-1)/2 - dimx)
-    anova_kernel = vector(mode="list", numK)
-    kernelCoord = vector(mode="list", numK)
+    } 
+    
+  } else if (kernel$type == 'spline2') {
+    numK = (2 * dimx) + (2 * dimx * (2 * dimx - 1) / 2 - dimx)
+    anova_kernel = vector(mode = "list", numK)
+    kernelCoord = vector(mode = "list", numK)
     index = 0
     # main effects
-    for(d in 1:dimx)
-    {
+    for (d in 1:dimx) {
       index = index + 1
-      A = as.matrix(x[, d])
-      B = as.matrix(y[, d])
+      A = x[, d, drop = FALSE]
+      B = y[, d, drop = FALSE]
       K_temp = spline_kernel(A, B)
       anova_kernel[[index]] = K_temp$K1
-      kernelCoord[[index]] = paste("x", d, " linear", sep="")
+      kernelCoord[[index]] = paste("x", d, " linear", sep = "")
       index = index + 1
       anova_kernel[[index]] = K_temp$K2
-      kernelCoord[[index]] = paste("x", d, " smooth", sep="")
+      kernelCoord[[index]] = paste("x", d, " smooth", sep = "")
     }  
     # two-way interactions
-    for (i in 1:(dimx-1))
-    {
-      for (j in (i+1):dimx)
-      {
+    for (i in 1:(dimx - 1)) {
+      for (j in (i + 1):dimx) {
         index = index + 1
-        A.linear = as.matrix(anova_kernel[[2*i-1]])
-        A.smooth = as.matrix(anova_kernel[[2*i]])
-        B.linear = as.matrix(anova_kernel[[2*j-1]])
-        B.smooth = as.matrix(anova_kernel[[2*j]])            
-        anova_kernel[[index]] = A.linear*B.linear
-        kernelCoord[[index]] = paste("x", i, " linear,", " x", j, " linear", sep="")
+        A_linear = as.matrix(anova_kernel[[2 * i - 1]])
+        A_smooth = as.matrix(anova_kernel[[2 * i]])
+        B_linear = as.matrix(anova_kernel[[2 * j - 1]])
+        B_smooth = as.matrix(anova_kernel[[2 * j]])            
+        anova_kernel[[index]] = A_linear * B_linear
+        kernelCoord[[index]] = paste("x", i, " linear,", " x", j, " linear", sep = "")
         index = index + 1
-        anova_kernel[[index]] = A.linear*B.smooth
-        kernelCoord[[index]] = paste("x", i, " linear,", " x", j, " smooth", sep="")
+        anova_kernel[[index]] = A_linear * B_smooth
+        kernelCoord[[index]] = paste("x", i, " linear,", " x", j, " smooth", sep = "")
         index = index + 1
-        anova_kernel[[index]] = A.smooth*B.linear
-        kernelCoord[[index]] = paste("x", i, " smooth,", " x", j, " linear", sep="")
+        anova_kernel[[index]] = A_smooth * B_linear
+        kernelCoord[[index]] = paste("x", i, " smooth,", " x", j, " linear", sep = "")
         index = index + 1
-        anova_kernel[[index]] = A.smooth*B.smooth
-        kernelCoord[[index]] = paste("x", i, " smooth,", " x", j, " smooth", sep="")
+        anova_kernel[[index]] = A_smooth * B_smooth
+        kernelCoord[[index]] = paste("x", i, " smooth,", " x", j, " smooth", sep = "")
       }
     }
-  }
-  else if (kernel$type == "spline-t")
-  {
+  } else if (kernel == "spline-t") {
     numK = dimx
     anova_kernel = vector(mode = "list", numK)
     kernelCoord = vector(mode = "list", numK)
     index = 0
-    for (d in 1:dimx)
-    {
+    for (d in 1:dimx) {
       index = index + 1
-      A = as.matrix(x[, d])
-      B = as.matrix(y[, d])
+      A = x[, d, drop = FALSE]
+      B = y[, d, drop = FALSE]
       K_temp = spline_kernel(A, B)
       anova_kernel[[index]] = (K_temp$K1 + K_temp$K2)
-      kernelCoord[[index]] = paste("x", d, sep="")
+      kernelCoord[[index]] = paste("x", d, sep = "")
     }
-  }
-  else if (kernel$type == 'spline-t2')
-  {
+  } else if (kernel$type == 'spline-t2') {
     numK = dimx + dimx * (dimx - 1) / 2
     anova_kernel = vector(mode = "list", numK)
     kernelCoord = vector(mode = "list", numK)
     index = 0
-    for (d in 1:dimx)
-    {
+    
+    for (d in 1:dimx) {
       index = index + 1
-      A = as.matrix(x[, d])
-      B = as.matrix(y[, d])
+      A = x[, d, drop = FALSE]
+      B = y[, d, drop = FALSE]
       K_temp = spline_kernel(A, B)
       anova_kernel[[index]] = (K_temp$K1 + K_temp$K2)
-      kernelCoord[[index]] = paste("x", d, sep="")
+      kernelCoord[[index]] = paste("x", d, sep = "")
     }
-    for (i in 1:(dimx - 1))
-    {
-      for (j in (i + 1):dimx)
-      {
+    
+    for (i in 1:(dimx - 1)) {
+      for (j in (i + 1):dimx) {
         index = index + 1
         A = anova_kernel[[i]]
         B = anova_kernel[[j]]
         anova_kernel[[index]] = A * B
-        kernelCoord[[index]] = paste("x", i, " x", j, sep="")
+        kernelCoord[[index]] = paste("x", i, " x", j, sep = "")
       }
     }
   } else if (kernel$type == "radial2") {
@@ -163,45 +168,42 @@ make_anovaKernel = function(x, y, kernel)
     anova_kernel = vector(mode = "list", numK)
     kernelCoord = vector(mode = "list", numK)
     index = 0
-    for (d in 1:dimx)
-    {
+    
+    for (d in 1:dimx) {
       index = index + 1
-      A = as.matrix(x[, d])
-      B = as.matrix(y[, d])
-      anova_kernel[[index]] = main_kernel(A, B, kernel)
+      A = x[, d, drop = FALSE]
+      B = y[, d, drop = FALSE]
+      anova_kernel[[index]] = kernelMatrix(A, B, kernel, kparam)
       kernelCoord[[index]] = paste("x", d, sep = "")
     }
-    for (i in 1:(dimx - 1))
-    {
-      for (j in (i + 1):dimx)
-      {
+    
+    for (i in 1:(dimx - 1)) {
+      for (j in (i + 1):dimx) {
         index = index + 1
         A = anova_kernel[[i]]
         B = anova_kernel[[j]]
         anova_kernel[[index]] = A * B
-        kernelCoord[[index]] = paste("x", i, " x", j, sep="")
+        kernelCoord[[index]] = paste("x", i, " x", j, sep = "")
       }
     }
   } else {
     numK = dimx
     anova_kernel = vector(mode = "list", numK)
     kernelCoord = vector(mode = "list", numK)
-    for (d in 1:dimx)
-    {
-      A = as.matrix(x[, d])
-      B = as.matrix(y[, d])
-      anova_kernel[[d]] = main_kernel(A, B, kernel)
+    for (d in 1:dimx) {
+      A = x[, d, drop = FALSE]
+      B = y[, d, drop = FALSE]
+      anova_kernel[[d]] = kernelMatrix(A, B, kernel, kparam)
       kernelCoord[[d]] = paste("x", d, sep = "")
     }
   }
-  list(K = anova_kernel, coord = kernelCoord, numK = numK, kernel = kernel)
+  return(list(K = anova_kernel, coord = kernelCoord, numK = numK, kernel = kernel, kparam = kparam))
 }
 
 combine_kernel = function(anova_kernel, theta = rep(1, anova_kernel$numK))
 {
   K = 0
-  for (d in 1:anova_kernel$numK)
-  {
+  for (d in 1:anova_kernel$numK) {
     K = (K + theta[d] * anova_kernel$K[[d]])
   }
   return(K)
@@ -235,14 +237,10 @@ find_intercept = function(y, K, gamma = 0.5, cmat, lambda)
   sign_vec = as.vector(sign_mat)
   # constraints
   
-  for (j in 1:n_class)
-  {
-    if(j == 1)
-    {
+  for (j in 1:n_class) {
+    if (j == 1) {
       temp_N = matrix(rowSums(K %*% cmat * matrix(Y_code[j, ], nrow = nrow(K), ncol = ncol(cmat), byrow = TRUE)))
-    } 
-    else 
-    {
+    } else {
       temp_N = rbind(temp_N, matrix(rowSums(K %*% cmat * matrix(Y_code[j, ], nrow = nrow(K), ncol = ncol(cmat), byrow = TRUE))))
     }
     N = temp_N
@@ -324,34 +322,6 @@ ramsvm_hinge = function(y, fit, k, gamma = 0.5)
   hinge_mj[hinge_mj < 0] = 0
   hinge_loss = 1 / n * sum((1 - gamma) * colSums(hinge_mj) + gamma * hinge_j)
   return(hinge_loss)
-}
-
-
-kernelMatrix_spline = function(X, Y) {
-  K = 0
-  p = ncol(X)
-  spline_kernel = function(x, u)
-  {
-    x = as.matrix(x)
-    u = as.matrix(u)
-    K1x = (x - 1/2)
-    K1u = (u - 1/2)
-    K2x = (K1x^2 - 1/12) / 2
-    K2u = (K1u^2 - 1/12) / 2
-    ax = x %x% matrix(1, 1, nrow(u)) 
-    au = u %x% matrix(1, 1, nrow(x))
-    b = abs(ax - t(au))
-    K1 = K1x %x% t(K1u)
-    K2 = K2x %x% t(K2u) - ((b - 1 / 2)^4 - (b - 1 / 2)^2 / 2 + 7 / 240) / 24
-    return(list(K1 = K1, K2 = K2))
-  }
-  
-  for(d in 1:p)
-  {
-    K_temp = spline_kernel(as.matrix(X[, d]), as.matrix(Y[, d]))
-    K = K + K_temp$K1 + K_temp$K2
-  }
-  return(K)
 }
 
 
@@ -626,66 +596,7 @@ data_split = function(y, nfolds, seed = length(y))
   return(ran)
 }
 
-kernelMat = function(x, y, kernel = "radial", kparam = 1.0) {
-  
-  if (NCOL(x) == 0) {
-    x = matrix(1, nrow = nrow(x), ncol = 1)
-  }
-  
-  if (NCOL(y) == 0) {
-    y = matrix(1, nrow = nrow(y), ncol = 1)
-  }
-  
-  if( kernel == "poly" ) {
-    obj = (x %*% t(y) + 1.0)^kparam
-  } else if(kernel == "radial" | kernel == "radial2") {
-    normx = rowSums(x^2)
-    # normy = drop((y^2) %*% rep(1.0, ncol(y)))
-    normy = rowSums(y^2)
-    temp = x %*% t(y)
-    temp = (-2.0 * temp) + outer(normx, rep(1.0, nrow(y)), "*") + outer(rep(1.0, nrow(x)), normy, "*")
-    obj = exp(-temp * kparam)
-    # obj = kernelMatrix(rbfdot(sigma = kparam), x, y)
-  } else if (kernel == "spline") {
-    K = 0
-    spline_kernel = function(x, u)
-    {
-      x = as.matrix(x)
-      u = as.matrix(u)
-      K1x = (x - 1/2)
-      K1u = (u - 1/2)
-      K2x = (K1x^2 - 1/12) / 2
-      K2u = (K1u^2 - 1/12) / 2
-      ax = x %x% matrix(1, 1, nrow(u)) 
-      au = u %x% matrix(1, 1, nrow(x))
-      b = abs(ax - t(au))
-      K1 = K1x %x% t(K1u)
-      K2 = K2x %x% t(K2u) - ((b - 1 / 2)^4 - (b - 1 / 2)^2 / 2 + 7 / 240) / 24
-      return(list(K1 = K1, K2 = K2))
-    }
-    for(d in 1:p)
-    {
-      K_temp = spline_kernel(as.matrix(x[, d]), as.matrix(y[, d]))
-      K = K + K_temp$K1 + K_temp$K2
-    }
-    obj = K
-  } else if (kernel == "linear") {
-    obj = tcrossprod(x, y)
-  } else if (kernel == "anova_radial") {
-      K = 0
-      for (d in 1:NCOL(x))
-      {
-        A = as.matrix(x[,d])
-        B = as.matrix(y[,d])
-        K_temp = main_kernel(A, B, kernel = list(type = "radial", par = kparam))
-        K = K + K_temp
-      }
-	obj = K
-  } else {
-    obj = NULL
-  }
-  return(obj)
-}
+
 
 interaction_svmfs = function(main_effect, interaction) 
 {
@@ -713,7 +624,7 @@ interaction_graph = function(comb, p, min = 3)
   return(cliques_list)
 }
 
-interaction_kernel = function(x, u, kernel, active_set, interaction_set, clique_list)
+interaction_kernel = function(x, u, kernel, kparam, active_set, interaction_set, clique_list)
 {
   if (!is.matrix(x)) {
     x = as.matrix(x)
@@ -723,16 +634,16 @@ interaction_kernel = function(x, u, kernel, active_set, interaction_set, clique_
   u = as.matrix(u)
   dimx = ncol(x)
   
-  scaled_kernel = function(x, u, kernel, active_set, index)
+  scaled_kernel = function(x, u, kernel, kparam, active_set, index)
   {
     X1 = matrix(rowSums(x[, active_set, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u))
     U1 = matrix(rowSums(u[, active_set, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u), byrow = TRUE)
     X2 = matrix(rowSums(x[, index, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u))
     U2 = matrix(rowSums(u[, index, drop = FALSE]^2), nrow = nrow(x), ncol = nrow(u), byrow = TRUE)
-    K = exp(-kernel$par * ((X1 + U1) - (X2 + U2)))
-    K1 = exp(-kernel$par * (X1 + U1))
-    K2 = exp(-kernel$par * (X2 + U2))
-    K_mat = main_kernel(x[, index, drop = FALSE], u[, index, drop = FALSE], kernel)
+    K = exp(-kparam * ((X1 + U1) - (X2 + U2)))
+    K1 = exp(-kparam * (X1 + U1))
+    K2 = exp(-kparam * (X2 + U2))
+    K_mat = kernelMatrix(x[, index, drop = FALSE], u[, index, drop = FALSE], kernel = kernel, kparam = kparam)
     res = K * K_mat - K1
     return(list(res = res, K = K, K1 = K1, K2 = K2))
   }
@@ -746,7 +657,7 @@ interaction_kernel = function(x, u, kernel, active_set, interaction_set, clique_
   
   
   for (j in 1:length(active_set)) {
-    temp_kernel = scaled_kernel(x, u, kernel, active_set, active_set[j])
+    temp_kernel = scaled_kernel(x, u, kernel = kernel, kparam = kparam, active_set = active_set, index = active_set[j])
     main_effects[[active_set[j]]] = temp_kernel$res
     # const_term[[active_set[j]]] = temp_kernel[-1]
   }

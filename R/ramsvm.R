@@ -1,10 +1,12 @@
 # dyn.load("./alpha_update2.dll")
-ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, 
-                         weight = NULL, epsilon = 1e-4 * length(y) * length(unique(y)), maxit = 300)
+ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, weight = NULL, 
+                         epsilon_D = 1e-8, epsilon = 1e-4 * length(y) * length(unique(y)), maxit = 300)
 {
   out = list()
   
   K = K + 1
+  max_K = max(abs(K))
+  diag(K) = diag(K) + max_K * epsilon_D
   
   y_temp = as.factor(y)
   y_name = levels(y_temp)
@@ -224,7 +226,7 @@ ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALS
     scaled = attr(x, "scaled:scale")
   }
   
-  K = kernelMat(x, x, kernel = kernel, kparam = kparam)
+  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam)
   if (type == "type1") {
     solutions = ramsvm_solver(K = K, y = y, gamma = gamma, lambda = lambda, ...)
   } else {
@@ -276,7 +278,7 @@ predict.ramsvm_core = function(object, newK = NULL) {
 predict.ramsvm = function(object, newx = NULL, newK = NULL, ...) {
 
   if (is.null(newK)) {
-    newK = kernelMat(newx, object$x, kernel = object$kernel, kparam = object$kparam)
+    newK = kernelMatrix(newx, object$x, kernel = object$kernel, kparam = object$kparam)
     # newK = kernelMatrix(rbfdot(sigma = object$kparam), newx, object$x)
   }
   

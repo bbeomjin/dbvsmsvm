@@ -69,7 +69,6 @@ cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kerne
     colnames(fitted_mat) = classname
     rownames(fitted_mat) = as.character(1:n)
     model_list = list()
-    kernel_list = list(type = kernel, par = kparam)
     
     for (j in 1:ncol(comb)) {
       theta = theta_mat[, j]
@@ -77,7 +76,7 @@ cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kerne
       yy = y[index]
       xx = x[index, ]
       
-      subanova_K = make_anovaKernel(xx, xx, kernel_list)
+      subanova_K = make_anovaKernel(xx, xx, kernel, kparam)
       subK = combine_kernel(subanova_K, theta)
       svm_fit = svm_compact(K = subK, y = yy, lambda = lambda, ...)
       # svm_fit = svm_compact(K = subK, y = yy, lambda = lambda)
@@ -93,7 +92,8 @@ cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kerne
     out$y = y
     out$classname = classname
     out$comb = comb
-    out$kernel_list = kernel_list
+    out$kernel = kernel
+    out$kparam = kparam
     out$models = model_list
     out$type = type
     out$fit_class = fit_class
@@ -109,13 +109,12 @@ cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kerne
     colnames(fitted_mat) = classname
     rownames(fitted_mat) = as.character(1:n)
     model_list = list()
-    kernel_list = list(type = kernel, par = kparam)
     
     for (j in 1:n_class) {
       theta = theta_mat[, j]
       index = y %in% classname[j]
       yy = ifelse(index, 1, -1)
-      subanova_K = make_anovaKernel(x, x, kernel_list)
+      subanova_K = make_anovaKernel(x, x, kernel, kparam)
       subK = combine_kernel(subanova_K, theta)
       svm_fit = svm_compact(K = subK, y = yy, lambda = lambda, ...)
       # svm_fit = svm_compact(K = subK, y = yy, lambda = lambda)
@@ -135,7 +134,8 @@ cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kerne
     out$x = x
     out$y = y
     out$classname = classname
-    out$kernel_list = kernel_list
+    out$kernel = kernel
+    out$kparam = kparam
     out$models = model_list
     out$type = type
     out$fit_class = fit_class
@@ -163,7 +163,7 @@ predict.cstep_m_core = function(object, newx, theta_mat = NULL)
       xx = object$x[index, ]
       theta = theta_mat[, j]
       
-      K_valid = combine_kernel(make_anovaKernel(newx, xx, object$kernel_list), theta)
+      K_valid = combine_kernel(make_anovaKernel(newx, xx, object$kernel, object$kparam), theta)
       pred_val = predict.svm_compact(model, newK = K_valid)$class
       pred_mat[cbind(1:n, as.character(pred_val))] = pred_mat[cbind(1:n, as.character(pred_val))] + 1
     }
@@ -180,7 +180,7 @@ predict.cstep_m_core = function(object, newx, theta_mat = NULL)
       model = object$models[[j]]
       theta = theta_mat[, j]
       
-      K_valid = combine_kernel(make_anovaKernel(newx, object$x, object$kernel_list), theta)
+      K_valid = combine_kernel(make_anovaKernel(newx, object$x, object$kernel, object$kparam), theta)
       pred_val = predict.svm_compact(model, newK = K_valid)$class
       nj = which(pred_val == 1)
       if (length(nj) == 0) {
@@ -400,7 +400,6 @@ findtheta_m.ssvm = function(y, x, models, lambda, lambda_theta, kernel, kparam, 
   classname = levels(factor(y))
   if (is(y, "numeric")) {classname = as.numeric(classname)}
   n_class = length(classname)
-  kernel_list = list(type = kernel, par = kparam)
   
   p = NCOL(x)
   if (kernel %in% c("anova_radial")) {
@@ -419,7 +418,7 @@ findtheta_m.ssvm = function(y, x, models, lambda, lambda_theta, kernel, kparam, 
       yy = y[index]
       xx = x[index, ]
       
-      subanova_K = make_anovaKernel(xx, xx, kernel_list)
+      subanova_K = make_anovaKernel(xx, xx, kernel, kparam)
       
       alpha = models[[j]]$alpha
       bias = models[[j]]$bias
@@ -436,7 +435,7 @@ findtheta_m.ssvm = function(y, x, models, lambda, lambda_theta, kernel, kparam, 
     for (j in 1:n_class) {
       index = y %in% classname[j]
       yy = ifelse(index, 1, -1)
-      subanova_K = make_anovaKernel(x, x, kernel_list)
+      subanova_K = make_anovaKernel(x, x, kernel, kparam)
       
       alpha = models[[j]]$alpha
       bias = models[[j]]$bias
@@ -477,17 +476,16 @@ cstep.ssvm = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfolds
   }
   
   lambda_seq = sort(lambda_seq, decreasing = FALSE)
-  kernel_list = list(type = kernel, par = kparam)
   
   if (!is.null(valid_x) & !is.null(valid_y)) {
     
-    anova_K = make_anovaKernel(x, x, kernel_list)
+    anova_K = make_anovaKernel(x, x, kernel, kparam)
     if (is.null(theta)) {
       theta = rep(1, anova_K$numK)
     }
     K = combine_kernel(anova_K, theta)
     
-    anova_K_valid = make_anovaKernel(valid_x, x, kernel_list)
+    anova_K_valid = make_anovaKernel(valid_x, x, kernel, kparam)
     K_valid = combine_kernel(anova_K_valid, theta)
     
     fold_err = mclapply(1:length(lambda_seq),
@@ -530,13 +528,13 @@ cstep.ssvm = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfolds
       valid_x = x[omit, ]
       valid_y = y[omit]
       
-      subanova_K = make_anovaKernel(train_x, train_x, kernel_list)
+      subanova_K = make_anovaKernel(train_x, train_x, kernel, kparam)
       if (is.null(theta)) {
         theta = rep(1, subanova_K$numK)
       }
       subK = combine_kernel(subanova_K, theta)
       
-      subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel_list)
+      subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel, kparam)
       subK_valid = combine_kernel(subanova_K_valid, theta)
       
       fold_err = mclapply(1:length(lambda_seq),
@@ -590,8 +588,7 @@ cstep.ssvm = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfolds
     if (!is.null(valid_x) & !is.null(valid_y)) {
       out$opt_model = model_list[[opt_ind]]
     } else {
-      kernel_list = list(type = kernel, par = kparam)
-      anova_K = make_anovaKernel(x, x, kernel_list)
+      anova_K = make_anovaKernel(x, x, kernel, kparam)
       if (is.null(theta)) {
         theta = rep(1, anova_K$numK)
       }
@@ -628,8 +625,7 @@ thetastep.ssvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.out 
   
   nfolds = object$nfolds
   
-  kernel_list = list(type = kernel, par = kparam)
-  anova_K = make_anovaKernel(x, x, kernel = kernel_list)
+  anova_K = make_anovaKernel(x, x, kernel, kparam)
   
   if (is.null(object$opt_model)) {
     K = combine_kernel(anova_K, object$theta)
@@ -651,9 +647,9 @@ thetastep.ssvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.out 
       valid_x = x[omit, ]
       valid_y = y[omit]
       
-      subanova_K = make_anovaKernel(train_x, train_x, kernel_list)
+      subanova_K = make_anovaKernel(train_x, train_x, kernel, kparam)
       subK = combine_kernel(subanova_K, object$theta)
-      subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel_list)
+      subanova_K_valid = make_anovaKernel(valid_x, train_x, kernel, kparam)
       
       init_model = svm_compact(K = subK, y = train_y, lambda = lambda, ...)
       alpha = init_model$alpha
