@@ -223,7 +223,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       x_valid = x[fold, , drop = FALSE]
       
       fold_model = object$fold_models[[i]]
-      print(sum(fold_model$x != x_fold)) # just test
+      # print(sum(fold_model$x != x_fold)) # just test
       fold_gd = gradient(alpha = fold_model$cmat, x = x_fold, y = y_fold, scale = gd_scale,
                          kernel = kernel, kparam = kparam)
       

@@ -1,6 +1,6 @@
 # dyn.load("./alpha_update2.dll")
 ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, weight = NULL, 
-                         epsilon_D = 1e-8, epsilon = 1e-4 * length(y) * length(unique(y)), maxit = 300)
+                         epsilon_K = 1e-6, epsilon = 1e-8 * length(y) * length(unique(y)), maxit = 1000)
 {
   out = list()
   
