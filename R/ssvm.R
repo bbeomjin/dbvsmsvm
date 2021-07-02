@@ -48,7 +48,7 @@ cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kerne
   p = NCOL(x)
   out = list()
   
-  if (kernel %in% c("anova_radial")) {
+  if (kernel %in% c("radial2")) {
     numK = p + choose(p, 2)
   } else {
     numK = p
