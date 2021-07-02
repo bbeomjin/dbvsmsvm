@@ -88,7 +88,7 @@ make_anovaKernel = function(x, y, kernel, kparam)
       kernelCoord[[index]] = paste("x", d, " smooth", sep="")
     } 
     
-  } else if (kernel$type == 'spline2') {
+  } else if (kernel == 'spline2') {
     numK = (2 * dimx) + (2 * dimx * (2 * dimx - 1) / 2 - dimx)
     anova_kernel = vector(mode = "list", numK)
     kernelCoord = vector(mode = "list", numK)
@@ -139,7 +139,7 @@ make_anovaKernel = function(x, y, kernel, kparam)
       anova_kernel[[index]] = (K_temp$K1 + K_temp$K2)
       kernelCoord[[index]] = paste("x", d, sep = "")
     }
-  } else if (kernel$type == 'spline-t2') {
+  } else if (kernel == 'spline-t2') {
     numK = dimx + dimx * (dimx - 1) / 2
     anova_kernel = vector(mode = "list", numK)
     kernelCoord = vector(mode = "list", numK)
@@ -163,7 +163,7 @@ make_anovaKernel = function(x, y, kernel, kparam)
         kernelCoord[[index]] = paste("x", i, " x", j, sep = "")
       }
     }
-  } else if (kernel$type == "radial2") {
+  } else if (kernel == "radial2") {
     numK = dimx + dimx * (dimx - 1) / 2
     anova_kernel = vector(mode = "list", numK)
     kernelCoord = vector(mode = "list", numK)
