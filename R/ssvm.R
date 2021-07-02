@@ -402,7 +402,7 @@ findtheta_m.ssvm = function(y, x, models, lambda, lambda_theta, kernel, kparam, 
   n_class = length(classname)
   
   p = NCOL(x)
-  if (kernel %in% c("anova_radial")) {
+  if (kernel %in% c("radial2")) {
     numK = p + choose(p, 2)
   } else {
     numK = p
