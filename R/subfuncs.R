@@ -485,9 +485,10 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   # res = gd
   
   if (scale) {
-    scaler = sum(drop(crossprod(W_mat, sqrt(scale_const)))^2)
+    # scaler = sum(drop(crossprod(W_mat, sqrt(scale_const)))^2)
     # res = colSums(gd_mat) / scaler
-    res = colSums(grad_mat) / k / scaler
+    # res = colSums(grad_mat) / k / scaler
+    res = colSums(grad_mat / scale_const) / k / scaler
   } else {
     res = colSums(grad_mat) / k
   }
