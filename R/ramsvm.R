@@ -6,7 +6,7 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, weight = NULL,
   
   K = K + 1
   max_K = max(abs(K))
-  diag(K) = diag(K) + max_K * epsilon_D
+  diag(K) = diag(K) + max_K * epsilon_K
   
   y_temp = as.factor(y)
   y_name = levels(y_temp)
