@@ -66,7 +66,7 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
 
 cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 5,
                          lambda_seq = 2^{seq(-10, 10, length.out = 100)}, theta = NULL,
-                         kernel = c("linear", "radial", "poly"), kparam = c(1),
+                         kernel = c("linear", "radial", "poly", "spline", "anova_radial", "radial2"), kparam = c(1),
                          scale = FALSE, criterion = c("0-1", "loss"), optModel = FALSE, nCores = 1,
                          type = c("type1", "type2"), ...)
 {

@@ -1,7 +1,7 @@
 ssvm_m = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfolds = 5,
                   lambda_seq = 2^seq(-10, 10, length.out = 100), 
                   lambda_theta_seq = 2^{seq(-10, 10, length.out = 100)}, cv_type = "original", isCombined = TRUE,
-                  kernel = c("linear", "radial", "poly", "spline", "anova_radial"), kparam = 1, type = c("OVO", "OVR"),
+                  kernel = c("linear", "radial", "poly", "spline", "anova_radial", "radial2"), kparam = 1, type = c("OVO", "OVR"),
                   scale = FALSE, criterion = c("0-1", "loss"), optModel = FALSE, nCores = 1, verbose = 1, ...)
 {
   out = list()
@@ -198,7 +198,7 @@ predict.cstep_m_core = function(object, newx, theta_mat = NULL)
 
 cstep_m.ssvm = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfolds = 5,
                         lambda_seq = 2^seq(-10, 10, length.out = 100), 
-                        kernel = c("linear", "radial", "poly", "spline", "anova_radial"), kparam = 1, type = c("OVO", "OVR"),
+                        kernel = c("linear", "radial", "poly", "spline", "anova_radial", "radial2"), kparam = 1, type = c("OVO", "OVR"),
                         theta_mat = NULL, scale = FALSE, criterion = c("0-1", "loss"), optModel = FALSE, nCores = 1, ...)
 {
   call = match.call()
@@ -452,7 +452,7 @@ findtheta_m.ssvm = function(y, x, models, lambda, lambda_theta, kernel, kparam, 
 
 cstep.ssvm = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfolds = 5,
                       lambda_seq = 2^seq(-10, 10, length.out = 100), 
-                      kernel = c("linear", "radial", "poly", "spline", "anova_radial"), kparam = 1,
+                      kernel = c("linear", "radial", "poly", "spline", "anova_radial", "radial2"), kparam = 1,
                       theta = NULL, scale = FALSE, criterion = c("0-1", "loss"), optModel = FALSE, nCores = 1, ...)
 {
   call = match.call()
