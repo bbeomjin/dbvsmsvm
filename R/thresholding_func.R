@@ -95,32 +95,38 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
       
       fold_err = mclapply(gd_vec,
                          function(thresh) {
-                           msvm_fit = ramsvm(x = x_fold[, init_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
-                                             lambda = lambda, kernel = kernel, kparam = kparam, ...)
-
-                           pred_val = predict.ramsvm(msvm_fit, newx = x_valid[, init_gd > thresh, drop = FALSE])
-
-                           if (criterion == "0-1") {
-                             acc = sum(y_valid == pred_val$class) / length(y_valid)
-                             err = 1 - acc
+                           error = try({
+                             msvm_fit = ramsvm(x = x_fold[, init_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
+                                               lambda = lambda, kernel = kernel, kparam = kparam, ...) 
+                           })
+                           
+                           if (!inherits(error, "try-error")) {
+                             pred_val = predict.ramsvm(msvm_fit, newx = x_valid[, init_gd > thresh, drop = FALSE])
+                             
+                             if (criterion == "0-1") {
+                               acc = sum(y_valid == pred_val$class) / length(y_valid)
+                               err = 1 - acc
+                             } else {
+                               err = ramsvm_hinge(y_valid, pred_val$inner_prod, k = k, gamma = gamma)
+                             }
                            } else {
-                             err = ramsvm_hinge(y_valid, pred_val$inner_prod, k = k, gamma = gamma)
+                             err = Inf
                            }
                            return(err)
                          }, mc.cores = nCores)
       valid_err_mat[i, ] = unlist(fold_err)
     }
-    valid_err = colMeans(valid_err_mat, na.rm = TRUE)
-    valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
-    opt_ind = max(which(valid_err == min(valid_err)))
-    opt_ind_osr = max(which(valid_err <= (valid_err[opt_ind] + valid_se[opt_ind])))
-
+    valid_err = colMeans(valid_err_mat)
+    
     if (cv_type == "osr") {
-      opt_thresh = gd_vec[opt_ind_osr]
+      valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
+      opt_ind = max(which(valid_err == min(valid_err)))
+      opt_ind = max(which(valid_err <= (min(valid_err) + valid_se[opt_ind])))
+      opt_thresh = gd_vec[opt_ind]
     } else {
+      opt_ind = max(which(valid_err == min(valid_err)))
       opt_thresh = gd_vec[opt_ind]
     }
-
     opt_valid_err = min(valid_err)
     selected = as.integer(gd > opt_thresh)
   }
@@ -230,29 +236,36 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       fold_err = mclapply(gd_vec,
                          function(thresh) {
                            # Fit model under the fold set
-                           msvm_fit = ramsvm(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
-                                             lambda = lambda, kernel = kernel, kparam = kparam, ...)
-
-                           pred_val = predict.ramsvm(msvm_fit, newx = x_valid[, fold_gd > thresh, drop = FALSE])
-
-                           if (criterion == "0-1") {
-                             acc = sum(y_valid == pred_val$class) / length(y_valid)
-                             err = 1 - acc
+                           error = try({
+                             msvm_fit = ramsvm(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
+                                               lambda = lambda, kernel = kernel, kparam = kparam, ...) 
+                           })
+                           
+                           if (!inherits(error, "try-error")) {
+                             pred_val = predict.ramsvm(msvm_fit, newx = x_valid[, fold_gd > thresh, drop = FALSE])
+                             
+                             if (criterion == "0-1") {
+                               acc = sum(y_valid == pred_val$class) / length(y_valid)
+                               err = 1 - acc
+                             } else {
+                               err = ramsvm_hinge(y_valid, pred_val$inner_prod, k = k, gamma = gamma)
+                             } 
                            } else {
-                             err = ramsvm_hinge(y_valid, pred_val$inner_prod, k = k, gamma = gamma)
+                             err = Inf 
                            }
                            return(err)
                          }, mc.cores = nCores)
       valid_err_mat[i, ] = unlist(fold_err)
     }
-    valid_err = colMeans(valid_err_mat, na.rm = TRUE)
-    valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
-    opt_ind = max(which(valid_err == min(valid_err)))
-    opt_ind_osr = max(which(valid_err <= (valid_err[opt_ind] + valid_se[opt_ind])))
+    valid_err = colMeans(valid_err_mat)
 
     if (cv_type == "osr") {
-      opt_thresh = gd_vec[opt_ind_osr]
+      valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
+      opt_ind = max(which(valid_err == min(valid_err)))
+      opt_ind = max(which(valid_err <= (min(valid_err) + valid_se[opt_ind])))
+      opt_thresh = gd_vec[opt_ind]
     } else {
+      opt_ind = max(which(valid_err == min(valid_err)))
       opt_thresh = gd_vec[opt_ind]
     }
     opt_valid_err = min(valid_err)
