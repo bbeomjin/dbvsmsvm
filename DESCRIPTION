@@ -1,11 +1,15 @@
 Package: dbvsmsvm
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Implementations of derivative-based variable selection on the multicategory support vector machines
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: c(person("Beomjin", "Park", role=c("aut", "cre"), email = "bbbeomjin@gmail.com"),
+			 person("Changyi", "Park", role=c("aut")))
+Depends: R (>= 3.5.0)
+Imports: methods, utils, stats, parallel, quadprog, lpSolve, mlbench
+Description: Provides functions for derivative-based variable selection on the multicategory support vector machines.
+License: GPL-2
+NeedsCompilation: yes
+Author: Beomjin Park[aut, cre]
+		Changyi Park [aut]
+Maintainer: Beomjin Park <bbbeomjin@gmail.com>
 Encoding: UTF-8
-LazyData: true

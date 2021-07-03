@@ -600,31 +600,31 @@ data_split = function(y, nfolds, seed = length(y))
 
 
 
-interaction_svmfs = function(main_effect, interaction) 
-{
-  if (sum(interaction) != 0) {
-    p = length(main_effect)
-    comb_mat = combn(1:p, 2)
-    ind_mat = comb_mat[, interaction == 1, drop = FALSE]
-    for (i in 1:nrow(ind_mat)) {
-      ind = ind_mat[i, ]
-      main_effect[ind] = 1
-    }
-  }
-  res = c(main_effect, interaction)
-  return(res)
-}
-
-
-interaction_graph = function(comb, p, min = 3)
-{
-  int_mat = Matrix::Matrix(0, nrow = p, ncol = p)
-  int_mat[t(comb)] = 1
-  int_mat = Matrix::t(int_mat) + int_mat
-  g = graph_from_adjacency_matrix(int_mat, mode = "undirected")
-  cliques_list = max_cliques(g, min = 3)
-  return(cliques_list)
-}
+# interaction_svmfs = function(main_effect, interaction) 
+# {
+#   if (sum(interaction) != 0) {
+#     p = length(main_effect)
+#     comb_mat = combn(1:p, 2)
+#     ind_mat = comb_mat[, interaction == 1, drop = FALSE]
+#     for (i in 1:nrow(ind_mat)) {
+#       ind = ind_mat[i, ]
+#       main_effect[ind] = 1
+#     }
+#   }
+#   res = c(main_effect, interaction)
+#   return(res)
+# }
+# 
+# 
+# interaction_graph = function(comb, p, min = 3)
+# {
+#   int_mat = Matrix::Matrix(0, nrow = p, ncol = p)
+#   int_mat[t(comb)] = 1
+#   int_mat = Matrix::t(int_mat) + int_mat
+#   g = graph_from_adjacency_matrix(int_mat, mode = "undirected")
+#   cliques_list = max_cliques(g, min = 3)
+#   return(cliques_list)
+# }
 
 interaction_kernel = function(x, u, kernel, kparam, active_set, interaction_set, clique_list)
 {
