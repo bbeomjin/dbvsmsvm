@@ -117,9 +117,9 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
       valid_err_mat[i, ] = unlist(fold_err)
     }
     valid_err = colMeans(valid_err_mat)
+    valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
     
     if (cv_type == "osr") {
-      valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
       opt_ind = max(which(valid_err == min(valid_err)))
       opt_ind = max(which(valid_err <= (min(valid_err) + valid_se[opt_ind])))
       opt_thresh = gd_vec[opt_ind]
