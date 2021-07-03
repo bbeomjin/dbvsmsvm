@@ -33,7 +33,7 @@ ramsvm(x, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1
   A logical indicating the variables to be scaled.
   }
   \item{type}{
-  A type of ramsvm. If \code{type} = "type1", the intercepts included in regularization.
+  A type of ramsvm. If \code{type = "type1"}, the intercepts included in regularization.
   }
   \item{...}{
   Other arguments that can be passed to ramsvm core function.
