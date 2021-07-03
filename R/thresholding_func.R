@@ -46,7 +46,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
   gd = gradient(alpha = fit$cmat, x = x, y = y, scale = gd_scale, kernel = kernel, kparam = kparam)
 
   # Compute thresholding path
-  gd_vec = c(0, seq(min(gd), max(gd), length.out = thresh_Ngrid))
+  gd_vec = seq(0, max(gd), length.out = thresh_Ngrid)
   gd_vec = gd_vec[-c(length(gd_vec))]
 
   if (!is.null(valid_x) & !is.null(valid_y)) {
@@ -187,7 +187,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
   gd = gradient(alpha = fit$cmat, x = x, y = y, scale = gd_scale, kernel = kernel, kparam = kparam)
 
   # Compute thresholding path
-  gd_vec = c(0, seq(min(gd), max(gd), length.out = thresh_Ngrid))
+  gd_vec = seq(0, max(gd), length.out = thresh_Ngrid)
   gd_vec = gd_vec[-c(length(gd_vec))]
 
   if (!is.null(valid_x) & !is.null(valid_y)) {

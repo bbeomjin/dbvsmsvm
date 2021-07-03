@@ -53,11 +53,11 @@ ramsvm(x, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1
   \item{cmat}{The estimated parameters of the classification functions.}
   \item{c0vec}{The estimated intercepts of the classification functions.}
   \item{alpha}{A solutions of quadratic programming.}
-  \item{scale}{}
-  \item{center}{}
-  \item{scaled}{}
-  \item{fit_class}{}
-  \item{epsilon}{}
+  \item{scale}{A logical.}
+  \item{center}{The center vector of input \emph{x} if \emph{x} is scaled.}
+  \item{scaled}{The scale vector of input \emph{x} if \emph{x} is scaled.}
+  \item{fit_class}{Fitted class.}
+  \item{epsilon}{Convergence tolerance in the ramsvm core algorithm.}
 }
 
 \references{}
