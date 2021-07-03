@@ -49,7 +49,7 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, weight = NULL,
           as.double(epsilon),
           outalpha_ij = as.vector(numeric(n * n_class)),
           maxiter = as.integer(maxit),
-          PACKAGE = "GBFSMSVM")
+          PACKAGE = "dbvsmsvm")
 
   alpha = matrix(data = aa$outalpha_ij, nrow = n, ncol = n_class)
 
