@@ -71,41 +71,30 @@ dbvsmsvm(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
 
 \value{
   An S3 object with the following slots
-  \item{selected}{selected variables.}
-  \item{gd}{Derivative-based measures}
-  \item{lambda}{vector used for regularization path.}
-  \item{v}{vector of network variability measured for each regularization level.}
-  \item{opt_lambda}{The lambda that gives the optimal network.}
+  \item{selected}{Selected variables.}
+  \item{gd}{Derivative-based measures.}
+  \item{threshold_path}{A sequence of threshold parameter.}
+  \item{opt_threshold}{Optimal threshold value.}
+  \item{valid_err}{Validation errors.}
+  \item{opt_valid_err}{A minimum value of validation errors.}
+  \item{int_selected}{Selected variables of interaction selection.}
+  \item{gd_interaction}{Derivative-based measures of interaction selection.}
+  \item{threshold_path_int}{A sequence of threshold parameter of interaction selection.}
+  \item{opt_threshold_int}{Optimal threshold value of interaction selection.}
+  \item{int_valid_err}{Validation errors for interaction selection.}
+  \item{int_opt_valid_err}{A minimum value of validation errors of interaction selection.}
+  \item{cv_type}{A type of cross-validation.}
+  \item{call}{The call of dbvsmsvm}
 }
 
-\references{Choi, H., J. Gim, S. Won, Y. J. Kim, S. Kwon, and C. Park, 2017: Network analysis for count data with excess zeros. \emph{BMC genetics}, \bold{18}, no. 1, 1-10. \cr
-			Park, B., H. Choi, C. Park, 2021: Negative binomial graphical model with excess zeros.}
+\references{}
 
 
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
-require(ZILGM)
-set.seed(1)
-n = 100; p = 10; prob = 2 / p;
-A = generate_network(p, prob, type = "random")
-simul_dat = zilgm_sim(A = A, n = n, p = p, zlvs = 0.1, 
-					  family = "negbin", signal = 1.5, theta = 0.5, noise = 0.0)
-					  
-# Compute a sequence of regularization parameter
-lambda_max = find_lammax(simul_dat$X)
-lambda_min = 1e-4 * lambda_max
-lambs = exp(seq(log(lambda_max), log(lambda_min), length.out = 50))
-nb2_fit = zilgm(X = simul_dat$X, lambda = lambs, family = "NBII", update_type = "IRLS", 
-                do_boot = TRUE, boot_num = 30, sym = "OR", nCores = 10)
+require(dbvsmsvm)
 
-# To compute the regularization parameters automatically, use the argument nlambda
-nb2_fit = zilgm(X = simul_dat$X, nlambda = 50, family = "NBII", update_type = "IRLS",
-                do_boot = TRUE, boot_num = 30, sym = "OR", nCores = 10)
-				
-# Get estimated graph
-est_graph = nb2_fit$network[[nb2_fit$opt_index]]
-}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

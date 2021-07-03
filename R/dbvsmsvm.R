@@ -27,18 +27,18 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   out = list()
   out$selected = selected
   out$gd = select_fit$gd
-  out$threshold_path = select_fit$thresh_path
-  out$opt_threshold = select_fit$opt_thresh
-  out$opt_valid_err = select_fit$opt_valid_err
+  out$threshold_path = select_fit$threshold_path
+  out$opt_threshold = select_fit$opt_threshold
   out$valid_err = select_fit$valid_err
+  out$opt_valid_err = select_fit$opt_valid_err
   if (interaction) {
     out$int_selected = select_fit$int_selected
     out$gd_interaction = select_fit$gd_interaction
-    out$opt_thresh_int = select_fit$opt_thresh_int
-    out$thresh_path_int = select_fit$thresh_path_int
-    out$int_opt_valid_err = select_fit$int_opt_valid_err
+    out$threshold_path_int = select_fit$threshold_path_int
+    out$opt_threshold_int = select_fit$opt_threshold_int
     out$int_valid_err = select_fit$int_valid_err
-    out$int_valid_se = select_fit$se_int
+    out$int_opt_valid_err = select_fit$int_opt_valid_err
+    # out$int_valid_se = select_fit$se_int
   }
   
   if (optModel) {
