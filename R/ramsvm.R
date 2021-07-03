@@ -1,12 +1,12 @@
 # dyn.load("./alpha_update2.dll")
 ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, weight = NULL, 
-                         epsilon_K = 1e-6, epsilon = 1e-8 * length(y) * length(unique(y)), maxit = 1000)
+                         epsilon_D = 1e-6, epsilon = 1e-8 * length(y) * length(unique(y)), maxit = 1000)
 {
   out = list()
   
-  K = K + 1
-  max_K = max(abs(K))
-  diag(K) = diag(K) + max_K * epsilon_K
+  D = K + 1
+  max_D = max(abs(D))
+  diag(D) = diag(D) + max_D * epsilon_D
   
   y_temp = as.factor(y)
   y_name = levels(y_temp)
@@ -30,14 +30,14 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, weight = NULL,
   alpha_ij = matrix(data = 0.0, nrow = n, ncol = n_class)
   alpha_yi = numeric(n)
 
-  erci = -diag(K) / 2 / as.double(n) / lambda
+  erci = -diag(D) / 2 / as.double(n) / lambda
 
   aa = .C("alpha_update",
           as.vector(alpha_ij),
           as.vector(alpha_yi),
           as.vector(t(W)),
           as.vector(yyi),
-          as.vector(K),
+          as.vector(D),
           as.double(lambda),
           as.vector(weight),
           as.integer(n),

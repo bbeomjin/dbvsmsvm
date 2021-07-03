@@ -432,7 +432,7 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   n = length(y)
   k = length(unique(y))
   
-  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam)
+  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam) + 1
   if (kernel == "linear") {
     if (scale) {
 	    # scale_const = sapply(1:NCOL(alpha), FUN = function(i) sum(crossprod(alpha[, i], x)^2))
@@ -504,9 +504,8 @@ gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", 
 {
   n = length(y)
   k = length(unique(y))
-  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam)
   
-  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam)
+  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam) + 1
   if (kernel == "linear") {
     if (scale) {
       # scale_const = sapply(1:NCOL(alpha), FUN = function(i) sum(crossprod(alpha[, i], x)^2))
