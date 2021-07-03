@@ -118,13 +118,12 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
     }
     valid_err = colMeans(valid_err_mat)
     valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
+    opt_ind = max(which(valid_err == min(valid_err)))
     
     if (cv_type == "osr") {
-      opt_ind = max(which(valid_err == min(valid_err)))
-      opt_ind = max(which(valid_err <= (min(valid_err) + valid_se[opt_ind])))
-      opt_thresh = gd_vec[opt_ind]
+      opt_ind_osr = max(which(valid_err <= (min(valid_err) + valid_se[opt_ind])))
+      opt_thresh = gd_vec[opt_ind_osr]
     } else {
-      opt_ind = max(which(valid_err == min(valid_err)))
       opt_thresh = gd_vec[opt_ind]
     }
     opt_valid_err = min(valid_err)
@@ -258,14 +257,13 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       valid_err_mat[i, ] = unlist(fold_err)
     }
     valid_err = colMeans(valid_err_mat)
-
+    valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
+    opt_ind = max(which(valid_err == min(valid_err)))
+    
     if (cv_type == "osr") {
-      valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
-      opt_ind = max(which(valid_err == min(valid_err)))
-      opt_ind = max(which(valid_err <= (min(valid_err) + valid_se[opt_ind])))
-      opt_thresh = gd_vec[opt_ind]
+      opt_ind_osr = max(which(valid_err <= (min(valid_err) + valid_se[opt_ind])))
+      opt_thresh = gd_vec[opt_ind_osr]
     } else {
-      opt_ind = max(which(valid_err == min(valid_err)))
       opt_thresh = gd_vec[opt_ind]
     }
     opt_valid_err = min(valid_err)
