@@ -6,6 +6,7 @@ dbvsmsvm = function(x, y, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_se
                     thresh_Ngrid = 10, kernel = "linear", kparam = 1, scale = FALSE, criterion = "0-1", cv_type = "original", interaction = FALSE,
                     gd_scale = FALSE, gamma = 0.5, optModel = FALSE, nCores = 1, ...)
 {
+  call = match.call()
   # Find a optimal lambda in first step
   cat("Step 1 : ")
   initial_fit = Kfold_ramsvm(x = x, y = y, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds, 
