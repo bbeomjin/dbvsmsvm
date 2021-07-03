@@ -33,7 +33,7 @@ ramsvm(x, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1
   A logical indicating the variables to be scaled.
   }
   \item{type}{
-  A type of ramsvm. If \code{type = "type1"}, the intercepts included in regularization.
+  A type of ramsvm. If \code{type} = "type1", the intercepts included in regularization.
   }
   \item{...}{
   Other arguments that can be passed to ramsvm core function.
@@ -42,20 +42,22 @@ ramsvm(x, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1
 
 \value{
   An S3 object with the following slots
-  \item{selected}{Selected variables.}
-  \item{gd}{Derivative-based measures.}
-  \item{threshold_path}{A sequence of threshold parameter.}
-  \item{opt_threshold}{Optimal threshold value.}
-  \item{valid_err}{Validation errors.}
-  \item{opt_valid_err}{A minimum value of validation errors.}
-  \item{int_selected}{Selected variables of interaction selection.}
-  \item{gd_interaction}{Derivative-based measures of interaction selection.}
-  \item{threshold_path_int}{A sequence of threshold parameter of interaction selection.}
-  \item{opt_threshold_int}{Optimal threshold value of interaction selection.}
-  \item{int_valid_err}{Validation errors for interaction selection.}
-  \item{int_opt_valid_err}{A minimum value of validation errors of interaction selection.}
-  \item{cv_type}{A type of cross-validation.}
-  \item{call}{The call of dbvsmsvm}
+  \item{x}{Input \emph{x}.}
+  \item{y}{Input \emph{y}.}
+  \item{y_name}{The class labels of \emph{y}.}
+  \item{gamma}{The convex combination parameter of the loss function.}
+  \item{n_class}{The number of classes.}
+  \item{lambda}{The regularization parameter.}
+  \item{kernel}{Given type of kernel.}
+  \item{kparam}{Given parameter for kernel.}
+  \item{cmat}{The estimated parameters of the classification functions.}
+  \item{c0vec}{The estimated intercepts of the classification functions.}
+  \item{alpha}{A solutions of quadratic programming.}
+  \item{scale}{}
+  \item{center}{}
+  \item{scaled}{}
+  \item{fit_class}{}
+  \item{epsilon}{}
 }
 
 \references{}

@@ -23,7 +23,7 @@ dbvsmsvm(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
   The convex combination parameter of the loss function.
   }
   \item{valid_x}{
-  A validation data matrix for selecting \code{lambda} and threshold parameter \emph{v}. If \code{valid_x = NULL}, cross-validation is performed.
+  A validation data matrix for selecting \code{lambda} and threshold parameter \emph{v}. If \code{valid_x} = NULL, cross-validation is performed.
   }
   \item{valid_y}{
   A validation response vector.
@@ -50,7 +50,7 @@ dbvsmsvm(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
   A type of criterion evaluating prediction performance.
   }
   \item{cv_type}{
-  A type of cross-validation. If \code{cv_type = "osr"}, one standard error rule is adopted.
+  A type of cross-validation. If \code{cv_type} = "osr", one standard error rule is adopted.
   }
   \item{interaction}{
   A logical. Whether to estimate interaction effect. 

@@ -238,11 +238,11 @@ ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALS
   out$gamma = gamma
   out$n_class = n_class
   out$lambda = lambda
+  out$kernel = kernel
   out$kparam = kparam
   out$cmat = solutions$cmat
   out$c0vec = solutions$c0vec
   out$alpha = solutions$alpha
-  out$kernel = kernel
   out$scale = scale
   out$center = center
   out$scaled = scaled
