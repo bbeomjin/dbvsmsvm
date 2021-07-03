@@ -31,6 +31,7 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   out$opt_threshold = select_fit$opt_threshold
   out$valid_err = select_fit$valid_err
   out$opt_valid_err = select_fit$opt_valid_err
+  out$opt_valid_err_se = select_fit$opt_valid_err_se
   if (interaction) {
     out$int_selected = select_fit$int_selected
     out$gd_interaction = select_fit$gd_interaction
