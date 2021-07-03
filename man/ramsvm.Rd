@@ -32,26 +32,11 @@ ramsvm(x, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1
   \item{scale}{
   A logical indicating the variables to be scaled.
   }
-  \item{criterion}{
-  A type of criterion evaluating prediction performance.
-  }
-  \item{cv_type}{
-  A type of cross-validation. If \code{cv_type = "osr"}, one standard error rule is adopted.
-  }
-  \item{interaction}{
-  A logical. Whether to estimate interaction effect. 
-  }
-  \item{gd_scale}{
-  A logical. Whether to scale the derivative-based measure.
-  }
-  \item{optModel}{
-  A logical. Whether to obtain the optimal classification model.
-  }
-  \item{nCores}{
-  The number of cores to use for parallel computing.
+  \item{type}{
+  A type of ramsvm. If \code{type = "type1"}, the intercepts included in regularization.
   }
   \item{...}{
-  Other arguments that can be passed to ramsvm function.
+  Other arguments that can be passed to ramsvm core function.
   }
 }
 
