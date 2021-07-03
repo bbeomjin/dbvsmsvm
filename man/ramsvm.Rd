@@ -68,6 +68,6 @@ ramsvm(x, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1
 
 \examples{
 require(dbvsmsvm)
-
+}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
