@@ -3,7 +3,7 @@ exportClasses("dbvsmsvm")
 exportClasses("ramsvm")
 
 # Load dynamic libraries (shared object files)
-useDynLib(GBFSMSVM)
+useDynLib(dbvsmsvm)
 
 import("methods")
 import("stats")
