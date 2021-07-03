@@ -263,8 +263,8 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
   out$selected = selected
   cat("The number of selected features out of ", length(selected), ":", sum(selected), "\r", "\n")
   out$gd = gd
-  out$thresh_path = gd_vec
-  out$opt_thresh = opt_thresh
+  out$threshold_path = gd_vec
+  out$opt_threshold = opt_thresh
   out$opt_valid_err = opt_valid_err
   if (is.null(valid_x) | is.null(valid_y)) {
     out$opt_valid_err_se = valid_se[opt_ind]
@@ -345,8 +345,8 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
     }
     out$int_selected = int_selected
     out$gd_interaction = gd_interaction
-    out$opt_thresh_int = opt_thresh_int
-    out$thresh_path_int = gd_vec_int
+    out$opt_threshold_int = opt_thresh_int
+    out$threshold_path_int = gd_vec_int
     out$int_opt_valid_err = min(int_valid_err)
     out$int_valid_err = int_valid_err
     out$se_int = int_valid_se
