@@ -396,7 +396,7 @@ Kfold_ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfold
                           function(j) {
                             msvm_fit = ramsvm(x = x_fold, y = y_fold, gamma = gamma, lambda = params$lambda[j], 
                                               kernel = kernel, kparam = params$kparam[j], ...)
-                            pred_val = predict(msvm_fit, newx = x_valid)
+                            pred_val = predict.ramsvm(msvm_fit, newx = x_valid)
                             
                             if (criterion == "0-1") {
                               acc = sum(y_valid == pred_val$class) / length(y_valid)
@@ -409,7 +409,7 @@ Kfold_ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfold
       valid_err_mat[i, ] = sapply(fold_err, "[[", "error")
       model_list[[i]] = lapply(fold_err, "[[", "fit_model")
     }
-    valid_err = colMeans(valid_err_mat, na.rm = TRUE)
+    valid_err = colMeans(valid_err_mat)
     opt_ind = max(which(valid_err == min(valid_err)))
 	# opt_ind = min(which(valid_err == min(valid_err)))
     opt_param = params[opt_ind, ]
