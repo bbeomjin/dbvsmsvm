@@ -24,8 +24,6 @@ Beomjin Park
 Maintainer : Beomjin Park <bbbeomjin@gmail.com>
 }
 
-#\references{Choi, H., J. Gim, S. Won, Y. J. Kim, S. Kwon, and C. Park, 2017: Network analysis for count data with excess zeros. \emph{BMC genetics}, \bold{18}, no. 1, 1-10. \cr
-#			Park, B., H. Choi, C. Park, 2021: Negative binomial graphical model with excess zeros.}
 
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
