@@ -422,6 +422,7 @@ Kfold_ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfold
   out$opt_valid_err = opt_valid_err
   out$opt_ind = opt_ind
   out$valid_err = valid_err
+  out$nfolds = nfolds
   out$fold_models = lapply(model_list, "[[", opt_ind)
   out$fold_ind = fold_list
   out$x = x

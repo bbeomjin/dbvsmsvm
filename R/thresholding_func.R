@@ -214,8 +214,9 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
     
   } else {
 
-    fold_list = object$fold_ind
-    nfolds = length(unique(fold_list))
+    # fold_list = object$fold_ind
+    nfolds = object$nfolds
+    fold_list = data_split(y, nfolds)
     valid_err_mat = matrix(NA, nrow = nfolds, ncol = length(gd_vec))
     
     for (i in 1:nfolds) {
@@ -227,16 +228,18 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       y_valid = y[fold]
       x_valid = x[fold, , drop = FALSE]
       
-      fold_model = object$fold_models[[i]]
-      # print(sum(fold_model$x != x_fold)) # just test
-      fold_gd = gradient(alpha = fold_model$cmat, x = x_fold, y = y_fold, scale = gd_scale,
+      # Initial fitting RAMSVM for computing the gradients
+      init_fit = ramsvm(x = x_fold, y = y_fold, gamma = gamma, lambda = lambda,
+                        kernel = kernel, kparam = kparam, ...)
+      
+      init_gd = gradient(alpha = init_fit$cmat, x = x_fold, y = y_fold, scale = gd_scale,
                          kernel = kernel, kparam = kparam)
       
       fold_err = mclapply(gd_vec,
                          function(thresh) {
                            # Fit model under the fold set
                            error = try({
-                             msvm_fit = ramsvm(x = x_fold[, fold_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
+                             msvm_fit = ramsvm(x = x_fold[, init_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
                                                lambda = lambda, kernel = kernel, kparam = kparam, ...) 
                            })
                            
