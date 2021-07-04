@@ -433,31 +433,11 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   k = length(unique(y))
   
   K = kernelMatrix(x, x, kernel = kernel, kparam = kparam) + 1
-  if (kernel == "linear") {
-    if (scale) {
-	    # scale_const = sapply(1:NCOL(alpha), FUN = function(i) sum(crossprod(alpha[, i], x)^2))
-	    scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
-	  }
-  }
   
-  if (kernel == "poly") {
-    if (scale) {
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
-    }
-  }
-  
-  if ((kernel == "radial") | (kernel == "anova_radial")) {
-    if (scale) {
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
-      # scale_const = drop(t(alpha) %*% kernelMatrix(rbf, X) %*% alpha)
-      # system.time((a = sum(sapply(1:n, FUN = function(i) K_rbf(alpha, X, X[i, ], sigma = sigma)) * alpha)))
-    }
-  }
-  
-  if (kernel == "spline") {
-    if (scale) {
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
-    }
+  if (scale) {
+    scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
+  } else {
+    scale_const = rep(1, NCOL(alpha))
   }
   
   dkernel = switch(kernel,
@@ -485,17 +465,8 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   # gd = colSums(gd_mat) / scaler
   # res = gd
   
-  if (scale) {
-    # scaler = sum(drop(crossprod(W_mat, sqrt(scale_const)))^2)
-    # res = colSums(gd_mat) / scaler
-    # res = colSums(grad_mat) / k / scaler
-    res = colSums(grad_mat) #/ sum(scale_const) 
-  } else {
-    res = colSums(grad_mat) 
-  }
+  res = colSums(grad_mat) #/ sum(scale_const) 
   
-  # if (scale) {res = gd / scale_const} else {res = gd}
-  # if (scale) {res = rowMeans(gd^2) / scale_const} else {res = rowMeans(gd^2)}
   return(res)
 }
 
