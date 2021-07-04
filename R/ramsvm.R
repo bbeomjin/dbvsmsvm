@@ -381,7 +381,7 @@ Kfold_ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfold
     # fold_list = createFolds(y, k = nfolds, list = TRUE)
     fold_list = data_split(y, nfolds)
     valid_err_mat = matrix(NA, nrow = nfolds, ncol = nrow(params))
-    model_list = vector("list", nfolds)
+    # model_list = vector("list", nfolds)
     
     for (i in 1:nfolds) {
       cat(nfolds, "- fold CV :", i / nfolds * 100, "%", "\r")
@@ -405,10 +405,12 @@ Kfold_ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfold
                             } else {
                               err = ramsvm_hinge(y_valid, pred_val$pred_value, k = k, gamma = gamma)
                             }
-                            return(list(error = err, fit_model = msvm_fit))
+                            # return(list(error = err, fit_model = msvm_fit))
+                            return(err)
                           }, mc.cores = nCores)
-      valid_err_mat[i, ] = sapply(fold_err, "[[", "error")
-      model_list[[i]] = lapply(fold_err, "[[", "fit_model")
+      # valid_err_mat[i, ] = sapply(fold_err, "[[", "error")
+      valid_err_mat[i, ] = unlist(fold_err)
+      # model_list[[i]] = lapply(fold_err, "[[", "fit_model")
     }
     valid_err = colMeans(valid_err_mat)
     opt_ind = max(which(valid_err == min(valid_err)))
@@ -423,8 +425,8 @@ Kfold_ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfold
   out$opt_ind = opt_ind
   out$valid_err = valid_err
   out$nfolds = nfolds
-  out$fold_models = lapply(model_list, "[[", opt_ind)
-  out$fold_ind = fold_list
+  # out$fold_models = lapply(model_list, "[[", opt_ind)
+  # out$fold_ind = fold_list
   out$x = x
   out$y = y
   out$valid_x = valid_x
