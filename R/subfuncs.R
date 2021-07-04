@@ -387,7 +387,7 @@ dlinear = function(X, xp, kparam = 1)
 #   return(drop(crossprod(alpha, X)))
 # }
 
-dpoly = function(alpha, X, xp, kparam = 1)
+dpoly = function(X, xp, kparam = 1)
 {
   # degree = kernel_par$degree
   # scale = kernel_par$scale
