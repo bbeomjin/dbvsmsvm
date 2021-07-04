@@ -244,7 +244,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
                            })
                            
                            if (!inherits(error, "try-error")) {
-                             pred_val = predict.ramsvm(msvm_fit, newx = x_valid[, fold_gd > thresh, drop = FALSE])
+                             pred_val = predict.ramsvm(msvm_fit, newx = x_valid[, init_gd > thresh, drop = FALSE])
                              
                              if (criterion == "0-1") {
                                acc = sum(y_valid == pred_val$class) / length(y_valid)
