@@ -4,6 +4,7 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, weight = NULL,
   out = list()
   
   D = K + 1
+  D = fixit(D)
   max_D = max(abs(D))
   diag(D) = diag(D) + max_D * epsilon_D
   

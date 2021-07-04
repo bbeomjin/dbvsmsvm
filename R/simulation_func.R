@@ -1,4 +1,3 @@
-require(mlbench)
 sim_gen = function(n, p, class = 3, seed = NULL, type = c("bayes", "poly", "cosso", "neuralnet"))
 {
   call = match.call()
