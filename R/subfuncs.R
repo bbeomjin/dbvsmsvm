@@ -554,7 +554,7 @@ gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", 
   
   grad_mat = 0
   for (i in 1:n) {
-    dK_sq = crossprod(alpha, ddkernel(x, x[i, ], kparam, comb_set))^2
+    dK_sq = (crossprod(alpha, ddkernel(x, x[i, ], kparam, comb_set)) / n)^2
     # gd_mat = gd_mat + crossprod(W_mat, dK)^2 / n
     grad_mat = grad_mat + dK_sq / n
   }
@@ -562,9 +562,9 @@ gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", 
   if (scale) {
     scaler = sum(drop(crossprod(W_mat, sqrt(scale_const)))^2)
     # res = sapply(gd, function(x) return(mean(x^2) / scale_const))
-    res = colSums(grad_mat) / k / scaler
+    res = colSums(grad_mat)/ scaler
   } else {
-    res = colSums(gd) / k
+    res = colSums(gd)
   }
   
   # if (scale) {res = rowMeans(gd^2) / scale_const} else {res = rowMeans(gd^2)}
