@@ -471,6 +471,52 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
 }
 
 
+
+gradient2 = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "radial", "spline", "anova_radial"),
+                    kparam = 1)
+{
+  n = length(y)
+  k = length(unique(y))
+  
+  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam) + 1
+  
+  if (scale) {
+    scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
+  } else {
+    scale_const = rep(1, NCOL(alpha))
+  }
+  
+  dkernel = switch(kernel,
+                   linear = dlinear,
+                   poly = dpoly,
+                   radial = drbf,
+                   spline = dspline,
+                   anova_radial = drbf)
+  
+  
+  W_mat = XI_gen(k)
+  
+  grad_mat = 0
+  for (i in 1:n) {
+    # dK_sq = crossprod(alpha, dkernel(x, x[i, ], kparam))^2
+    dK_sq = crossprod(alpha, dkernel(x, x[i, ], kparam))^2
+    # gd_mat = gd_mat + crossprod(W_mat, dK)^2 / n
+    grad_mat = grad_mat + dK_sq / n
+  }
+  # browser()
+  # print(dim(dK))
+  
+  # print(dim(gd_mat))
+  # print(scaler)
+  # gd = colSums(gd_mat) / scaler
+  # res = gd
+  
+  res = colSums(grad_mat / scale_const) 
+  
+  return(res)
+}
+
+
 gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "radial"),
                               kparam = list(), active_set = NULL)
 {
