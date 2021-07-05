@@ -453,7 +453,7 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   grad_mat = 0
   for (i in 1:n) {
     # dK_sq = crossprod(alpha, dkernel(x, x[i, ], kparam))^2
-    dK_sq = (crossprod(alpha, dkernel(x, x[i, ], kparam)) / sqrt(scale_const))^2
+    dK_sq = crossprod(alpha, dkernel(x, x[i, ], kparam))^2
     # gd_mat = gd_mat + crossprod(W_mat, dK)^2 / n
     grad_mat = grad_mat + dK_sq / n
   }
@@ -465,7 +465,7 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
   # gd = colSums(gd_mat) / scaler
   # res = gd
   
-  res = colSums(grad_mat) #/ sum(scale_const) 
+  res = colSums(grad_mat / scale_const) #/ sum(scale_const) 
   
   return(res)
 }
