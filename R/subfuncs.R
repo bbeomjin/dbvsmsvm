@@ -426,7 +426,7 @@ gradient_interaction = function(alpha, x, y, kernel = c("linear", "poly", "radia
     grad_mat = grad_mat + dK_sq / n
   }
   
-  res = colSums(gd)
+  res = colSums(grad_mat)
   return(res)
 }
 
