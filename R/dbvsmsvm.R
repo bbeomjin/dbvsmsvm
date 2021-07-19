@@ -4,7 +4,7 @@
 
 dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6),
                     thresh_Ngrid = 10, kernel = "linear", kparam = 1, scale = FALSE, criterion = "0-1", cv_type = "original", interaction = FALSE,
-                    gd_scale = FALSE, optModel = FALSE, nCores = 1, ...)
+                    optModel = FALSE, nCores = 1, ...)
 {
   call = match.call()
   # Find a optimal lambda in first step
@@ -17,7 +17,7 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   
   # Find a relevant variable for optimal lambda in second step
   cat("Step 2 : ")
-  select_fit = threshold_fun.dbvsmsvm(initial_fit, thresh_Ngrid = thresh_Ngrid, cv_type = cv_type, criterion = criterion, gd_scale = gd_scale,
+  select_fit = threshold_fun.dbvsmsvm(initial_fit, thresh_Ngrid = thresh_Ngrid, cv_type = cv_type, criterion = criterion,
                                       interaction = interaction, nCores = nCores, ...)
   selected = select_fit$selected
   

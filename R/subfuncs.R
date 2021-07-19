@@ -339,27 +339,6 @@ drbf = function(X, xp, kparam = 1)
   return(tmp)
 }
 
-# drbf_mul = function(alpha, X, xp, kernel_par = list(sigma = NULL))
-# {
-#   gamma = kernel_par$sigma
-#   np = dim(X)
-#   diff_mat = X - matrix(xp, nrow = np[1], ncol = np[2], byrow = TRUE)
-#   dgd = crossprod(alpha, exp(-rowSums(diff_mat^2) * gamma) * 2 * gamma * diff_mat)
-#   return(dgd)
-# }
-
-
-# ddrbf = function(X, xp, kernel_par = list(sigma = NULL), ind1, ind2)
-# {
-#   gamma = kernel_par$sigma
-#   np = dim(X)
-#   diff_mat = X - matrix(xp, nrow = np[1], ncol = np[2], byrow = TRUE)
-#   tmp = exp(-rowSums(diff_mat^2) * gamma) * (2 * gamma * diff_mat[, ind1]) * (2 * gamma * diff_mat[, ind2])
-#   # dgd = drop(crossprod(alpha, tmp))
-#   return(tmp)
-# }
-
-
 ddrbf = function(X, xp, kparam = 1, comb_set)
 {
   gamma = kparam
@@ -382,10 +361,6 @@ dlinear = function(X, xp, kparam = 1)
   return(X)
 }
 
-# dlinear_mul = function(alpha, X, xp, kernel_par = list())
-# {
-#   return(drop(crossprod(alpha, X)))
-# }
 
 dpoly = function(X, xp, kparam = 1)
 {
@@ -399,15 +374,6 @@ dpoly = function(X, xp, kparam = 1)
   return(tmp)
 }
 
-# dpoly_mul = function(alpha, X, xp, kernel_par = list(degree = NULL))
-# {
-#   degree = kernel_par[[1]]
-#   scale = 1
-#   offset = 0
-#   tmp = degree * (scale * drop(X %*% xp) + offset)^{degree - 1} * scale * X
-#   return(drop(crossprod(alpha, tmp)))
-# }
-
 ddspline = function(x, y)
 {
   m1 = (x - (1 / 2)) + (1 / 2) * ((x - (1 / 2))^2 - (1 / 12)) * (y - (1 / 2))
@@ -416,29 +382,11 @@ ddspline = function(x, y)
   return(m1 - m2)
 }
 
-# dspline_mul = function(alpha, X, xp, kernel_par = list())
-# {
-#   res_mat = matrix(0, nrow = NROW(X), ncol = NCOL(X))
-#   for (k in 1:NCOL(X)) {
-#     res_mat[, k] = ddspline(X[, k], xp[k])
-#   }
-#   dgd = drop(crossprod(alpha, res_mat))
-#   return(dgd)
-# }
 
-gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "radial", "spline", "anova_radial"),
-                    kparam = 1)
+gradient = function(alpha, x, y, kernel = c("linear", "poly", "radial", "spline", "anova_radial"), kparam = 1)
 {
   n = length(y)
   k = length(unique(y))
-  
-  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam) + 1
-  
-  if (scale) {
-    scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
-  } else {
-    scale_const = rep(1, NCOL(alpha))
-  }
   
   dkernel = switch(kernel,
                    linear = dlinear,
@@ -447,147 +395,38 @@ gradient = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "rad
                    spline = dspline,
 				           anova_radial = drbf)
   
-  
-  W_mat = XI_gen(k)
-  
   grad_mat = 0
   for (i in 1:n) {
-    # dK_sq = crossprod(alpha, dkernel(x, x[i, ], kparam))^2
     dK_sq = crossprod(alpha, dkernel(x, x[i, ], kparam))^2
-    # gd_mat = gd_mat + crossprod(W_mat, dK)^2 / n
     grad_mat = grad_mat + dK_sq / n
   }
-  # browser()
-  # print(dim(dK))
   
-  # print(dim(gd_mat))
-  # print(scaler)
-  # gd = colSums(gd_mat) / scaler
-  # res = gd
-  
-  res = colSums(grad_mat / scale_const) #/ sum(scale_const) 
-  
+  res = colSums(grad_mat)
   return(res)
 }
 
 
 
-gradient2 = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "radial", "spline", "anova_radial"),
-                    kparam = 1)
+gradient_interaction = function(alpha, x, y, kernel = c("linear", "poly", "radial"),
+                                kparam = 1, active_set = NULL)
 {
   n = length(y)
   k = length(unique(y))
-  
-  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam) + 1
-  
-  if (scale) {
-    scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
-  } else {
-    scale_const = rep(1, NCOL(alpha))
-  }
-  
-  dkernel = switch(kernel,
-                   linear = dlinear,
-                   poly = dpoly,
-                   radial = drbf,
-                   spline = dspline,
-                   anova_radial = drbf)
-  
-  
-  W = XI_gen(k)
-  
-  grad_mat = 0
-  for (i in 1:n) {
-    # dK_sq = crossprod(alpha, dkernel(x, x[i, ], kparam))^2
-    # dK_sq = (t(W) %*% crossprod(alpha, dkernel(x, x[i, ], kparam)))^2
-    dK_sq = (t(alpha) %*% dkernel(x, x[i, ], kparam))^2
-    # gd_mat = gd_mat + crossprod(W_mat, dK)^2 / n
-    grad_mat = grad_mat + dK_sq / n
-  }
-  # browser()
-  # print(dim(dK))
-  
-  # print(dim(gd_mat))
-  # print(scaler)
-  # gd = colSums(gd_mat) / scaler
-  # res = gd
-  
-  # res = colSums(grad_mat / scale_const) 
-  res = colSums(grad_mat) / sum(scale_const)
-  
-  return(res)
-}
-
-
-gradient_interaction = function(alpha, x, y, scale = TRUE, kernel = c("linear", "poly", "radial"),
-                              kparam = list(), active_set = NULL)
-{
-  n = length(y)
-  k = length(unique(y))
-  
-  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam) + 1
-  if (kernel == "linear") {
-    if (scale) {
-      # scale_const = sapply(1:NCOL(alpha), FUN = function(i) sum(crossprod(alpha[, i], x)^2))
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
-    }
-  }
-  
-  if (kernel == "poly") {
-    if (scale) {
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
-    }
-  }
-  
-  if ((kernel == "radial") | (kernel == "anova_radial")) {
-    if (scale) {
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
-      # scale_const = drop(t(alpha) %*% kernelMatrix(rbf, X) %*% alpha)
-      # system.time((a = sum(sapply(1:n, FUN = function(i) K_rbf(alpha, X, X[i, ], sigma = sigma)) * alpha)))
-    }
-  }
-  
-  if (kernel == "spline") {
-    if (scale) {
-      scale_const = sapply(1:NCOL(alpha), FUN = function(i) drop(crossprod(alpha[, i], K) %*% alpha[, i]))
-    }
-  }
   
   ddkernel = switch(kernel,
                     linear = ddlinear,
                     poly = ddpoly,
-                    poly2 = ddpoly,
-                    radial = ddrbf,
-                    radial2 = ddrbf)
-  
-  W_mat = XI_gen(k)
+                    radial = ddrbf)
   
   comb_set = combn(active_set, 2)
-  
-  
-  # system.time({
-  #   gd = sapply(1:ncol(comb_set), function(k) {
-  #     gd_res = rowMeans(sapply(1:n, FUN = function(i) {return(crossprod(alpha, ddkernel(x, x[i, ], kparam, comb_set[1, k], comb_set[2, k]))^2)}))
-  #     return(gd_res)
-  #   })
-  # })
   
   grad_mat = 0
   for (i in 1:n) {
     dK_sq = crossprod(alpha, ddkernel(x, x[i, ], kparam, comb_set))^2
-    # gd_mat = gd_mat + crossprod(W_mat, dK)^2 / n
     grad_mat = grad_mat + dK_sq / n
   }
   
-  if (scale) {
-    scaler = sum(drop(crossprod(W_mat, sqrt(scale_const)))^2)
-    # res = sapply(gd, function(x) return(mean(x^2) / scale_const))
-    res = colSums(grad_mat)/ scaler
-  } else {
-    res = colSums(gd)
-  }
-  
-  # if (scale) {res = rowMeans(gd^2) / scale_const} else {res = rowMeans(gd^2)}
+  res = colSums(gd)
   return(res)
 }
 
@@ -602,7 +441,7 @@ data_split = function(y, nfolds, seed = length(y))
   ran = rep(0, n_data) 
   if ((min(class_size) < nfolds) & (nfolds != n_data))
   {
-    warning(' The given fold is bigger than the smallest class size. \n Only a fold size smaller than the minimum class size \n or the same as the sample size (LOOCV) is supported.\n')
+    warning('The given fold is bigger than the smallest class size. \n Only a fold size smaller than the minimum class size \n or the same as the sample size (LOOCV) is supported.\n')
     return(NULL)
   }
   
@@ -793,8 +632,6 @@ fixit = function(A, epsilon = .Machine$double.eps, is_diag = FALSE)
     eps = max(tol * abs(eig$values[1]), 0)
     eig$values[eig$values < eps] = eps
     Q = eig$vectors %*% diag(eig$values) %*% t(eig$vectors)
-    # positive = eig$values > eps
-    # Q = eig$vectors[, positive, drop = FALSE] %*% diag(eig$values[positive]) %*% t(eig$vectors[, positive, drop = FALSE])
   }
   return(Q)
 }
