@@ -320,7 +320,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
                                                           active_set, temp[, fold_gd_int > thresh, drop = FALSE])
                                   
                                   # Fit model under the fold set
-                                  msvm_fit = ramsvm_solver(K = KK, y = y_fold, gamma = gamma, lambda = lambda, ...)
+                                  msvm_fit = ramsvm(K = KK, y = y_fold, gamma = gamma, lambda = lambda, ...)
                                   
                                   valid_KK = interaction_kernel(x_valid, x_fold, kernel = kernel, kparam = kparam, 
                                                                 active_set, temp[, fold_gd_int > thresh, drop = FALSE])

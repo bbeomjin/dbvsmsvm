@@ -202,31 +202,31 @@ ramsvm_compact = function(K, y, gamma = 0.5, lambda, epsilon = 1e-6, eig_tol_D =
 }
 
 
-ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1", "type2"), ...)
+ramsvm = function(x = NULL, K = NULL, y, gamma = 0.5, lambda = 1, 
+                  kernel = NULL, kparam = NULL, scale = FALSE, type = c("type1", "type2"), ...)
 {
   out = list()
   type = match.arg(type)
-  # y_temp = as.factor(y)
-  # y_name = levels(y_temp)
+  n = length(y)
   n_class = length(unique(y))
-  # 
-  # y_int = integer(length(y))
-  # for(j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
-  # if (is(y, "numeric")) {y_name = as.numeric(y_name)}
+  center = NULL
+  scaled = NULL
   
-  n = NROW(x)
-  p = ncol(x)
   
-  center = rep(0, p)
-  scaled = rep(1, p)
-  
-  if (scale) {
-    x = scale(x)
-    center = attr(x, "scaled:center")
-    scaled = attr(x, "scaled:scale")
+  if (!is.null(x)) {
+    
+    p = ncol(x)
+    center = rep(0, p)
+    scaled = rep(1, p)
+    
+    if (scale) {
+      x = scale(x)
+      center = attr(x, "scaled:center")
+      scaled = attr(x, "scaled:scale")
+    }
+    K = kernelMatrix(x, x, kernel = kernel, kparam = kparam)
   }
   
-  K = kernelMatrix(x, x, kernel = kernel, kparam = kparam)
   if (type == "type1") {
     solutions = ramsvm_solver(K = K, y = y, gamma = gamma, lambda = lambda, ...)
   } else {
@@ -234,6 +234,7 @@ ramsvm = function(x = NULL, y, gamma = 0.5, lambda, kernel, kparam, scale = FALS
   }
   
   out$x = x
+  out$K = K
   out$y = y
   out$y_name = solutions$y_name
   out$gamma = gamma
