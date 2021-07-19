@@ -131,7 +131,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
 
   out = list()
   out$selected = selected
-  cat("The number of selected features out of ", length(selected), ":", sum(selected), "\r", "\n")
+  cat(" The number of selected features out of ", length(selected), ":", sum(selected), "\r", "\n")
   out$gd = gd
   out$thresh_path = gd_vec
   out$opt_thresh = opt_thresh
@@ -298,6 +298,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       opt_thresh_int = NULL
       int_opt_valid_err = NULL
       int_valid_err = NULL
+      gd_vec_int = 0
     } else {
       gd_interaction = gradient_interaction(alpha = fit$cmat, x = x, y = y, kernel = kernel, kparam = kparam, active_set = active_set)
       temp = combn(active_set, 2)
