@@ -298,6 +298,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       opt_thresh_int = NULL
       int_valid_err = Inf
       gd_vec_int = NULL
+      int_valid_se = NULL
     } else {
       gd_interaction = gradient_interaction(alpha = fit$cmat, x = x, y = y, kernel = kernel, kparam = kparam, active_set = active_set)
       temp = combn(active_set, 2)
