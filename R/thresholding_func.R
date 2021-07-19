@@ -179,7 +179,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
   p = NCOL(x)
   
   # Initial fitting
-  fit = ramsvm(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, ...)
+  fit = ramsvm(x = x, y = y, gamma = gamma, lambda = lambda, kernel = kernel, kparam = kparam, scale = FALSE, ...)
 
   # Compute the gradient with respect to x
   gd = gradient(alpha = fit$cmat, x = x, y = y, kernel = kernel, kparam = kparam)
@@ -193,7 +193,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
     fold_err = mclapply(gd_vec,
                         function(thresh) {
                           msvm_fit = ramsvm(x = x[, gd > thresh, drop = FALSE], y = y, gamma = gamma,
-                                                   lambda = lambda, kernel = kernel, kparam = kparam, ...)
+                                                   lambda = lambda, kernel = kernel, kparam = kparam, scale = FALSE, ...)
 
                           pred_val = predict.ramsvm(msvm_fit, newx = valid_x[, gd > thresh, drop = FALSE])
 
@@ -229,7 +229,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       
       # Initial fitting RAMSVM for computing the gradients
       init_fit = ramsvm(x = x_fold, y = y_fold, gamma = gamma, lambda = lambda,
-                        kernel = kernel, kparam = kparam, ...)
+                        kernel = kernel, kparam = kparam, scale = FALSE, ...)
       
       init_gd = gradient(alpha = init_fit$cmat, x = x_fold, y = y_fold, kernel = kernel, kparam = kparam)
       
@@ -238,7 +238,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
                            # Fit model under the fold set
                            error = try({
                              msvm_fit = ramsvm(x = x_fold[, init_gd > thresh, drop = FALSE], y = y_fold, gamma = gamma,
-                                               lambda = lambda, kernel = kernel, kparam = kparam, ...) 
+                                               lambda = lambda, kernel = kernel, kparam = kparam, scale = FALSE, ...) 
                            })
                            
                            if (!inherits(error, "try-error")) {
@@ -308,26 +308,23 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
         y_valid = y[fold]
         x_valid = x[fold, , drop = FALSE]
         
-        # Pre-computed gradient
-        fold_model = object$fold_models[[i]]
-        fold_gd_int = gradient_interaction(alpha = fold_model$cmat, x = x_fold, y = y_fold, 
+        # Initial fitting RAMSVM for computing the gradients
+        init_fit = ramsvm(x = x_fold, y = y_fold, gamma = gamma, lambda = lambda,
+                          kernel = kernel, kparam = kparam, scale = FALSE, ...)
+        fold_gd_int = gradient_interaction(alpha = init_fit$cmat, x = x_fold, y = y_fold, 
                                            kernel = kernel, kparam = kparam, active_set = active_set)
         
         fold_err_int = mclapply(gd_vec_int,
                                 function(thresh) {
-                                  
-                                  # clique_list = interaction_graph(temp[, fold_gd_int > thresh, drop = FALSE], p, min = 3)
-                                  clique_list = list()
                                   KK = interaction_kernel(x_fold, x_fold, kernel = list(type = kernel, par = kparam), 
-                                                          active_set, temp[, fold_gd_int > thresh, drop = FALSE], clique_list)
-                                  
+                                                          active_set, temp[, fold_gd_int > thresh, drop = FALSE])
                                   
                                   # Fit model under the fold set
-                                  msvm_fit = ramsvm(K = KK, y = y_fold, gamma = gamma,
+                                  msvm_fit = ramsvm_solver(K = KK, y = y_fold, gamma = gamma,
                                                            lambda = lambda, kernel = kernel, kparam = kparam, ...)
                                   
                                   valid_KK = interaction_kernel(x_valid, x_fold, kernel = list(type = kernel, par = kparam), 
-                                                                active_set, temp[, fold_gd_int > thresh, drop = FALSE], clique_list)
+                                                                active_set, temp[, fold_gd_int > thresh, drop = FALSE])
                                   pred_val = predict.ramsvm(msvm_fit, newK = valid_KK)
                                   
                                   if (criterion == "0-1") {

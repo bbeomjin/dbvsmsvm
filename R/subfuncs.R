@@ -485,7 +485,7 @@ strong_heredity = function(main_effect, interaction)
 #   return(cliques_list)
 # }
 
-interaction_kernel = function(x, u, kernel, kparam, active_set, interaction_set, clique_list)
+interaction_kernel = function(x, u, kernel, kparam, active_set, interaction_set)
 {
   if (!is.matrix(x)) {
     x = as.matrix(x)
@@ -509,51 +509,15 @@ interaction_kernel = function(x, u, kernel, kparam, active_set, interaction_set,
     return(list(res = res, K = K, K1 = K1, K2 = K2))
   }
   
-  # numK = dimx * (dimx - 1) / 2
-  # anova_kernel_temp = vector(mode = "list", dimx)
   main_effects = vector(mode = "list", dimx)
-  high_order_kernel = vector(mode = "list", length(clique_list))
-  # const_term = vector(mode = "list", dimx)
-  # kernelCoord = vector(mode = "list", numK)
-  
   
   for (j in 1:length(active_set)) {
     temp_kernel = scaled_kernel(x, u, kernel = kernel, kparam = kparam, active_set = active_set, index = active_set[j])
     main_effects[[active_set[j]]] = temp_kernel$res
-    # const_term[[active_set[j]]] = temp_kernel[-1]
   }
-  
-  
-  # if (length(clique_list) != 0) {
-  #   for (d in 1:length(clique_list)) {
-  #     ind = sort(as.vector(clique_list[[d]]))
-  #     # scale_const = scaler(x, u, kernel, active_set, ind)
-  #     # anova_kernel[[d]] = scale_const$K * (main_kernel(x[, ind, drop = FALSE], u[, ind, drop = FALSE], kernel))
-  #     clique_kernel = scaled_kernel(x, u, kernel, active_set, ind)$res
-  #     temp_comb = combn(ind, 2)
-  #     # interaction_effects = lapply(1:ncol(temp_comb), FUN = function(i) {
-  #     #   ind = temp_comb[, i]
-  #     #   return(((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1)
-  #     # })
-  #     # sum_interaction = Reduce("+", interaction_effects)
-  #     
-  #     sum_interaction = 0
-  #     for (i in 1:ncol(temp_comb)) {
-  #       ind = temp_comb[, i]
-  #       sum_interaction = sum_interaction + ((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1
-  #     }
-  #     
-  #     sum_main = Reduce("+", main_effects[ind])
-  #     high_order_kernel[[d]] = clique_kernel - sum_main - sum_interaction
-  #   }
-  # }
   
   interaction_kernel = 0
   if (ncol(interaction_set) != 0) {
-    # interaction_kernel = lapply(1:ncol(interaction_set), FUN = function(i) {
-    #   ind = interaction_set[, i]
-    #   return(((main_effects[[ind[1]]]) * (main_effects[[ind[2]]])) / temp_kernel$K1)
-    # })
     
     for (i in 1:ncol(interaction_set)) {
       ind = interaction_set[, i]
@@ -561,13 +525,8 @@ interaction_kernel = function(x, u, kernel, kparam, active_set, interaction_set,
     }
   }
   
-  # if (length(clique_list) != 0) {
-  #   # K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + Reduce("+", interaction_kernel) + Reduce("+", high_order_kernel)
-  #   K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + interaction_kernel + Reduce("+", high_order_kernel)
-  # } else {
-    # K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + Reduce("+", interaction_kernel)
   K = temp_kernel$K1 + Reduce("+", main_effects[active_set]) + interaction_kernel
-  # }
+  
   return(K)
 }
 
