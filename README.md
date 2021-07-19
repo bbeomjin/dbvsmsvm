@@ -1,8 +1,7 @@
 # dbvsmsvm
 Derivative-based variable selection method for multicategory support vector machine
 
-"dbvsmsvm" is an R package. ZILGM provides functions to fit the type I and II zero-inflated local negative binomial graphical models (ZILNBGM), and zero-inflated local Poisson graphical model (ZILPGM).
-It also provides a function that generates simulation data. 
+"dbvsmsvm" is an R package. dbvsmsvm provides functions to implement the derivative-based variable selection method for multicategory problems using the angle-based multicategory support vector machine (MSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
 
 ## 1. INSTALLATION
 
