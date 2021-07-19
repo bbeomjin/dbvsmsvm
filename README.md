@@ -1,7 +1,7 @@
 # dbvsmsvm
 Derivative-based variable selection method for multicategory support vector machine
 
-```dbvsmsvm``` is an R package. ```dbvsmsvm``` provides functions to implement the derivative-based variable selection method for multicategory problems using the angle-based multicategory support vector machine (MSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
+```dbvsmsvm``` is an R package. ```dbvsmsvm``` provides functions to implement the derivative-based variable selection method for multicategory problems using the reinforced angle-based multicategory support vector machine (RAMSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
 
 ## 1. INSTALLATION
 
@@ -12,7 +12,7 @@ Please see below to install in R.
 (1) From GitHub
 ```{r}
 > library(devtools)
-> install_github("bbeomjin/ZILGM")
+> install_github("bbeomjin/dbvsmsvm")
 ```
 
 ## 2. USAGE NOTES
@@ -22,11 +22,11 @@ Please see below to install in R.
 - Descriptions of arguments in the functions in ```dbvsmsvm``` can be obtained by help() or ? in R prompt, and documentation of ```dbvsmsvm```.   
 
 
-(3) List of R functions in ZILGM package
+(2) List of R functions in ```dbvsmsvm``` package
 
-- zilgm : "zilgm" function is used to fit the type I and II ZILNBGM model, and ZILPGM model.
+- ```dbvsmsvm``` : ```dbvsmsvm``` function is used to implement variable selection with the derivative-based variable selection method.
 
-- generate_network : "generate_network" function is that generates scale-free, hub and random graph strutures.
+- ```Kfold_ramsvm``` : ```Kfold_ramsvm``` function selects the optimal regularization parameter for the RAMSVM by k-fold cross-validation and yields the classifier with optimal parameter.
 
 - zilgm_sim : "zilgm_sim" is used to generate the zero-inflated count data with overdispersion for simulation given graph structure.
 
