@@ -1,12 +1,12 @@
 # dbvsmsvm
 Derivative-based variable selection method for multicategory support vector machine
 
-"dbvsmsvm" is an R package. The dbvsmsvm package provides functions to implement the derivative-based variable selection method for multicategory problems using the angle-based multicategory support vector machine (MSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
+```{r}dbvsmsvm``` is an R package. The dbvsmsvm package provides functions to implement the derivative-based variable selection method for multicategory problems using the angle-based multicategory support vector machine (MSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
 
 ## 1. INSTALLATION
 
-The dbvsmsvm package is not submitted to CRAN. Therefore, the dbvsmsvm package can not be installed through install.packages("ZILGM") in R prompt.
-Instead, the ZILGM package can be installed through our GitHub.
+The dbvsmsvm package is not submitted to CRAN. Therefore, the dbvsmsvm package can not be installed through install.packages("dbvsmsvm") in R prompt.
+Instead, the dbvsmsvm package can be installed through our GitHub.
 Please see below to install in R.
 
 (1) From GitHub
