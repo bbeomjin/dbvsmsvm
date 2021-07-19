@@ -316,7 +316,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
         
         fold_err_int = mclapply(gd_vec_int,
                                 function(thresh) {
-                                  KK = interaction_kernel(x_fold, x_fold, kernel = kernel, kparam = kparam), 
+                                  KK = interaction_kernel(x_fold, x_fold, kernel = kernel, kparam = kparam, 
                                                           active_set, temp[, fold_gd_int > thresh, drop = FALSE])
                                   
                                   # Fit model under the fold set
