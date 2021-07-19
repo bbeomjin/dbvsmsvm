@@ -357,7 +357,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       int_comb = temp[, int_selected == 1, drop = FALSE]
       int_selected = as.integer(paste0(comb_f[1, ], comb_f[2, ]) %in% paste0(int_comb[1, ], int_comb[2, ]))
     }
-    out$int_selected = c(selected, int_selected)
+    out$selected = c(selected, int_selected)
     out$gd_interaction = gd_interaction
     out$opt_threshold_int = opt_thresh_int
     out$threshold_path_int = gd_vec_int
