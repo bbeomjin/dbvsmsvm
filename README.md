@@ -26,11 +26,11 @@ Please see below to install in R.
 
 - ```dbvsmsvm``` : ```dbvsmsvm``` function is used to implement variable selection with the derivative-based variable selection method.
 
-- ```Kfold_ramsvm``` : ```Kfold_ramsvm``` function selects the optimal regularization parameter for the RAMSVM by k-fold cross-validation and yields the classifier with optimal parameter.
+- ```Kfold_ramsvm``` : ```Kfold_ramsvm``` function tunes regularization parameters of the RAMSVM by k-fold cross-validation and yields the model on the complete data with optimal parameter.
 
-- zilgm_sim : "zilgm_sim" is used to generate the zero-inflated count data with overdispersion for simulation given graph structure.
+- ```ramsvm``` : ```ramsvm``` is used to fit the RAMSVM with supplied hyperparameter on the given data.
 
-- find_lammax : "find_lammax"  function finds the maximum value of the regularization parameter.
+- ```sramsvm``` : ```sramsvm``` function tunes hyperparameters of the SRAMSVM and then fit the SRAMSVM with optimal hyperparameters.
 
 
 ## 3. EXAMPLE
