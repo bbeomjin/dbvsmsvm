@@ -216,6 +216,7 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
     # fold_list = object$fold_ind
     nfolds = object$nfolds
     fold_list = data_split(y, nfolds)
+    model_list = vector("list", nfolds)
     valid_err_mat = matrix(NA, nrow = nfolds, ncol = length(gd_vec))
     
     for (i in 1:nfolds) {
@@ -231,6 +232,10 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
       init_fit = ramsvm(x = x_fold, y = y_fold, gamma = gamma, lambda = lambda,
                         kernel = kernel, kparam = kparam, scale = FALSE, ...)
       
+      # Save the fitted model
+      model_list[[i]] = init_fit
+      
+      # Compute the partial derivative
       init_gd = gradient(alpha = init_fit$cmat, x = x_fold, y = y_fold, kernel = kernel, kparam = kparam)
       
       fold_err = mclapply(gd_vec,
@@ -309,8 +314,9 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
         x_valid = x[fold, , drop = FALSE]
         
         # Initial fitting RAMSVM for computing the gradients
-        init_fit = ramsvm(x = x_fold, y = y_fold, gamma = gamma, lambda = lambda,
-                          kernel = kernel, kparam = kparam, scale = FALSE, ...)
+        # init_fit = ramsvm(x = x_fold, y = y_fold, gamma = gamma, lambda = lambda,
+        #                   kernel = kernel, kparam = kparam, scale = FALSE, ...)
+        init_fit = model_list[[i]]
         fold_gd_int = gradient_interaction(alpha = init_fit$cmat, x = x_fold, y = y_fold, 
                                            kernel = kernel, kparam = kparam, active_set = active_set)
         
@@ -347,8 +353,11 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
         opt_thresh_int = gd_vec_int[int_opt_ind]
       }
       int_selected = as.integer(gd_interaction > opt_thresh_int)
+      comb_f = combn(1:p, 2)
+      int_comb = temp[, int_selected == 1, drop = FALSE]
+      int_selected = as.integer(paste0(comb_f[1, ], comb_f[2, ]) %in% paste0(int_comb[1, ], int_comb[2, ]))
     }
-    out$int_selected = int_selected
+    out$int_selected = c(selected, int_selected)
     out$gd_interaction = gd_interaction
     out$opt_threshold_int = opt_thresh_int
     out$threshold_path_int = gd_vec_int
