@@ -316,14 +316,14 @@ threshold_fun.dbvsmsvm = function(object, thresh_Ngrid = 10, cv_type = c("origin
         
         fold_err_int = mclapply(gd_vec_int,
                                 function(thresh) {
-                                  KK = interaction_kernel(x_fold, x_fold, kernel = list(type = kernel, par = kparam), 
+                                  KK = interaction_kernel(x_fold, x_fold, kernel = kernel, kparam = kparam), 
                                                           active_set, temp[, fold_gd_int > thresh, drop = FALSE])
                                   
                                   # Fit model under the fold set
                                   msvm_fit = ramsvm_solver(K = KK, y = y_fold, gamma = gamma,
                                                            lambda = lambda, kernel = kernel, kparam = kparam, ...)
                                   
-                                  valid_KK = interaction_kernel(x_valid, x_fold, kernel = list(type = kernel, par = kparam), 
+                                  valid_KK = interaction_kernel(x_valid, x_fold, kernel = kernel, kparam = kparam, 
                                                                 active_set, temp[, fold_gd_int > thresh, drop = FALSE])
                                   pred_val = predict.ramsvm(msvm_fit, newK = valid_KK)
                                   
