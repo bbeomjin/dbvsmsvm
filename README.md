@@ -1,12 +1,12 @@
 # dbvsmsvm
 Derivative-based variable selection method for multicategory support vector machine
 
-```dbvsmsvm``` is an R package. The ```dbvsmsvm``` provides functions to implement the derivative-based variable selection method for multicategory problems using the angle-based multicategory support vector machine (MSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
+```dbvsmsvm``` is an R package. ```dbvsmsvm``` provides functions to implement the derivative-based variable selection method for multicategory problems using the angle-based multicategory support vector machine (MSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
 
 ## 1. INSTALLATION
 
-The ```dbvsmsvm``` is not submitted to CRAN. Therefore, the ```dbvsmsvm``` can not be installed through install.packages("dbvsmsvm") in R prompt.
-Instead, the ```dbvsmsvm``` can be installed through our GitHub.
+```dbvsmsvm``` is not submitted to CRAN. Therefore, ```dbvsmsvm``` can not be installed through install.packages("dbvsmsvm") in R prompt.
+Instead, ```dbvsmsvm``` can be installed through our GitHub.
 Please see below to install in R.
 
 (1) From GitHub
@@ -17,26 +17,9 @@ Please see below to install in R.
 
 ## 2. USAGE NOTES
 
-(1) Access to and use of real data in the manuscript
+(1) Description of R functions in ```dbvsmsvm```
 
-- Cervical data : Cervical data can be available at the "MLSeq" package in R. The data can be loaded with the code below in R.
-```{r}
-> library(BioManager)
-> BioManager::install("MLSeq")
-> library(MLSeq)
-> data(cervical)
-```
-- Classic3 data : Classic3 data can be available at http://www.dataminingresearch.com/index.php/2010/09/classic3-classic4-datasets. 
-	         However, it seems that the URL cannot be accessed. Therefore, we included classic3 data in our ZILGM package.
-	         The data can be loaded with the code below in R.
-```{r}
-> library(ZILGM)
-> data(classic3)
-```
-
-(2) Description of R functions in ZILGM package
-
-- Descriptions of arguments in the functions in ZILGM can be obtained by help() or ? in R prompt, and documentation of ZILGM.   
+- Descriptions of arguments in the functions in ```dbvsmsvm``` can be obtained by help() or ? in R prompt, and documentation of ```dbvsmsvm```.   
 
 
 (3) List of R functions in ZILGM package
