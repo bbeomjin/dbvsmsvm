@@ -19,13 +19,12 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   cat("Step 2 : ")
   select_fit = threshold_fun.dbvsmsvm(initial_fit, thresh_Ngrid = thresh_Ngrid, cv_type = cv_type, criterion = criterion,
                                       interaction = interaction, nCores = nCores, ...)
-  selected = select_fit$selected[1:NCOL(x)]
   
   # Find a optimal lambda under the selected variable in third step  
-  selected_x = x[, selected == 1, drop = FALSE]
+  selected_x = x[, select_fit$selected[1:NCOL(x)] == 1, drop = FALSE]
   
   out = list()
-  out$selected = selected
+  out$selected = select_fit$selected
   out$gd = select_fit$gd
   out$threshold_path = select_fit$threshold_path
   out$opt_threshold = select_fit$opt_threshold
@@ -33,7 +32,7 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   out$opt_valid_err = select_fit$opt_valid_err
   out$opt_valid_err_se = select_fit$opt_valid_err_se
   if (interaction) {
-    out$int_selected = select_fit$int_selected
+    # out$int_selected = select_fit$int_selected
     out$gd_interaction = select_fit$gd_interaction
     out$threshold_path_int = select_fit$threshold_path_int
     out$opt_threshold_int = select_fit$opt_threshold_int
