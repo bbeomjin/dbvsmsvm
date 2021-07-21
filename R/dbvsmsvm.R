@@ -2,11 +2,15 @@
 # DBVSMSVM v1.0.0: R functions written by Beomjin Park
 ###########################################################################
 
-dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6),
-                    thresh_Ngrid = 10, kernel = "linear", kparam = 1, scale = FALSE, criterion = "0-1", cv_type = "original", interaction = FALSE,
-                    optModel = FALSE, nCores = 1, ...)
+dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, 
+                    lambda_seq = 2^{seq(-10, 15, length.out = 100)}, 
+                    v_seq = NULL, Nofv = 100,
+                    u_seq = NULL, Nofu = 100, 
+                    kernel = c("linear", "radial"), kparam = 1, scale = FALSE,
+                    criterion = "0-1", cv_type = "original", interaction = FALSE, optModel = FALSE, nCores = 1, ...)
 {
   call = match.call()
+  kernel = match.arg(kernel)
   # Find a optimal lambda in first step
   cat("Step 1 : ")
   initial_fit = Kfold_ramsvm(x = x, y = y, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds, 
@@ -17,7 +21,8 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   
   # Find a relevant variable for optimal lambda in second step
   cat("Step 2 : ")
-  select_fit = threshold_fun.dbvsmsvm(initial_fit, thresh_Ngrid = thresh_Ngrid, cv_type = cv_type, criterion = criterion,
+  select_fit = threshold_fun.dbvsmsvm(initial_fit, v_seq = v_seq, Nofv = Nofv, u_seq = u_seq, Nofu = Nofu,
+                                      cv_type = cv_type, criterion = criterion,
                                       interaction = interaction, nCores = nCores, ...)
   
   # Find a optimal lambda under the selected variable in third step  
@@ -26,16 +31,16 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   out = list()
   out$selected = select_fit$selected
   out$gd = select_fit$gd
-  out$threshold_path = select_fit$threshold_path
-  out$opt_threshold = select_fit$opt_threshold
+  out$v_path = select_fit$v_path
+  out$opt_v = select_fit$opt_v
   out$valid_err = select_fit$valid_err
   out$opt_valid_err = select_fit$opt_valid_err
   out$opt_valid_err_se = select_fit$opt_valid_err_se
   if (interaction) {
     # out$int_selected = select_fit$int_selected
     out$gd_interaction = select_fit$gd_interaction
-    out$threshold_path_int = select_fit$threshold_path_int
-    out$opt_threshold_int = select_fit$opt_threshold_int
+    out$u_path = select_fit$u_path
+    out$opt_u = select_fit$opt_u
     out$int_valid_err = select_fit$int_valid_err
     out$int_opt_valid_err = select_fit$int_opt_valid_err
     # out$int_valid_se = select_fit$se_int
