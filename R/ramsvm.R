@@ -329,6 +329,7 @@ Kfold_ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfold
                         kernel = c("linear", "radial", "poly", "spline", "anova_radial"), kparam = c(1),
                         scale = FALSE, criterion = c("0-1", "loss"), optModel = FALSE, nCores = 1, ...)
 {
+  out = list()
   call = match.call()
   kernel = match.arg(kernel)
   criterion = match.arg(criterion)
@@ -381,7 +382,7 @@ Kfold_ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfold
     # set.seed(y[1])
     # fold_list = createFolds(y, k = nfolds, list = TRUE)
     fold_list = data_split(y, nfolds)
-    valid_err_mat = matrix(NA, nrow = nfolds, ncol = nrow(params))
+    valid_err = matrix(NA, nrow = nfolds, ncol = nrow(params), dimnames = list(paste0("Fold", 1:nfolds)))
     # model_list = vector("list", nfolds)
     
     for (i in 1:nfolds) {
@@ -410,17 +411,16 @@ Kfold_ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfold
                             return(err)
                           }, mc.cores = nCores)
       # valid_err_mat[i, ] = sapply(fold_err, "[[", "error")
-      valid_err_mat[i, ] = unlist(fold_err)
+      valid_err[i, ] = unlist(fold_err)
       # model_list[[i]] = lapply(fold_err, "[[", "fit_model")
     }
-    valid_err = colMeans(valid_err_mat)
-    opt_ind = max(which(valid_err == min(valid_err)))
+    mean_valid_err = colMeans(valid_err)
+    opt_ind = max(which(mean_valid_err == min(mean_valid_err)))
 	# opt_ind = min(which(valid_err == min(valid_err)))
     opt_param = params[opt_ind, ]
-    opt_valid_err = min(valid_err)
+    opt_valid_err = min(mean_valid_err)
   }
   
-  out = list()
   out$opt_param = c(lambda = opt_param$lambda, kparam = opt_param$kparam)
   out$opt_valid_err = opt_valid_err
   out$opt_ind = opt_ind

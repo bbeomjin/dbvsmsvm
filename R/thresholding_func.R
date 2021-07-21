@@ -167,12 +167,6 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
   gamma = object$gamma
   kernel = object$kernel
   
-  if (object$scale & !is.null(valid_x)) {
-    means = attr(x, "scaled:center")
-    stds = attr(x, "scaled:scale")
-    valid_x = (valid_x - matrix(means, NROW(x), NCOL(x), byrow = TRUE)) / matrix(stds, NROW(x), NCOL(x), byrow = TRUE)
-  }
-
   # The number of classes
   k = length(unique(y))
   p = NCOL(x)
@@ -218,7 +212,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
     nfolds = object$nfolds
     fold_list = data_split(y, nfolds)
     model_list = vector("list", nfolds)
-    valid_err_mat = matrix(NA, nrow = nfolds, ncol = length(v_seq), dimnames = list(paste0("Fold", 1:nfolds)))
+    valid_err = matrix(NA, nrow = nfolds, ncol = length(v_seq), dimnames = list(paste0("Fold", 1:nfolds)))
     
     for (i in 1:nfolds) {
       cat(nfolds, "- fold CV :", i / nfolds * 100, "%", "\r")
@@ -261,19 +255,19 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
                            }
                            return(err)
                          }, mc.cores = nCores)
-      valid_err_mat[i, ] = unlist(fold_err)
+      valid_err[i, ] = unlist(fold_err)
     }
-    valid_err = colMeans(valid_err_mat)
-    valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
-    opt_ind = max(which(valid_err == min(valid_err)))
+    mean_valid_err = colMeans(valid_err)
+    valid_se = apply(valid_err, 2, sd) / sqrt(nfolds)
+    opt_ind = max(which(mean_valid_err == min(mean_valid_err)))
     
     if (cv_type == "osr") {
-      opt_ind_osr = max(which(valid_err <= (min(valid_err) + valid_se[opt_ind])))
+      opt_ind_osr = max(which(mean_valid_err <= (min(mean_valid_err) + valid_se[opt_ind])))
       opt_v = v_seq[opt_ind_osr]
     } else {
       opt_v = v_seq[opt_ind]
     }
-    opt_valid_err = min(valid_err)
+    opt_valid_err = min(mean_valid_err)
     selected = as.integer(pderiv_vec > opt_v)
   }
   
@@ -284,7 +278,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
                               opt_v = opt_v,
                               opt_valid_err = opt_valid_err,
                               opt_ind = opt_ind,
-                              valid_err_mat = valid_err_mat)
+                              valid_err = valid_err)
   
   if (interaction) {
     
@@ -294,7 +288,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
       interaction_selected = rep(0, choose(ncol(x), 2))
       so_pderiv_vec = rep(0, choose(ncol(x), 2))
       opt_u = NULL
-      valid_err = Inf
+      valid_err = NULL
       u_path = NULL
     } else {
       
@@ -306,7 +300,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
       }
       
       temp = combn(active_set, 2)
-      valid_err_mat = matrix(NA, nrow = nfolds, ncol = length(u_seq), dimnames = list(paste0("Fold", 1:nfolds)))
+      valid_err = matrix(NA, nrow = nfolds, ncol = length(u_seq), dimnames = list(paste0("Fold", 1:nfolds)))
       
       for (i in 1:nfolds) {
         cat(nfolds, "- fold CV (interaction) :", i / nfolds * 100, "%", "\r")
@@ -343,19 +337,19 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
                               }
                                 return(err)
                               }, mc.cores = nCores)
-        valid_err_mat[i, ] = unlist(fold_err)
+        valid_err[i, ] = unlist(fold_err)
       }
-      valid_err = colMeans(valid_err_mat)
-      valid_se = apply(valid_err_mat, 2, sd) / sqrt(nfolds)
-      opt_ind = max(which(valid_err == min(valid_err)))
-      opt_ind_osr = max(which(valid_err <= (valid_err[opt_ind] + valid_se[opt_ind])))
+      mean_valid_err = colMeans(valid_err)
+      valid_se = apply(valid_err, 2, sd) / sqrt(nfolds)
+      opt_ind = max(which(mean_valid_err == min(mean_valid_err)))
+      opt_ind_osr = max(which(mean_valid_err <= (mean_valid_err[opt_ind] + valid_se[opt_ind])))
       
       if (cv_type == "osr") {
         opt_u = u_seq[opt_ind_osr]
       } else {
         opt_u = u_seq[opt_ind]
       }
-      opt_valid_err = min(valid_err)
+      opt_valid_err = min(mean_valid_err)
       interaction_selected = as.integer(so_pderiv_vec > opt_u)
       comb_f = combn(1:p, 2)
       int_comb = temp[, interaction_selected == 1, drop = FALSE]
@@ -367,7 +361,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
                                             opt_u = opt_u,
                                             opt_valid_err = opt_valid_err,
                                             opt_ind = opt_ind,
-                                            valid_err_mat = valid_err_mat)
+                                            valid_err = valid_err)
   }
   out$cv_type = cv_type
   out$call = call
