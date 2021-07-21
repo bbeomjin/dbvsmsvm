@@ -45,7 +45,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
   # Compute threshold path
   if (is.null(v_seq)) {
     v_seq = seq(0, max(pderiv_vec), length.out = Nofv)
-    v_seq = v_seq[-c(length(v_seq))]
+    # v_seq = v_seq[-c(length(v_seq))]
   } 
   
   if (!is.null(valid_x) & !is.null(valid_y)) {
@@ -156,7 +156,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
       
       if (is.null(u_seq)) {
         u_seq = seq(0, max(so_pderiv_vec), length.out = Nofu)
-        u_seq = u_seq[-c(length(u_seq))]
+        # u_seq = u_seq[-c(length(u_seq))]
       }
       
       temp = combn(active_set, 2)
@@ -225,7 +225,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
   }
   out$cv_type = cv_type
   out$call = call
-  cat(" The number of selected features out of ", length(selected), ":", sum(selected), "\r", "\n")
+  cat(" The number of selected features out of ", length(out$selected), ":", sum(out$selected), "\r", "\n")
   return(out)
 }
 
@@ -261,7 +261,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
   # Compute thresholding path
   if (is.null(v_seq)) {
     v_seq = seq(0, max(pderiv_vec), length.out = Nofv)
-    v_seq = v_seq[-c(length(v_seq))]
+    # v_seq = v_seq[-c(length(v_seq))]
   } 
 
   if (!is.null(valid_x) & !is.null(valid_y)) {
@@ -376,7 +376,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
       
       if (is.null(u_seq)) {
         u_seq = seq(0, max(so_pderiv_vec), length.out = Nofu)
-        u_seq = u_seq[-c(length(u_seq))]
+        # u_seq = u_seq[-c(length(u_seq))]
       }
       
       temp = combn(active_set, 2)
