@@ -383,7 +383,7 @@ ddspline = function(x, y)
 }
 
 
-gradient = function(alpha, x, y, kernel = c("linear", "poly", "radial", "spline", "anova_radial"), kparam = 1)
+pderiv = function(alpha, x, y, kernel = c("linear", "poly", "radial", "spline", "anova_radial"), kparam = 1)
 {
   n = length(y)
   k = length(unique(y))
@@ -407,8 +407,7 @@ gradient = function(alpha, x, y, kernel = c("linear", "poly", "radial", "spline"
 
 
 
-gradient_interaction = function(alpha, x, y, kernel = c("linear", "poly", "radial"),
-                                kparam = 1, active_set = NULL)
+pderiv_so = function(alpha, x, y, kernel = c("linear", "poly", "radial"), kparam = 1, active_set = NULL)
 {
   n = length(y)
   k = length(unique(y))

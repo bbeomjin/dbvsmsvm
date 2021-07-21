@@ -7,10 +7,13 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
                     v_seq = NULL, Nofv = 100,
                     u_seq = NULL, Nofu = 100, 
                     kernel = c("linear", "radial"), kparam = 1, scale = FALSE,
-                    criterion = "0-1", cv_type = "original", interaction = FALSE, optModel = FALSE, nCores = 1, ...)
+                    criterion = c("0-1", "hinge"), cv_type = c("original", "osr"), interaction = FALSE, optModel = FALSE, nCores = 1, ...)
 {
+  out = list()
   call = match.call()
   kernel = match.arg(kernel)
+  cv_type = match.arg(cv_type)
+  criterion = match.arg(criterion)
   # Find a optimal lambda in first step
   cat("Step 1 : ")
   initial_fit = Kfold_ramsvm(x = x, y = y, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds, 
@@ -28,22 +31,11 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   # Find a optimal lambda under the selected variable in third step  
   selected_x = x[, select_fit$selected[1:NCOL(x)] == 1, drop = FALSE]
   
-  out = list()
   out$selected = select_fit$selected
-  out$gd = select_fit$gd
-  out$v_path = select_fit$v_path
-  out$opt_v = select_fit$opt_v
-  out$valid_err = select_fit$valid_err
-  out$opt_valid_err = select_fit$opt_valid_err
-  out$opt_valid_err_se = select_fit$opt_valid_err_se
+  out$selection_inform = select_fit$selection_inform
+  
   if (interaction) {
-    # out$int_selected = select_fit$int_selected
-    out$gd_interaction = select_fit$gd_interaction
-    out$u_path = select_fit$u_path
-    out$opt_u = select_fit$opt_u
-    out$int_valid_err = select_fit$int_valid_err
-    out$int_opt_valid_err = select_fit$int_opt_valid_err
-    # out$int_valid_se = select_fit$se_int
+    out$interaction_selection_inform = select_fit$interaction_selection_inform
   }
   
   if (optModel) {
