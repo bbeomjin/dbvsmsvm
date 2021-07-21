@@ -133,7 +133,6 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
   }
 
   out$selected = selected
-  cat(" The number of selected features out of ", length(selected), ":", sum(selected), "\r", "\n")
   out$selection_inform = list(partial_deriv = pderiv_vec,
                               v_path = v_seq,
                               opt_v = opt_v,
@@ -226,6 +225,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
   }
   out$cv_type = cv_type
   out$call = call
+  cat(" The number of selected features out of ", length(selected), ":", sum(selected), "\r", "\n")
   return(out)
 }
 
@@ -353,7 +353,6 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
   }
   
   out$selected = selected
-  cat("The number of selected features out of ", length(selected), ":", sum(selected), "\r", "\n")
   out$selection_inform = list(partial_deriv = pderiv_vec,
                               v_path = v_seq,
                               opt_v = opt_v,
@@ -446,6 +445,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
   }
   out$cv_type = cv_type
   out$call = call
+  cat("The number of selected features out of ", length(selected), ":", sum(selected), "\r", "\n")
   return(out)
 }
 
