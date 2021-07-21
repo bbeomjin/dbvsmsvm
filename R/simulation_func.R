@@ -1,4 +1,4 @@
-sim_gen = function(n, p, class = 3, seed = NULL, type = c("bayes", "poly", "cosso", "neuralnet"))
+sim_gen = function(n, p, seed = NULL, type = c("linear", "poly", "cosso", "neuralnet"))
 {
   call = match.call()
   type = match.arg(type)
@@ -35,8 +35,8 @@ sim_gen = function(n, p, class = 3, seed = NULL, type = c("bayes", "poly", "coss
     out$true = rep(c(1, 0), c(2, p - 2))
   }
   
-  if (type == "bayes") {
-    dat = mlbench.2dnormals(n = n, cl = class, sd = 1)
+  if (type == "linear") {
+    dat = mlbench.2dnormals(n = n, cl = 3, sd = 1)
     X_true = dat$x
     r = ncol(X_true)
     y = dat$classes
