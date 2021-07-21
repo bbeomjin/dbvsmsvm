@@ -165,8 +165,6 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
   gamma = object$gamma
   kernel = object$kernel
   
-  v_seq = as.numeric(v_seq)
-  
   if (object$scale & !is.null(valid_x)) {
     means = attr(x, "scaled:center")
     stds = attr(x, "scaled:scale")
