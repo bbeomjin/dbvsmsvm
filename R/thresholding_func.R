@@ -119,11 +119,11 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
       valid_err[i, ] = unlist(fold_err)
     }
     mean_valid_err = colMeans(valid_err)
-    valid_se = apply(valid_err, 2, sd) / sqrt(nfolds)
+    cv_se = apply(valid_err, 2, sd) / sqrt(nfolds)
     opt_ind = max(which(mean_valid_err == min(mean_valid_err)))
     
     if (cv_type == "osr") {
-      opt_ind_osr = max(which(mean_valid_err <= (min(mean_valid_err) + valid_se[opt_ind])))
+      opt_ind_osr = max(which(mean_valid_err <= (min(mean_valid_err) + cv_se[opt_ind])))
       opt_v = v_seq[opt_ind_osr]
     } else {
       opt_v = v_seq[opt_ind]
@@ -200,9 +200,9 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
         valid_err[i, ] = unlist(fold_err)
       }
       mean_valid_err = colMeans(valid_err)
-      valid_se = apply(valid_err, 2, sd) / sqrt(nfolds)
+      cv_se = apply(valid_err, 2, sd) / sqrt(nfolds)
       opt_ind = max(which(mean_valid_err == min(mean_valid_err)))
-      opt_ind_osr = max(which(mean_valid_err <= (mean_valid_err[opt_ind] + valid_se[opt_ind])))
+      opt_ind_osr = max(which(mean_valid_err <= (mean_valid_err[opt_ind] + cv_se[opt_ind])))
       
       if (cv_type == "osr") {
         opt_u = u_seq[opt_ind_osr]
@@ -339,11 +339,11 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
       valid_err[i, ] = unlist(fold_err)
     }
     mean_valid_err = colMeans(valid_err)
-    valid_se = apply(valid_err, 2, sd) / sqrt(nfolds)
+    cv_se = apply(valid_err, 2, sd) / sqrt(nfolds)
     opt_ind = max(which(mean_valid_err == min(mean_valid_err)))
     
     if (cv_type == "osr") {
-      opt_ind_osr = max(which(mean_valid_err <= (min(mean_valid_err) + valid_se[opt_ind])))
+      opt_ind_osr = max(which(mean_valid_err <= (min(mean_valid_err) + cv_se[opt_ind])))
       opt_v = v_seq[opt_ind_osr]
     } else {
       opt_v = v_seq[opt_ind]
@@ -420,9 +420,9 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
         valid_err[i, ] = unlist(fold_err)
       }
       mean_valid_err = colMeans(valid_err)
-      valid_se = apply(valid_err, 2, sd) / sqrt(nfolds)
+      cv_se = apply(valid_err, 2, sd) / sqrt(nfolds)
       opt_ind = max(which(mean_valid_err == min(mean_valid_err)))
-      opt_ind_osr = max(which(mean_valid_err <= (mean_valid_err[opt_ind] + valid_se[opt_ind])))
+      opt_ind_osr = max(which(mean_valid_err <= (mean_valid_err[opt_ind] + cv_se[opt_ind])))
       
       if (cv_type == "osr") {
         opt_u = u_seq[opt_ind_osr]

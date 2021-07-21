@@ -32,7 +32,7 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   selected_x = x[, select_fit$selected[1:NCOL(x)] == 1, drop = FALSE]
   
   out$selected = select_fit$selected
-  out$kfold_inform = initial_fit
+  out$kfold_cv_inform = initial_fit
   out$selection_inform = select_fit$selection_inform
   
   if (interaction) {
@@ -53,8 +53,8 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
                            nfolds = nfolds, lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = kparam,
                            scale = scale, criterion = criterion, optModel = TRUE, nCores = nCores, ...)
     out$opt_model = final_fit$opt_model
-    out$valid_err = final_fit$valid_err
     out$opt_valid_err = final_fit$opt_valid_err
+    out$valid_err = final_fit$valid_err
   }
   out$cv_type = select_fit$cv_type
   out$call = call
