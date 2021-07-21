@@ -48,7 +48,7 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
     
   }
   out$opt_theta = theta_step_fit$opt_theta
-  out$cstep_inform = opt_cstep_fit
+  out$cstep_inform = cstep_fit
   out$theta_step_inform = theta_step_fit
   if (optModel) {
     cat("Fit c-step \n")
