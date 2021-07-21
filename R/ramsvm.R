@@ -339,7 +339,7 @@ Kfold_ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfold
     if (!is.null(valid_x)) {
       means = attr(x, "scaled:center")
       stds = attr(x, "scaled:scale")
-      valid_x = (valid_x - matrix(means, NROW(x), NCOL(x), byrow = TRUE)) / matrix(stds, NROW(x), NCOL(x), byrow = TRUE)
+      valid_x = (valid_x - matrix(means, NROW(valid_x), NCOL(valid_x), byrow = TRUE)) / matrix(stds, NROW(valid_x), NCOL(valid_x), byrow = TRUE)
     }
   }
   
