@@ -32,7 +32,7 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   selected_x = x[, select_fit$selected[1:NCOL(x)] == 1, drop = FALSE]
   
   out$selected = select_fit$selected
-  out$kfold_inform = inital_fit
+  out$kfold_inform = initial_fit
   out$selection_inform = select_fit$selection_inform
   
   if (interaction) {
