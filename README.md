@@ -38,20 +38,27 @@ Please see below to install in R.
 ```{r}
 # Generation of simulated data
 > require(dbvsmsvm)
-> set.seed(1)
-> n = 100; p = 10; prob = 2 / p;
-> A = generate_network(p, prob, type = "random")
-> simul_dat = zilgm_sim(A = A, n = n, p = p, zlvs = 0.1, family = "negbin", signal = 1.5, theta = 0.25, noise = 0.0)    
+> n = 100; p = 10; 
+> data = dbvsmsvm:::sim_gen(n = n, p = p, type = "linear")
+> x = scale(data$x)
+> y = data$y
+> sigma = kernlab::sigest(y ~ x, scaled = FALSE)[3]
 
-# Compute a sequence of regularization parameter
-> lambda_max = find_lammax(simul_dat$X)
-> lambda_min = 1e-4 * lambda_max
-> lambs = exp(seq(log(lambda_max), log(lambda_min), length.out = 50))
-> nb2_fit = zilgm(X = simul_dat$X, lambda = lambs, family = "NBII", update_type = "IRLS", do_boot = TRUE,
-                      boot_num = 30, sym = "OR")
 
-# Get estimated graph
-> est_graph = nb2_fit$network[[nb2_fit$opt_index]]
+# Fit the dbvsmsvm method with the linear and Gaussian kernel
+# The number of lambda values is set to 100. 
+# The number of threshold values is set to 100.
+# The optimal lambda and threshold values are selected via 5-fold cross-validation with one standard error rule.
+# Fit the dbvsmsvm with the linear kernel
+> dbvs_linear = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = c(2^{seq(-20, 5, length.out = 100)}),
+                         Nofv = 100, kernel = "linear", scale = FALSE, cv_type = "osr", 
+                         interaction = FALSE, gamma = 0.5, optModel = FALSE, nCores = 1)
+
+# Fit the dbvsmsvm with the Gaussian kernel
+> dbvs_radial = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = c(2^{seq(-20, 5, length.out = 100)}),
+                         Nofv = 100, kernel = "radial", kparam = sigma, scale = FALSE, cv_type = "osr", 
+                         interaction = FALSE, gamma = 0.5, optModel = FALSE, nCores = 1)
+
 ```
 ## 4. SIMULATION
 
