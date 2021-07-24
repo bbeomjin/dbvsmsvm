@@ -18,7 +18,7 @@
 sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 5,
                    lambda_seq = 2^{seq(-10, 10, length.out = 100)},
                    lambda_theta_seq = 2^{seq(-10, 10, length.out = 100)},
-                   kernel = c("linear", "radial", "radial2", "poly", "spline", "spline2", "spline-t"), kparam,
+                   kernel = c("linear", "radial", "radial2", "poly", "spline", "spline2", "spline-t"), kparam = 1,
                    scale = FALSE, criterion = c("0-1", "loss"),
                    isCombined = FALSE, cv_type = c("original", "osr"), type = c("type1", "type2"), 
                    optModel = FALSE, nCores = 1, verbose = 1, ...)

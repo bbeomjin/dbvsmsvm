@@ -17,9 +17,7 @@ sim_gen = function(n, p, seed = NULL, type = c("linear", "poly", "cosso", "neura
     
     lr1 = 1.1 * g1(X[, 1]) + 1.6 * g2(X[, 2]) - 2.2 #+ 1 * g3(X[, 3]) - 6 * g4(X[, 4])
     lr2 = 3.3 * g1(X[, 1]) + 1.5 * g2(X[, 2]) - 2.0 #- 3.5 * g3(X[, 3]) - 4.5 * g4(X[, 4])
-    # lr3 = 3 * g1(X[, 1]) + 2 * g2(X[, 2]) + 1 * g3(X[, 3]) + 4 * g4(X[, 4])
-    # lr = cbind(lr1, lr2, lr3)
-    # probs = exp(lr - as.vector(HTLR:::log_sum_exp(lr)))
+    
     const = (1 + exp(lr1) + exp(lr2))
     prob1 = exp(lr1) / const
     prob2 = exp(lr2) / const
@@ -61,7 +59,7 @@ sim_gen = function(n, p, seed = NULL, type = c("linear", "poly", "cosso", "neura
     beta3 = beta1 - beta2
     lr = X_kern %*% cbind(beta1, beta2, beta3)
     
-    probs = exp(lr - as.vector(HTLR:::log_sum_exp(lr)))
+    probs = exp(lr - as.vector(log_sum_exp(lr)))
     y = apply(probs, 1, function(prob) {
       sample(1:3, 1, TRUE, prob)})
     X_noise = matrix(rnorm(n * (p - r)), n, (p - r))

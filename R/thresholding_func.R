@@ -445,7 +445,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
   }
   out$cv_type = cv_type
   out$call = call
-  cat("The number of selected features out of ", length(selected), ":", sum(selected), "\r", "\n")
+  cat("The number of selected features out of ", length(out$selected), ":", sum(out$selected), "\r", "\n")
   return(out)
 }
 
