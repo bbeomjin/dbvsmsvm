@@ -11,7 +11,7 @@ import("quadprog")
 import("lpSolve")
 import("parallel")
 import("mlbench")
-importFrom("HTLR", "log_sum_exp")
+import("HTLR")
 
 S3method(threshold_fun, default)
 S3method(threshold_fun, dbvsmsvm)
