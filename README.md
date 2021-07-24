@@ -36,8 +36,8 @@ Please see below to install in R.
 ## 3. EXAMPLE
 
 ```{r}
-# Generation of simulated data under the random graph structure
-> require(ZILGM)
+# Generation of simulated data
+> require(dbvsmsvm)
 > set.seed(1)
 > n = 100; p = 10; prob = 2 / p;
 > A = generate_network(p, prob, type = "random")
