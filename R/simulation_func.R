@@ -59,7 +59,7 @@ sim_gen = function(n, p, seed = NULL, type = c("linear", "poly", "cosso", "neura
     beta3 = beta1 - beta2
     lr = X_kern %*% cbind(beta1, beta2, beta3)
     
-    probs = exp(lr - as.vector(log_sum_exp(lr)))
+    probs = exp(lr - as.vector(HTLR:::log_sum_exp(lr)))
     y = apply(probs, 1, function(prob) {
       sample(1:3, 1, TRUE, prob)})
     X_noise = matrix(rnorm(n * (p - r)), n, (p - r))
