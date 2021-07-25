@@ -7,23 +7,25 @@ Derivative-based variable selection on the multicategory support vector machines
 Derivative-based variable selection on the multicategory support vector machines.
 }
 \usage{
-dbvsmsvm(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = c(2^{seq(-10, 15, length.out = 100)}, 1e+6),
-		 thresh_Ngrid = 10, kernel = "linear", kparam = 1, scale = FALSE, criterion = "0-1", cv_type = "original", interaction = FALSE,
-		 gd_scale = FALSE, optModel = FALSE, nCores = 1, ...)
+dbvsmsvm(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = 2^{seq(-10, 15, length.out = 100)},
+		 v_seq = NULL, Nofv = 100, u_seq = NULL, Nofu = 100,
+		 kernel = c("linear", "gaussian"), kparam = 1, scale = FALSE, 
+		 criterion = c("0-1", "hinge"), cv_type = c("standard", "osr"), 
+		 interaction = FALSE, optModel = FALSE, nCores = 1, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-  A \emph{n} x \emph{p} data matrix, where \emph{n} is the number of observations and \emph{p} is the number of variables.
+  A \emph{n} x \emph{p} input data matrix, where \emph{n} is the number of observations and \emph{p} is the number of variables.
   }
   \item{y}{
-  A response vector with two and more label for each row of \emph{x}.
+  A response variable with three and more labels.
   }
   \item{gamma}{
-  The convex combination parameter of the loss function.
+  The convex combination parameter of the loss function. 
   }
   \item{valid_x}{
-  A validation data matrix for selecting \code{lambda} and threshold parameter \emph{v}. If \code{valid_x = NULL}, cross-validation is performed.
+  A validation data matrix for selecting \code{lambda} and threshold parameter \emph{v}. If \code{valid_x = NULL}, \code{nfolds}-fold cross-validation is performed.
   }
   \item{valid_y}{
   A validation response vector.
@@ -34,29 +36,35 @@ dbvsmsvm(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
   \item{lambda_seq}{
   A sequence of regularization parameter to control a level of \emph{l_2}-penalty.
   }
-  \item{thresh_Ngrid}{
-  The number of grid for a sequence of threshold parameter.
+  \item{v_seq}{
+  A sequence of threshold parameter to select informative variables.
+  }  
+  \item{Nofv}{
+  The number of threshold values. If \code{v_seq} is not given, a sequence of threshold parameter is automatically computed based on \code{Nofv}. 
+  }
+  \item{u_seq}{
+  A sequence of threshold parameter for interaction selection.
+  }
+  \item{Nofu}{
+  The number of threshold values for interaction selection. If \code{u_seq} is not given, a sequence of threshold parameter is automatically computed based of \code{Nofu}.
   }
   \item{kernel}{
-  A type of kernel.
+  A character string representing onf of type of kernel.
   }
   \item{kparam}{
   A parameter needed for kernel.
   }
   \item{scale}{
-  A logical indicating the variables to be scaled.
+  A logical value indicating whether to scale the variables. If \code{scale = TRUE}, \code{x} is scaled to zero mean and unit variance.
   }
   \item{criterion}{
-  A type of criterion evaluating prediction performance.
+  A type of criterion evaluating prediction performance of cross-validation.
   }
   \item{cv_type}{
-  A type of cross-validation. If \code{cv_type = "osr"}, one standard error rule is adopted.
+  A rule of selecting threshold parameter. If \code{cv_type = "osr"}, one standard error rule is adopted.
   }
   \item{interaction}{
-  A logical. Whether to estimate interaction effect. 
-  }
-  \item{gd_scale}{
-  A logical. Whether to scale the derivative-based measure.
+  A logical. Whether to select interaction terms. 
   }
   \item{optModel}{
   A logical. Whether to obtain the optimal classification model.
@@ -70,20 +78,15 @@ dbvsmsvm(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
 }
 
 \value{
-  An S3 object with the following slots
-  \item{selected}{Selected variables.}
-  \item{gd}{Derivative-based measures.}
-  \item{threshold_path}{A sequence of threshold parameter.}
-  \item{opt_threshold}{Optimal threshold value.}
-  \item{valid_err}{Validation errors.}
-  \item{opt_valid_err}{A minimum value of validation errors.}
-  \item{int_selected}{Selected variables of interaction selection.}
-  \item{gd_interaction}{Derivative-based measures of interaction selection.}
-  \item{threshold_path_int}{A sequence of threshold parameter of interaction selection.}
-  \item{opt_threshold_int}{Optimal threshold value of interaction selection.}
-  \item{int_valid_err}{Validation errors for interaction selection.}
-  \item{int_opt_valid_err}{A minimum value of validation errors of interaction selection.}
-  \item{cv_type}{A type of cross-validation.}
+  An S3 object with "\code{dbvsmsvm}" containing the following slots
+  \item{selected}{A zero-one vector indicating the selected variables.}
+  \item{lambda_cv_inform}{Information of cross-validation for lambda including cross-validation errors and optimal lambda value.}
+  \item{selection_cv_inform}{Information of cross-validation for threshold parameter including cross-validation errors and optimal threshold value.}
+  \item{interaction_selection_cv_inform}{Information of cross-validation for threshold parameter of interaction selection including cross-validation errors and optimal threshold value.}
+  \item{opt_model}{If \code{optModel = TRUE}, optimal classification model with the selected lambda and threshold parameter is returned.}
+  \item{opt_valid_err}{If \code{optModel = TRUE}, a minimum value of cross-validation errors based on the selected variables is returned.}
+  \item{valid_err}{If \code{optModel = TRUE}, cross-validation errors based on the selected variables is returned.}
+  \item{cv_type}{A fule of selecting threshold parameter.}
   \item{call}{The call of dbvsmsvm}
 }
 
