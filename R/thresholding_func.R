@@ -10,8 +10,8 @@ threshold_fun = function(x, ...)
 
 threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 1, nfolds = 10,
                                  v_seq = NULL, Nofv = 100, u_seq = NULL, Nofu = 100,
-                                 gamma = 0.5, kernel = c("linear", "radial", "poly", "spline", "anova_radial"), kparam = c(1),
-                                 scale = FALSE, cv_type = c("original", "osr"), criterion = c("0-1", "loss"),
+                                 gamma = 0.5, kernel = c("linear", "gaussian", "poly", "spline", "anova_gaussian"), kparam = c(1),
+                                 scale = FALSE, cv_type = c("standard", "osr"), criterion = c("0-1", "loss"),
                                  interaction = FALSE, nCores = 1, ...)
 {
   out = list()
@@ -231,7 +231,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
 
 
 threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL, Nofu = 100,
-                                  cv_type = c("original", "osr"), criterion = c("0-1", "loss"), 
+                                  cv_type = c("standard", "osr"), criterion = c("0-1", "loss"), 
                                   interaction = FALSE, nCores = 1, ...)
 {
   out = list()

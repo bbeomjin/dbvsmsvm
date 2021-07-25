@@ -1,4 +1,4 @@
-kernelMatrix = function(x, y, kernel = "radial", kparam = 1.0) {
+kernelMatrix = function(x, y, kernel = "gaussian", kparam = 1.0) {
   
   x = as.matrix(x)
   y = as.matrix(y)
@@ -14,7 +14,7 @@ kernelMatrix = function(x, y, kernel = "radial", kparam = 1.0) {
   
   if (kernel == "poly") {
     K = (x %*% t(y) + 1.0)^kparam
-  } else if(kernel == "radial" | kernel == "radial2") {
+  } else if(kernel == "gaussian" | kernel == "gaussian2") {
     normx = rowSums(x^2)
     normy = rowSums(y^2)
     temp = x %*% t(y)
@@ -29,12 +29,12 @@ kernelMatrix = function(x, y, kernel = "radial", kparam = 1.0) {
     }
   } else if (kernel == "linear") {
     K = tcrossprod(x, y)
-  } else if (kernel == "anova_radial") {
+  } else if (kernel == "anova_gaussian") {
     K = 0
     for (d in 1:p) {
       A = x[, d, drop = FALSE]
       B = y[, d, drop = FALSE]
-      K_temp = kernelMatrix(A, B, kernel = "radial", kparam = kparam)
+      K_temp = kernelMatrix(A, B, kernel = "gaussian", kparam = kparam)
       K = K + K_temp
     }
   } else {
@@ -163,7 +163,7 @@ make_anovaKernel = function(x, y, kernel, kparam)
         kernelCoord[[index]] = paste("x", i, " x", j, sep = "")
       }
     }
-  } else if (kernel == "radial2") {
+  } else if (kernel == "gaussian2") {
     numK = dimx + dimx * (dimx - 1) / 2
     anova_kernel = vector(mode = "list", numK)
     kernelCoord = vector(mode = "list", numK)
@@ -325,7 +325,7 @@ ramsvm_hinge = function(y, fit, k, gamma = 0.5)
 }
 
 
-drbf = function(X, xp, kparam = 1)
+dgaussian = function(X, xp, kparam = 1)
 {
   gamma = kparam
   # diff_mat = sweep(X, xp, MARGIN = 2)
@@ -339,7 +339,7 @@ drbf = function(X, xp, kparam = 1)
   return(tmp)
 }
 
-ddrbf = function(X, xp, kparam = 1, comb_set)
+ddgaussian = function(X, xp, kparam = 1, comb_set)
 {
   gamma = kparam
   np = dim(X)
@@ -383,7 +383,7 @@ ddspline = function(x, y)
 }
 
 
-pderiv = function(alpha, x, y, kernel = c("linear", "poly", "radial", "spline", "anova_radial"), kparam = 1)
+pderiv = function(alpha, x, y, kernel = c("linear", "poly", "gaussian", "spline", "anova_gaussian"), kparam = 1)
 {
   n = length(y)
   k = length(unique(y))
@@ -391,9 +391,9 @@ pderiv = function(alpha, x, y, kernel = c("linear", "poly", "radial", "spline", 
   dkernel = switch(kernel,
                    linear = dlinear,
                    poly = dpoly,
-                   radial = drbf,
+                   gaussian = dgaussian,
                    spline = dspline,
-				           anova_radial = drbf)
+				           anova_gaussian = dgaussian)
   
   grad_mat = 0
   for (i in 1:n) {
@@ -407,7 +407,7 @@ pderiv = function(alpha, x, y, kernel = c("linear", "poly", "radial", "spline", 
 
 
 
-pderiv_so = function(alpha, x, y, kernel = c("linear", "poly", "radial"), kparam = 1, active_set = NULL)
+pderiv_so = function(alpha, x, y, kernel = c("linear", "poly", "gaussian"), kparam = 1, active_set = NULL)
 {
   n = length(y)
   k = length(unique(y))
@@ -415,7 +415,7 @@ pderiv_so = function(alpha, x, y, kernel = c("linear", "poly", "radial"), kparam
   ddkernel = switch(kernel,
                     linear = ddlinear,
                     poly = ddpoly,
-                    radial = ddrbf)
+                    gaussian = ddgaussian)
   
   comb_set = combn(active_set, 2)
   
