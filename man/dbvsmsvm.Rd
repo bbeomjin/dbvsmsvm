@@ -8,10 +8,10 @@ Derivative-based variable selection on the multicategory support vector machines
 }
 \usage{
 dbvsmsvm(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = 2^{seq(-10, 15, length.out = 100)},
-v_seq = NULL, Nofv = 100, u_seq = NULL, Nofu = 100,
-kernel = c("linear", "gaussian"), kparam = 1, scale = FALSE, 
-criterion = c("0-1", "hinge"), cv_type = c("standard", "osr"), 
-interaction = FALSE, optModel = FALSE, nCores = 1, ...)
+	v_seq = NULL, Nofv = 100, u_seq = NULL, Nofu = 100,
+	kernel = c("linear", "gaussian"), kparam = 1, scale = FALSE, 
+	criterion = c("0-1", "hinge"), cv_type = c("standard", "osr"), 
+	interaction = FALSE, optModel = FALSE, nCores = 1, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
