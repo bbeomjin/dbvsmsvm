@@ -60,9 +60,9 @@ Please see below to install in R.
                          interaction = FALSE, gamma = 0.5, optModel = FALSE, nCores = 1)
 
 # Fit the DBVS-MSVM with the Gaussian kernel for selecting second-order interaction
-dbvs_interaction = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = c(2^{seq(-20, 5, length.out = 100)}),
-                       Nofv = 100, kernel = "gaussian", kparam = sigma, criterion = "0-1", scale = FALSE,
-                       cv_type = "osr", interaction = TRUE, gamma = 0.5, optModel = TRUE, nCores = 1)
+> dbvs_interaction = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = c(2^{seq(-20, 5, length.out = 100)}),
+                             Nofv = 100, kernel = "gaussian", kparam = sigma, criterion = "0-1", scale = FALSE,
+                             cv_type = "osr", interaction = TRUE, gamma = 0.5, optModel = TRUE, nCores = 1)
 
 
 # Fit the SRAMSVM with the linear kernel
