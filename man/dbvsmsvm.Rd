@@ -118,7 +118,7 @@ dbvs_radial = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = 2^{seq(-20, 0, len
 # Fit the DBVS-MSVM with the Gaussian kernel for selecting second-order interaction
 dbvs_interaction = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = 2^{seq(-20, 0, length.out = 100)},
                             Nofv = 100, kernel = "gaussian", kparam = sigma, criterion = "0-1", scale = FALSE,
-                            cv_type = "osr", interaction = TRUE, gamma = 0.5, optModel = TRUE, nCores = 1)
+                            cv_type = "osr", interaction = TRUE, gamma = 0.5, optModel = FALSE, nCores = 1)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
