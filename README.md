@@ -50,17 +50,17 @@ Please see below to install in R.
 # The number of threshold values is set to 100.
 # The optimal lambda and threshold values are selected via 5-fold cross-validation with one standard error rule.
 # Fit the DBVS-MSVM with the linear kernel
-> dbvs_linear = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = c(2^{seq(-20, 0, length.out = 100)}),
+> dbvs_linear = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = 2^{seq(-20, 0, length.out = 100)},
                          Nofv = 100, kernel = "linear", scale = FALSE, cv_type = "osr", 
                          interaction = FALSE, gamma = 0.5, optModel = FALSE, nCores = 1)
 
 # Fit the DBVS-MSVM method with the Gaussian kernel
-> dbvs_radial = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = c(2^{seq(-20, 0, length.out = 100)}),
+> dbvs_radial = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = 2^{seq(-20, 0, length.out = 100)},
                          Nofv = 100, kernel = "gaussian", kparam = sigma, scale = FALSE, cv_type = "osr", 
                          interaction = FALSE, gamma = 0.5, optModel = FALSE, nCores = 1)
 
 # Fit the DBVS-MSVM with the Gaussian kernel for selecting second-order interaction
-> dbvs_interaction = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = c(2^{seq(-20, 0, length.out = 100)}),
+> dbvs_interaction = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = 2^{seq(-20, 0, length.out = 100)},
                              Nofv = 100, kernel = "gaussian", kparam = sigma, criterion = "0-1", scale = FALSE,
                              cv_type = "osr", interaction = TRUE, gamma = 0.5, optModel = TRUE, nCores = 1)
 
