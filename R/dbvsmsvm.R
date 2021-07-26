@@ -50,8 +50,8 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
     # temporary estimates sigma
     # opt_sigma = kernlab::sigest(y ~ selected_x, frac = 1, scaled = FALSE)[3]
     final_fit = cv.ramsvm(x = selected_x, y = y, valid_x = selected_valid_x, valid_y = valid_y,
-                           nfolds = nfolds, lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = kparam,
-                           scale = scale, criterion = criterion, optModel = TRUE, nCores = nCores, ...)
+                          nfolds = nfolds, lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = kparam,
+                          scale = scale, criterion = criterion, optModel = TRUE, nCores = nCores, ...)
     out$opt_model = final_fit$opt_model
     out$opt_valid_err = final_fit$opt_valid_err
     out$valid_err = final_fit$valid_err

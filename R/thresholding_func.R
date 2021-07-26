@@ -78,7 +78,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
     valid_err = matrix(NA, nrow = nfolds, ncol = length(v_seq), dimnames = list(paste0("Fold", 1:nfolds)))
 
     for (i in 1:nfolds) {
-      cat(nfolds, "- fold CV :", i / nfolds * 100, "%", "\r")
+      cat(nfolds, "-fold CV : ", i / nfolds * 100, "%", "\r", sep = "")
       # fold = fold_list[[i]]
       fold = which(fold_list == i)
       y_fold = y[-fold]
@@ -163,7 +163,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
       valid_err = matrix(NA, nrow = nfolds, ncol = length(u_seq), dimnames = list(paste0("Fold", 1:nfolds)))
       
       for (i in 1:nfolds) {
-        cat(nfolds, "- fold CV (interaction) :", i / nfolds * 100, "%", "\r")
+        cat(nfolds, "-fold CV (interaction) : ", i / nfolds * 100, "%", "\r", sep = "")
         fold = which(fold_list == i)
         y_fold = y[-fold]
         x_fold = x[-fold, , drop = FALSE]
@@ -296,7 +296,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
     valid_err = matrix(NA, nrow = nfolds, ncol = length(v_seq), dimnames = list(paste0("Fold", 1:nfolds)))
     
     for (i in 1:nfolds) {
-      cat(nfolds, "- fold CV :", i / nfolds * 100, "%", "\r")
+      cat(nfolds, "-fold CV : ", i / nfolds * 100, "%", "\r", sep = "")
       # fold = fold_list[[i]]
       fold = which(fold_list == i)
       y_fold = y[-fold]
@@ -383,7 +383,7 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
       valid_err = matrix(NA, nrow = nfolds, ncol = length(u_seq), dimnames = list(paste0("Fold", 1:nfolds)))
       
       for (i in 1:nfolds) {
-        cat(nfolds, "- fold CV (interaction) :", i / nfolds * 100, "%", "\r")
+        cat(nfolds, "-fold CV (interaction) : ", i / nfolds * 100, "%", "\r", sep = "")
         fold = which(fold_list == i)
         y_fold = y[-fold]
         x_fold = x[-fold, , drop = FALSE]

@@ -386,7 +386,7 @@ cv.ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds =
     # model_list = vector("list", nfolds)
     
     for (i in 1:nfolds) {
-      cat(nfolds, "- fold CV :", i / nfolds * 100, "%", "\r")
+      cat(nfolds, "-fold CV : ", i / nfolds * 100, "%", "\r", sep = "")
       # fold = fold_list[[i]]
       fold = which(fold_list == i)
       y_fold = y[-fold]
