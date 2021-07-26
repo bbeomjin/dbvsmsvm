@@ -120,7 +120,7 @@ sram_radial = sramsvm(x = x, y = y, gamma = 0.5, nfolds = 5,
 sram_radial_interaction = sramsvm(x = x, y = y, gamma = 0.5, nfolds = 5,
                       lambda_seq = 2^{seq(-20, 0, length.out = 100)},
                       lambda_theta_seq = 2^{seq(-20, 0, length.out = 100)},
-                      kernel = "gaussian", kparam = sigma, scale = FALSE, criterion = "0-1",
+                      kernel = "gaussian2", kparam = sigma, scale = FALSE, criterion = "0-1",
                       isCombined = TRUE, cv_type = "osr", nCores = 1)
 
 
