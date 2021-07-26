@@ -70,7 +70,25 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   return(out)  
 }
   
+
+predict.dbvsmsvm = function(object, newx = NULL) {
   
+  p = NCOL(object$lambda_cv_inform$x)
+  if (is.null(newx)) {
+    newx = object$lambda_cv_inform$x
+  }
+  
+  if (is.null(object$opt_model)) {
+    model = object$selection_cv_inform$opt_model
+  } else {
+    model = object$opt_model
+  }
+  selected = object$selected[1:p]
+  pred = predict.ramsvm(model, newx = newx[, selected == 1, drop = FALSE])
+  return(list(class = pred$class, pred_value = pred$pred_value))
+}
+
+
   
   
   
