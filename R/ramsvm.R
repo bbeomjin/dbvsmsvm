@@ -271,7 +271,7 @@ predict.ramsvm_core = function(object, newK = NULL) {
   fit = matrix(W_c0, nrow = nrow(newK), ncol = n_class, byrow = T) + ((newK %*% cmat) %*% W)
   pred_y = apply(fit, 1, which.max)
   pred_y = object$classname[pred_y]
-  if (is(object$y, "factor")) {pred_y = factor(pred_y, classname)}
+  if (is(object$y, "factor")) {pred_y = factor(pred_y, object$classname)}
   
   # for(i in 1:object$n_class) {
   #   pred_y[pred_y == i] = object$classname[i]
@@ -298,7 +298,7 @@ predict.ramsvm = function(object, newx = NULL, newK = NULL, ...) {
   fit = matrix(W_c0, nrow = nrow(newK), ncol = n_class, byrow = T) + ((newK %*% cmat) %*% W)
   pred_y = apply(fit, 1, which.max)
   pred_y = object$classname[pred_y]
-  if (is(object$y, "factor")) {pred_y = factor(pred_y, classname)}
+  if (is(object$y, "factor")) {pred_y = factor(pred_y, object$classname)}
   
   # for(i in 1:object$n_class) {
   #   pred_y[pred_y == i] = object$classname[i]
