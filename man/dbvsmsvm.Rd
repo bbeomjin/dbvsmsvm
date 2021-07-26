@@ -104,17 +104,17 @@ x = scale(data$x)
 y = data$y
 sigma = kernlab::sigest(y ~ x, scaled = FALSE)[3]
 
-# Fitting the dbvs-msvm with the linear kernel
+# Fit the dbvs-msvm with the linear kernel
 dbvs_linear = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = 2^{seq(-20, 0, length.out = 100)},
                        Nofv = 100, kernel = "linear", criterion = "0-1", scale = FALSE,
                        cv_type = "osr", interaction = FALSE, gamma = 0.5, optModel = FALSE, nCores = 1)
 
-# Fitting the dbvs-msvm with the Gaussian kernel
+# Fit the dbvs-msvm with the Gaussian kernel
 dbvs_radial = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = 2^{seq(-20, 5, length.out = 100)},
                        Nofv = 100, kernel = "gaussian", kparam = sigma, criterion = "0-1", scale = FALSE,
                        cv_type = "osr", interaction = FALSE, gamma = 0.5, optModel = TRUE, nCores = 1)
 
-# Fitting the dbvs-msvm with the Gaussian kernel for selecting second-order interaction.
+# Fit the dbvs-msvm with the Gaussian kernel for selecting second-order interaction
 dbvs_interaction = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = c(2^{seq(-20, 5, length.out = 100)}),
                        Nofv = 100, kernel = "gaussian", kparam = sigma, criterion = "0-1", scale = FALSE,
                        cv_type = "osr", interaction = TRUE, gamma = 0.5, optModel = TRUE, nCores = 1)
