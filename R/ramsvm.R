@@ -9,12 +9,12 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, weight = NULL,
   diag(D) = diag(D) + max_D * epsilon_D
   
   y_temp = as.factor(y)
-  y_name = levels(y_temp)
-  n_class = length(y_name)
+  classname = levels(y_temp)
+  n_class = length(classname)
   
   y_int = integer(length(y))
-  for (j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
-  if (is(y, "numeric")) {y_name = as.numeric(y_name)}
+  for (j in 1:n_class) y_int[which(y_temp %in% classname[j])] = j
+  if (is(y, "numeric")) {classname = as.numeric(classname)}
   
   n = length(y_int)
   if (is.null(weight)) weight = numeric(n) + 1.0
@@ -69,9 +69,11 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, weight = NULL,
   # compute the fitted values
   fit = (matrix(W_c0vec, nrow = n, ncol = n_class, byrow = T) + Kcmat)
   fit_class = apply(fit, 1, which.max)
+  fit_class = classname[fit_class]
+  if (is(y, "factor")) {fit_class = factor(fit_class, classname)}
   
   out$y = y
-  out$y_name = y_name
+  out$classname = classname
   out$alpha = alpha
   out$cmat = cmat
   out$c0vec = c0vec
@@ -90,12 +92,12 @@ ramsvm_compact = function(K, y, gamma = 0.5, lambda, epsilon = 1e-6, eig_tol_D =
   out = list()
   
   y_temp = as.factor(y)
-  y_name = levels(y_temp)
-  n_class = length(y_name)
+  classname = levels(y_temp)
+  n_class = length(classname)
   
   y_int = integer(length(y))
-  for (j in 1:n_class) {y_int[which(y_temp %in% y_name[j])] = j}
-  if (is(y, "numeric")) {y_name = as.numeric(y_name)}
+  for (j in 1:n_class) {y_int[which(y_temp %in% classname[j])] = j}
+  if (is(y, "numeric")) {classname = as.numeric(classname)}
   
   n = length(y_int)
   qp_dim = n * n_class
@@ -183,11 +185,13 @@ ramsvm_compact = function(K, y, gamma = 0.5, lambda, epsilon = 1e-6, eig_tol_D =
   # compute the fitted values
   fit = (matrix(W_c0vec, nrow = n, ncol = n_class, byrow = T) + Kcmat)
   fit_class = apply(fit, 1, which.max)
+  fit_class = classname[fit_class]
+  if (is(y, "factor")) {fit_class = factor(fit_class, classname)}
   # table(y, fit_class)
   
   # Return the output
   out$y = y
-  out$y_name = y_name
+  out$classname = classname
   out$alpha = alpha_mat
   out$cmat = cmat
   out$c0vec = c0vec
@@ -236,7 +240,7 @@ ramsvm = function(x = NULL, K = NULL, y, gamma = 0.5, lambda = 1,
   out$x = x
   out$K = K
   out$y = y
-  out$y_name = solutions$y_name
+  out$classname = solutions$classname
   out$gamma = gamma
   out$n_class = n_class
   out$lambda = lambda
@@ -266,10 +270,12 @@ predict.ramsvm_core = function(object, newK = NULL) {
   
   fit = matrix(W_c0, nrow = nrow(newK), ncol = n_class, byrow = T) + ((newK %*% cmat) %*% W)
   pred_y = apply(fit, 1, which.max)
+  pred_y = object$classname[pred_y]
+  if (is(object$y, "factor")) {pred_y = factor(pred_y, classname)}
   
-  for(i in 1:object$n_class) {
-    pred_y[pred_y == i] = object$y_name[i]
-  }
+  # for(i in 1:object$n_class) {
+  #   pred_y[pred_y == i] = object$classname[i]
+  # }
   
   # return(list(class = pred_y, inner_prod = inner_prod))
   return(list(class = pred_y, pred_value = fit))
@@ -291,10 +297,12 @@ predict.ramsvm = function(object, newx = NULL, newK = NULL, ...) {
   W_c0 = drop(t(c0vec) %*% W)
   fit = matrix(W_c0, nrow = nrow(newK), ncol = n_class, byrow = T) + ((newK %*% cmat) %*% W)
   pred_y = apply(fit, 1, which.max)
+  pred_y = object$classname[pred_y]
+  if (is(object$y, "factor")) {pred_y = factor(pred_y, classname)}
   
-  for(i in 1:object$n_class) {
-    pred_y[pred_y == i] = object$y_name[i]
-  }
+  # for(i in 1:object$n_class) {
+  #   pred_y[pred_y == i] = object$classname[i]
+  # }
 
   return(list(class = pred_y, pred_value = fit))
 }

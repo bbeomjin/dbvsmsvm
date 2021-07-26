@@ -46,7 +46,7 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
       selected_valid_x = valid_x
     }
     cat("\n")
-    cat("Find optimal model : \n")
+    cat("Find optimal model \n")
     # temporary estimates sigma
     # opt_sigma = kernlab::sigest(y ~ selected_x, frac = 1, scaled = FALSE)[3]
     final_fit = cv.ramsvm(x = selected_x, y = y, valid_x = selected_valid_x, valid_y = valid_y,

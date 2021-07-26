@@ -334,12 +334,12 @@ findtheta.sramsvm = function(y, anova_kernel, gamma = 0.5, cmat, c0vec, lambda, 
   # standard LP form :
   # min a^T x , subject to A1x <= a1
   y_temp = as.factor(y)
-  y_name = levels(y_temp)
-  n_class = length(y_name)
+  classname = levels(y_temp)
+  n_class = length(classname)
   
   y_int = integer(length(y))
-  for (j in 1:n_class) y_int[which(y_temp %in% y_name[j])] = j
-  if (is(y, "numeric")) {y_name = as.numeric(y_name)}
+  for (j in 1:n_class) y_int[which(y_temp %in% classname[j])] = j
+  if (is(y, "numeric")) {classname = as.numeric(classname)}
   
   n = length(y_int)
   y_index = cbind(1:n, y_int)
