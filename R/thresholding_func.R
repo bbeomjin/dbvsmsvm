@@ -448,8 +448,8 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
                                             valid_err = valid_err)
   }
   if (optModel) {
-    out$opt_model = ramsvm(x = x[, selected == 1, drop = FALSE], y = y, gamma = gamma, lambda = lambda, 
-                           kernel = kernel, kparam = kparam, scale = FALSE, ...)
+    out$selection_inform$opt_model = ramsvm(x = x[, selected == 1, drop = FALSE], y = y, gamma = gamma, lambda = lambda, 
+                                            kernel = kernel, kparam = kparam, scale = FALSE, ...)
   }
   out$cv_type = cv_type
   out$call = call
