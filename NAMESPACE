@@ -1,4 +1,4 @@
-export(cv.ramsvm, threshold_fun, cstep.sramsvm, thetastep.sramsvm, dbvsmsvm, ramsvm, sramsvm)
+export(cv.ramsvm, dbvsmsvm, ramsvm, sramsvm)
 exportClasses("dbvsmsvm")
 exportClasses("ramsvm")
 exportClasses("sramsvm")
