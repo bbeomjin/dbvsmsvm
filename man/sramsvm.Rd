@@ -4,7 +4,7 @@
 Structured angle-based multicategory support vector machine with reinforced multicategory loss.
 }
 \description{
-Fitting a structured angle-based multicategory support vector machine with reinforced multicategory loss.
+Fit a structured angle-based multicategory support vector machine with reinforced multicategory loss.
 }
 \usage{
 sramsvm(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 5,
