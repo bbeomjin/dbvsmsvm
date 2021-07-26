@@ -45,7 +45,7 @@ ramsvm(x = NULL, K = NULL, y, gamma = 0.5, lambda = 1,
 }
 
 \value{
-  An S3 object with "\code{ramsvm}" containing the following slots
+  An S3 object of class "\code{ramsvm}" containing the following slots
   \item{x}{Input \code{x}.}
   \item{K}{Input \code{K}.}
   \item{y}{Input \code{y}.}

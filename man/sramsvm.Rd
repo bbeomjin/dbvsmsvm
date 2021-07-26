@@ -54,7 +54,7 @@ sramsvm(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 5,
   A type of criterion evaluating prediction performance of cross-validation.
   }
   \item{isCombined}{
-  A logical. If \code{isCombined = TRUE}, the theta-step is combined with the following alpha-step. 
+  A logical. If \code{isCombined = TRUE}, the theta-step is combined with the following c-step. 
   }
   \item{cv_type}{
   A rule of selecting lambda_theta parameter. If \code{cv_type="osr"}, one standard error rule is adopted.
@@ -77,21 +77,15 @@ sramsvm(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 5,
 }
 
 \value{
-  An S3 object with "\code{ramsvm}" containing the following slots
-  \item{x}{Input \code{x}.}
-  \item{K}{Input \code{K}.}
-  \item{y}{Input \code{y}.}
-  \item{y_name}{The class labels of \code{y}.}
-  \item{gamma}{The convex combination parameter of the loss function.}
-  \item{n_class}{The number of classes.}
-  \item{lambda}{Given regularization parameter.}
-  \item{kernel}{Given type of kernel.}
-  \item{kparam}{Given parameter for kernel.}
-  \item{cmat}{The corresponding coefficients.}
-  \item{c0vec}{The intercepts.}
-  \item{alpha}{The Lagrange multipliers.}
-  \item{fit_class}{Fitted class.}
-  \item{epsilon}{Convergence tolerance in the ramsvm core algorithm.}
+  An S3 object of class "\code{sramsvm}" containing the following slots
+  \item{opt_theta}{The theta vector at the optimal lambda_theta value.}
+  \item{cstep_inform}{Information of c-step including cross-validation errors and optimal lambda value.}
+  \item{theta_step_inform}{Information of theta-step including cross-validation errors and optimal lambda_theta value.}
+  \item{opt_model}{If \code{optModel=TRUE}, classification model with the optimal lambda and lambda_theta is returned.}
+  \item{opt_valid_err}{If \code{optModel=TRUE}, a minimum value of cross-validation errors based on the optimal lambda_theta is returned.}
+  \item{valid_err}{If \code{optModel=TRUE}, cross-validation errors based on the optimal lambda_theta is returned.}
+  \item{cv_type}{A rule of selecting lambda_theta.}
+  \item{call}{The call of \code{sramsvm}.}
 }
 
 \references{}

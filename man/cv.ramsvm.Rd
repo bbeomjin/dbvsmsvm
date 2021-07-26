@@ -59,7 +59,7 @@ cv.ramsvm(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10,
 }
 
 \value{
-  An S3 object with "\code{ramsvm}" containing the following slots
+  An S3 object of class "\code{ramsvm}" containing the following slots
   \item{opt_param}{The optimal lambda and kernel parameter.}
   \item{opt_valid_err}{A minimum value of cross-validation errors.}
   \item{opt_ind}{An index of optimal lambda.}
