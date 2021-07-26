@@ -16,7 +16,7 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   criterion = match.arg(criterion)
   # Find a optimal lambda in first step
   cat("Step 1 : \n")
-  initial_fit = Kfold_ramsvm(x = x, y = y, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds, 
+  initial_fit = cv.ramsvm(x = x, y = y, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds, 
                              lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = kparam,
                              scale = scale, criterion = criterion, optModel = FALSE, nCores = nCores, ...)
   
@@ -49,7 +49,7 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
     cat("Find optimal model : \n")
     # temporary estimates sigma
     # opt_sigma = kernlab::sigest(y ~ selected_x, frac = 1, scaled = FALSE)[3]
-    final_fit = Kfold_ramsvm(x = selected_x, y = y, valid_x = selected_valid_x, valid_y = valid_y,
+    final_fit = cv.ramsvm(x = selected_x, y = y, valid_x = selected_valid_x, valid_y = valid_y,
                            nfolds = nfolds, lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = kparam,
                            scale = scale, criterion = criterion, optModel = TRUE, nCores = nCores, ...)
     out$opt_model = final_fit$opt_model
