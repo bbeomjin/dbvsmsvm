@@ -1,7 +1,7 @@
 \name{sramsvm}
 \alias{sramsvm}
 \title{
-Structured angle-based multicategory support vector machine with reinforced multicategory loss.
+Structured angle-based multicategory support vector machine with reinforced multicategory loss
 }
 \description{
 Fit a structured angle-based multicategory support vector machine with reinforced multicategory loss.
@@ -102,21 +102,21 @@ x = scale(data$x)
 y = data$y
 sigma = kernlab::sigest(y ~ x, scaled = FALSE)[3]
 
-# Fit sramsvm with the linear kernel
+# Fit the SRAMSVM with the linear kernel
 sram_linear = sramsvm(x = x, y = y, gamma = 0.5, nfolds = 5,
                       lambda_seq = 2^{seq(-20, 0, length.out = 100)},
                       lambda_theta_seq = 2^{seq(-20, 0, length.out = 100)},
                       kernel = "linear", scale = FALSE, criterion = "0-1",
                       isCombined = TRUE, cv_type = "osr", nCores = 1)
 
-# Fit the sramsvm with the Gaussian kernel
+# Fit the SRAMSVM with the Gaussian kernel
 sram_radial = sramsvm(x = x, y = y, gamma = 0.5, nfolds = 5,
                       lambda_seq = 2^{seq(-20, 0, length.out = 100)},
                       lambda_theta_seq = 2^{seq(-20, 0, length.out = 100)},
                       kernel = "gaussian", kparam = sigma, scale = FALSE, criterion = "0-1",
                       isCombined = TRUE, cv_type = "osr", nCores = 1)
 
-# Fit the sramsvm with the Gaussian kernel with second-order interaction
+# Fit the SRAMSVM with the Gaussian kernel with second-order interaction
 sram_radial_interaction = sramsvm(x = x, y = y, gamma = 0.5, nfolds = 5,
                       lambda_seq = 2^{seq(-20, 0, length.out = 100)},
                       lambda_theta_seq = 2^{seq(-20, 0, length.out = 100)},

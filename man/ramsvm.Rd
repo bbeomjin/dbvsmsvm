@@ -1,7 +1,7 @@
 \name{ramsvm}
 \alias{ramsvm}
 \title{
-Angle-based multicategory support vector machine with reinforced multicategory loss.
+Angle-based multicategory support vector machine with reinforced multicategory loss
 }
 \description{
 Fit an angle-based multicategory support vector machine with reinforced multicategory loss.

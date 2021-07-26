@@ -2,10 +2,10 @@
 \alias{dbvsmsvm-package}
 \docType{package}
 \title{
-A R Package to implement derivative-based variable selection on the multicategory support vector machines
+An R Package to perform the derivative-based variable selection for the angle-based multicategory support vector machine with reinforced multicategory loss
 }
 \description{
-Implementation of derivative-based variable selection on the multicategory support vector machines.
+Implementation of the derivative-based variable selection for the angle-based multicategory support vector machines with reinforced multicategory loss.
 }
 
 \details{
