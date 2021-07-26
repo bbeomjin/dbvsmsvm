@@ -1,7 +1,7 @@
 # dbvsmsvm
 Derivative-based variable selection method for multicategory support vector machine
 
-```dbvsmsvm``` is an R package. ```dbvsmsvm``` provides functions to implement the derivative-based variable selection method for multicategory problems using the reinforced angle-based multicategory support vector machine (RAMSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
+```dbvsmsvm``` is an R package. ```dbvsmsvm``` provides functions to perform the derivative-based variable selection method for multicategory problems using the reinforced angle-based multicategory support vector machine (RAMSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
 
 ## 1. INSTALLATION
 
@@ -58,6 +58,12 @@ Please see below to install in R.
 > dbvs_radial = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = c(2^{seq(-20, 5, length.out = 100)}),
                          Nofv = 100, kernel = "radial", kparam = sigma, scale = FALSE, cv_type = "osr", 
                          interaction = FALSE, gamma = 0.5, optModel = FALSE, nCores = 1)
+
+# Fit the DBVS-MSVM with the Gaussian kernel for selecting second-order interaction
+dbvs_interaction = dbvsmsvm(x = x, y = y, nfolds = 5, lambda_seq = c(2^{seq(-20, 5, length.out = 100)}),
+                       Nofv = 100, kernel = "gaussian", kparam = sigma, criterion = "0-1", scale = FALSE,
+                       cv_type = "osr", interaction = TRUE, gamma = 0.5, optModel = TRUE, nCores = 1)
+
 
 # Fit the SRAMSVM with the linear kernel
 > sram_linear = sramsvm(x = x, y = y, gamma = 0.5, nfolds = 5,
