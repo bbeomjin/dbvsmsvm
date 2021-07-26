@@ -1,21 +1,25 @@
 \name{ramsvm}
 \alias{ramsvm}
 \title{
-Multicategory support vector machine with reinforced multicategory loss.
+Angle-based multicategory support vector machine with reinforced multicategory loss.
 }
 \description{
-A function for multicategory support vector machine with reinforced multicategory loss.
+Fit an angle-based multicategory support vector machine with reinforced multicategory loss.
 }
 \usage{
-ramsvm(x, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1", "type2"), ...)
+ramsvm(x = NULL, K = NULL, y, gamma = 0.5, lambda = 1,
+	 kernel = c("linear", "gaussian"), kparam = 1, scale = FALSE, type = c("type1", "type2"), ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
   A \emph{n} x \emph{p} data matrix, where \emph{n} is the number of observations and \emph{p} is the number of variables.
   }
+  \item{K}{
+  A kernel matrix computed from \code{x} and kernel function (optional). Given \code{K}, \code{kernel} and \code{kparam} are ignored. 
+  }
   \item{y}{
-  A response vector with two and more label for each row of \emph{x}.
+  A response vector with three and more labels.
   }
   \item{gamma}{
   The convex combination parameter of the loss function.
@@ -24,7 +28,7 @@ ramsvm(x, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1
   A regularization parameter to control a level of \emph{l_2}-penalty.
   }
   \item{kernel}{
-  A type of kernel.
+  A character string representing one of type of kernel.
   }
   \item{kparam}{
   A parameter needed for kernel.
@@ -33,7 +37,7 @@ ramsvm(x, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1
   A logical indicating the variables to be scaled.
   }
   \item{type}{
-  A type of ramsvm. If \code{type = "type1"}, the intercepts included in regularization.
+  A type of optimization method for ramsvm. If \code{type = "type1"}, intercepts are included in a regularization term. If \code{type = "type2"}, intercepts are omitted in the regularization term and estimated by a linear programming 
   }
   \item{...}{
   Other arguments that can be passed to ramsvm core function.
@@ -41,21 +45,19 @@ ramsvm(x, y, gamma = 0.5, lambda, kernel, kparam, scale = FALSE, type = c("type1
 }
 
 \value{
-  An S3 object with the following slots
-  \item{x}{Input \emph{x}.}
-  \item{y}{Input \emph{y}.}
-  \item{y_name}{The class labels of \emph{y}.}
+  An S3 object with "\code{ramsvm}" containing the following slots
+  \item{x}{Input \code{x}.}
+  \item{K} {Input \code{K}.}
+  \item{y}{Input \code{y}.}
+  \item{y_name}{The class labels of \code{y}.}
   \item{gamma}{The convex combination parameter of the loss function.}
   \item{n_class}{The number of classes.}
-  \item{lambda}{The regularization parameter.}
+  \item{lambda}{Given regularization parameter.}
   \item{kernel}{Given type of kernel.}
   \item{kparam}{Given parameter for kernel.}
-  \item{cmat}{The estimated parameters of the classification functions.}
-  \item{c0vec}{The estimated intercepts of the classification functions.}
-  \item{alpha}{A solutions of quadratic programming.}
-  \item{scale}{A logical.}
-  \item{center}{The center vector of input \emph{x} if \emph{x} is scaled.}
-  \item{scaled}{The scale vector of input \emph{x} if \emph{x} is scaled.}
+  \item{cmat}{The corresponding coefficients.}
+  \item{c0vec}{The intercepts.}
+  \item{alpha}{The Lagrange multipliers.}
   \item{fit_class}{Fitted class.}
   \item{epsilon}{Convergence tolerance in the ramsvm core algorithm.}
 }
