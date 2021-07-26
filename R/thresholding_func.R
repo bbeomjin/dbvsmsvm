@@ -12,7 +12,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
                                  v_seq = NULL, Nofv = 100, u_seq = NULL, Nofu = 100,
                                  gamma = 0.5, kernel = c("linear", "gaussian", "poly", "spline", "anova_gaussian"), kparam = c(1),
                                  scale = FALSE, cv_type = c("standard", "osr"), criterion = c("0-1", "loss"),
-                                 interaction = FALSE, nCores = 1, ...)
+                                 interaction = FALSE, optModel = FALSE, nCores = 1, ...)
 {
   out = list()
   call = match.call()
@@ -223,6 +223,10 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
                                             opt_ind = opt_ind,
                                             valid_err = valid_err)
   }
+  if (optModel) {
+    out$opt_model = ramsvm(x = x[, selected == 1, drop = FALSE], y = y, gamma = gamma, lambda = lambda, 
+                           kernel = kernel, kparam = kparam, scale = FALSE, ...)
+  }
   out$cv_type = cv_type
   out$call = call
   cat(" The number of selected features out of ", length(out$selected), ":", sum(out$selected), "\r", "\n")
@@ -232,7 +236,7 @@ threshold_fun.default = function(x, y, valid_x = NULL, valid_y = NULL, lambda = 
 
 threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL, Nofu = 100,
                                   cv_type = c("standard", "osr"), criterion = c("0-1", "loss"), 
-                                  interaction = FALSE, nCores = 1, ...)
+                                  interaction = FALSE, optModel = FALSE, nCores = 1, ...)
 {
   out = list()
   call = match.call()
@@ -442,6 +446,10 @@ threshold_fun.dbvsmsvm = function(object, v_seq = NULL, Nofv = 100, u_seq = NULL
                                             opt_valid_err = opt_valid_err,
                                             opt_ind = opt_ind,
                                             valid_err = valid_err)
+  }
+  if (optModel) {
+    out$opt_model = ramsvm(x = x[, selected == 1, drop = FALSE], y = y, gamma = gamma, lambda = lambda, 
+                           kernel = kernel, kparam = kparam, scale = FALSE, ...)
   }
   out$cv_type = cv_type
   out$call = call
