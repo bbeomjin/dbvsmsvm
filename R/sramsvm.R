@@ -38,7 +38,14 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
   
   cat("Fit theta-step \n")
   
-  theta_step_fit = thetastep.sramsvm(cstep_fit, lambda_theta_seq = lambda_theta_seq, isCombined = isCombined, cv_type = cv_type, nCores = nCores, ...)
+  if (optModel) {
+    theta_step_opt = FALSE
+  } else {
+    theta_step_opt = TRUE
+  }
+  
+  theta_step_fit = thetastep.sramsvm(cstep_fit, lambda_theta_seq = lambda_theta_seq, isCombined = isCombined,
+                                     cv_type = cv_type, optModel = theta_step_opt, nCores = nCores, ...)
 
   
   
@@ -194,7 +201,7 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
 }
 
 thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.out = 100)}, isCombined = TRUE,
-                             cv_type = c("original", "osr"), nCores = 1, ...)
+                             cv_type = c("original", "osr"), optModel = FALSE, nCores = 1, ...)
 {
   out = list()
   call = match.call()
@@ -320,6 +327,12 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
   out$theta_seq = theta_seq
   out$opt_valid_err = opt_valid_err
   out$valid_err = valid_err
+  if (optModel) {
+    anova_K = make_anovaKernel(x, x, kernel, kparam)
+    K = combine_kernel(anova_K, opt_theta)
+    opt_model = ramsvm_fun(K = K, y = y, gamma = gamma, lambda = lambda, ...)
+    out$opt_model = opt_model
+  }
   return(out)
 }
 
@@ -415,6 +428,22 @@ findtheta.sramsvm = function(y, anova_kernel, gamma = 0.5, cmat, c0vec, lambda, 
   return(as.vector(theta))
 }
 
-
+predict.sramsvm = function(object, newx = NULL) 
+{
+  if (is.null(newx)) {
+    newx = object$cstep_inform$x
+  }
+  
+  if (is.null(object$opt_model)) {
+    model = object$theta_step_inform$opt_model
+  } else {
+    model = object$opt_model
+  }
+  
+  new_anova_K = make_anovaKernel(newx, object$cstep_inform$x, object$cstep_inform$kernel, object$cstep_inform$kparam)
+  newK = combine_kernel(new_anova_K, object$opt_theta)
+  pred = predict.ramsvm_core(model, newK = newK)
+  return(list(class = pred$class, pred_value = pred$pred_value))
+}
 
 

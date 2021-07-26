@@ -71,7 +71,8 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
 }
   
 
-predict.dbvsmsvm = function(object, newx = NULL) {
+predict.dbvsmsvm = function(object, newx = NULL)
+{
   
   p = NCOL(object$lambda_cv_inform$x)
   if (is.null(newx)) {
