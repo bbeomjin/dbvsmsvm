@@ -1,7 +1,7 @@
 # dbvsmsvm
 Derivative-based variable selection method for multicategory support vector machine
 
-```dbvsmsvm``` is an R package. ```dbvsmsvm``` provides functions to implement the derivative-based variable selection method for multicategory problems using the reinforced angle-based multicategory support vector machine (RAMSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
+```dbvsmsvm``` is an R package. ```dbvsmsvm``` provides functions to perform the derivative-based variable selection method for multicategory problems using the reinforced angle-based multicategory support vector machine (RAMSVM). It also provides functions performing the structured reinforced angle-based MSVM (SRAMSVM) and generating simulated data. 
 
 ## 1. INSTALLATION
 
