@@ -325,7 +325,7 @@ coef_kernel = function(y, k, W, alpha, lambda){
   return(list(cmat = cmat, c0vec = c0vec))
 }
 
-cv.ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = 2^{seq(-10, 15, length.out = 100),
+cv.ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_seq = 2^{seq(-10, 15, length.out = 100)},
                      kernel = c("linear", "gaussian", "poly", "spline", "anova_gaussian"), kparam = 1,
                      scale = FALSE, criterion = c("0-1", "loss"), optModel = FALSE, nCores = 1, ...)
 {
