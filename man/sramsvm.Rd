@@ -49,7 +49,7 @@ sramsvm(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 5,
 \value{
   An S3 object with "\code{ramsvm}" containing the following slots
   \item{x}{Input \code{x}.}
-  \item{K} {Input \code{K}.}
+  \item{K}{Input \code{K}.}
   \item{y}{Input \code{y}.}
   \item{y_name}{The class labels of \code{y}.}
   \item{gamma}{The convex combination parameter of the loss function.}
