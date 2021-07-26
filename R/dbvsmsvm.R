@@ -15,7 +15,7 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   cv_type = match.arg(cv_type)
   criterion = match.arg(criterion)
   # Find a optimal lambda in first step
-  cat("Step 1 : \n")
+  cat("Step 1 \n")
   initial_fit = cv.ramsvm(x = x, y = y, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds, 
                              lambda_seq = lambda_seq, gamma = gamma, kernel = kernel, kparam = kparam,
                              scale = scale, criterion = criterion, optModel = FALSE, nCores = nCores, ...)
@@ -23,7 +23,7 @@ dbvsmsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 
   cat("\n")
   
   # Find a relevant variable for optimal lambda in second step
-  cat("Step 2 : \n")
+  cat("Step 2 \n")
   select_fit = threshold_fun.dbvsmsvm(initial_fit, v_seq = v_seq, Nofv = Nofv, u_seq = u_seq, Nofu = Nofu,
                                       cv_type = cv_type, criterion = criterion,
                                       interaction = interaction, nCores = nCores, ...)
