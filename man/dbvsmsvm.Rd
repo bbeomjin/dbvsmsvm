@@ -83,11 +83,11 @@ dbvsmsvm(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 10, lambda_
   \item{lambda_cv_inform}{Information of cross-validation for lambda including cross-validation errors and optimal lambda value.}
   \item{selection_cv_inform}{Information of cross-validation for threshold parameter including cross-validation errors and optimal threshold value.}
   \item{interaction_selection_cv_inform}{Information of cross-validation for threshold parameter of interaction selection including cross-validation errors and optimal threshold value.}
-  \item{opt_model}{If \code{optModel=TRUE}, optimal classification model with the selected lambda and threshold parameter is returned.}
+  \item{opt_model}{If \code{optModel=TRUE}, classification model with the optimal lambda and threshold parameter is returned.}
   \item{opt_valid_err}{If \code{optModel=TRUE}, a minimum value of cross-validation errors based on the selected variables is returned.}
   \item{valid_err}{If \code{optModel=TRUE}, cross-validation errors based on the selected variables is returned.}
   \item{cv_type}{A fule of selecting threshold parameter.}
-  \item{call}{The call of dbvsmsvm}
+  \item{call}{The call of \code{dbvsmsvm}.}
 }
 
 \references{}
