@@ -21,13 +21,25 @@ sramsvm(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 5,
   A \emph{n} x \emph{p} data matrix, where \emph{n} is the number of observations and \emph{p} is the number of variables.
   }
   \item{y}{
-  A response vector with three and more labels.
+  A response variable with three and more labels.
   }
   \item{gamma}{
-  The convex combination parameter of the loss function.
+  The convex combination parameter of the loss function. 
   }
-  \item{lambda}{
-  A regularization parameter to control a level of \emph{l_2}-penalty.
+  \item{valid_x}{
+  A validation data matrix for selecting \code{lambda} and threshold parameter \emph{v} (optional). If \code{valid_x=NULL}, \code{nfolds}-fold cross-validation is performed.
+  }
+  \item{valid_y}{
+  A validation response vector (optional).
+  }
+  \item{nfolds}{
+  The number of folds for cross-validation.
+  }
+  \item{lambda_seq}{
+  A sequence of regularization parameter to control a level of \emph{l_2}-penalty.
+  }
+  \item{lambda_theta_seq}{
+  A sequence of regularization parameter on theta's, which are weights for kernels.
   }
   \item{kernel}{
   A character string representing one of type of kernel.
@@ -38,8 +50,26 @@ sramsvm(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds = 5,
   \item{scale}{
   A logical indicating the variables to be scaled.
   }
+  \item{criterion}{
+  A type of criterion evaluating prediction performance of cross-validation.
+  }
+  \item{isCombined}{
+  A logical. If \code{isCombined = TRUE}, the theta-step is combined with the following alpha-step. 
+  }
+  \item{cv_type}{
+  A rule of selecting lambda_theta parameter. If \code{cv_type="osr"}, one standard error rule is adopted.
+  }
   \item{type}{
   A type of optimization method for ramsvm. If \code{type = "type1"}, intercepts are included in a regularization term. If \code{type = "type2"}, intercepts are omitted in the regularization term and estimated by a linear programming 
+  }
+  \item{optModel}{
+  A logical. Whether to obtain the optimal classification model.
+  }
+  \item{nCores}{
+  The number of cores to use for parallel computing.
+  }
+  \item{verbose}{
+  A integer value. If \code{verbose = 1}, the minimum values of cross-validation error for each step are printed. 
   }
   \item{...}{
   Other arguments that can be passed to ramsvm core function.

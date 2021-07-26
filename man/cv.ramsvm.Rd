@@ -1,7 +1,7 @@
 \name{cv.ramsvm}
 \alias{cv.ramsvm}
 \title{
-Cross-Validation for \code{ramsvm}.
+Cross-Validation for ramsvm.
 }
 \description{
 Perform cross-validation for the optimal lambda of \code{ramsvm}.

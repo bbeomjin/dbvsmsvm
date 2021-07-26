@@ -54,8 +54,10 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
     cat("Fit c-step \n")
     opt_cstep_fit = cstep.sramsvm(x = x, y = y, gamma = gamma, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds,
                                   lambda_seq = lambda_seq, theta = theta_step_fit$opt_theta, kernel = kernel, kparam = kparam,
-                                   criterion = criterion, optModel = TRUE, type = type, nCores = nCores, ...)  
-    cat("CV-error(cstep):", opt_cstep_fit$opt_valid_err, "\n")
+                                   criterion = criterion, optModel = TRUE, type = type, nCores = nCores, ...)
+    if (verbose == 1) {
+      cat("CV-error(cstep):", opt_cstep_fit$opt_valid_err, "\n")
+    }
     
     out$opt_model = opt_cstep_fit$opt_model
     out$opt_valid_err = opt_cstep_fit$opt_valid_err
