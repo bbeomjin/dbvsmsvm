@@ -346,7 +346,7 @@ findtheta.sramsvm = function(y, anova_kernel, gamma = 0.5, cmat, c0vec, lambda, 
   
   # standard LP form :
   # min a^T x , subject to A1x <= a1
-  y_temp = as.factor(y)
+  y_temp = factor(y)
   classname = levels(y_temp)
   n_class = length(classname)
   

@@ -8,7 +8,7 @@ ramsvm_solver = function(K = NULL, y, gamma = 0.5, lambda, weight = NULL,
   max_D = max(abs(D))
   diag(D) = diag(D) + max_D * epsilon_D
   
-  y_temp = as.factor(y)
+  y_temp = factor(y)
   classname = levels(y_temp)
   n_class = length(classname)
   
@@ -91,7 +91,7 @@ ramsvm_compact = function(K, y, gamma = 0.5, lambda, epsilon = 1e-6, eig_tol_D =
 {
   out = list()
   
-  y_temp = as.factor(y)
+  y_temp = factor(y)
   classname = levels(y_temp)
   n_class = length(classname)
   
@@ -383,7 +383,7 @@ cv.ramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfolds =
                         }, mc.cores = nCores)
     valid_err = sapply(fold_err, "[[", "error")
     model_list[[1]] = lapply(fold_err, "[[", "fit_model")
-    opt_ind = min(which(valid_err == min(valid_err)))
+    opt_ind = max(which(valid_err == min(valid_err)))
     opt_param = params[opt_ind, ]
     opt_valid_err = min(valid_err)
   } else {
