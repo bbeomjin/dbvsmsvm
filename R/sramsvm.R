@@ -39,28 +39,28 @@ sramsvm = function(x = NULL, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfo
   cat("Fit theta-step \n")
   
   if (optModel) {
-    theta_step_opt = FALSE
+    thetastep_opt = FALSE
   } else {
-    theta_step_opt = TRUE
+    thetastep_opt = TRUE
   }
   
-  theta_step_fit = thetastep.sramsvm(cstep_fit, lambda_theta_seq = lambda_theta_seq, isCombined = isCombined,
-                                     cv_type = cv_type, optModel = theta_step_opt, nCores = nCores, ...)
+  thetastep_fit = thetastep.sramsvm(cstep_fit, lambda_theta_seq = lambda_theta_seq, isCombined = isCombined,
+                                     cv_type = cv_type, optModel = thetastep_opt, nCores = nCores, ...)
 
   
   
   if (verbose == 1) {
     cat("CV-error(cstep):", cstep_fit$opt_valid_err, "\n")
-    cat("CV-error(theta-step):", theta_step_fit$opt_valid_err, "\n")
+    cat("CV-error(theta-step):", thetastep_fit$opt_valid_err, "\n")
     
   }
-  out$opt_theta = theta_step_fit$opt_theta
+  out$opt_theta = thetastep_fit$opt_theta
   out$cstep_inform = cstep_fit
-  out$theta_step_inform = theta_step_fit
+  out$thetastep_inform = thetastep_fit
   if (optModel) {
     cat("Fit c-step \n")
     opt_cstep_fit = cstep.sramsvm(x = x, y = y, gamma = gamma, valid_x = valid_x, valid_y = valid_y, nfolds = nfolds,
-                                  lambda_seq = lambda_seq, theta = theta_step_fit$opt_theta, kernel = kernel, kparam = kparam,
+                                  lambda_seq = lambda_seq, theta = thetastep_fit$opt_theta, kernel = kernel, kparam = kparam,
                                    criterion = criterion, optModel = TRUE, type = type, nCores = nCores, ...)
     if (verbose == 1) {
       cat("CV-error(cstep):", opt_cstep_fit$opt_valid_err, "\n")
@@ -435,7 +435,7 @@ predict.sramsvm = function(object, newx = NULL)
   }
   
   if (is.null(object$opt_model)) {
-    model = object$theta_step_inform$opt_model
+    model = object$thetastep_inform$opt_model
   } else {
     model = object$opt_model
   }
