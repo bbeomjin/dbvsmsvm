@@ -87,12 +87,6 @@ cstep.sramsvm = function(x, y, gamma = 0.5, valid_x = NULL, valid_y = NULL, nfol
   criterion = match.arg(criterion)
   type = match.arg(type)
   
-  if((criterion != "0-1") && (criterion != "hinge"))
-  {
-    cat("ERROR: Only 0-1 and hinge can be used as criterion!", "\n")
-    return(NULL)
-  }
-  
   if (type == "type1") {
     ramsvm_fun = ramsvm_solver
   } else {
@@ -209,11 +203,6 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
   lambda_theta_seq = sort(as.numeric(lambda_theta_seq), decreasing = FALSE)
   lambda = object$opt_param["lambda"]
   criterion = object$criterion
-  if((criterion != "0-1") && (criterion != "hinge"))
-  {
-    cat("Only 0-1 and hinge can be used as criterion!", "\n")
-    return(NULL)
-  }
   kernel = object$kernel
   kparam = object$kparam
   n_class = object$n_class
@@ -328,7 +317,7 @@ thetastep.sramsvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.o
   out$opt_valid_err = opt_valid_err
   out$valid_err = valid_err
   if (optModel) {
-    anova_K = make_anovaKernel(x, x, kernel, kparam)
+    # anova_K = make_anovaKernel(x, x, kernel, kparam)
     K = combine_kernel(anova_K, opt_theta)
     opt_model = ramsvm_fun(K = K, y = y, gamma = gamma, lambda = lambda, ...)
     out$opt_model = opt_model
