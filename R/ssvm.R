@@ -219,6 +219,32 @@ cstep_m.ssvm = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfol
   
   if (!is.null(valid_x) & !is.null(valid_y)) {
     
+    fold_err = mclapply(1:length(lambda_seq), function(j) {
+      error = try({
+        cstep_fit = cstep_m_core.ssvm(x = x, y = y, lambda = lambda_seq[j], theta_mat = theta_mat,
+                                      kernel = kernel, kparam = kparam, type = type, ...)
+      })
+      
+      if (!inherits(error, "try-error")) {
+        pred_val = predict.cstep_m_core(cstep_fit, newx = valid_x, theta_mat = theta_mat)
+        if (criterion == "0-1") {
+          acc = sum(valid_y == pred_val) / length(valid_y)
+          err = 1 - acc
+        } else {
+          
+        }
+      } else {
+        cstep_fit = NULL
+        err = Inf
+      }
+      return(list(error = err, fit_model = cstep_fit))
+    }, mc.cores = nCores)
+    
+    valid_err = sapply(fold_err, "[[", "error")
+    opt_ind = max(which(valid_err = min(valid_err)))
+    opt_param = c(lambda = lambda_seq[opt_ind])
+    opt_valid_err = min(valid_err)
+    
   } else {
     
     ran = data_split(y, nfolds)
@@ -317,6 +343,36 @@ thetastep_m.ssvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.ou
   }
   
   if (!is.null(valid_x) & !is.null(valid_y)) {
+    
+    init_model = opt_model
+    
+    fold_err = mclapply(1:length(lambda_theta_seq),
+                        function(j) {
+                          error = try({
+                            theta = findtheta_m.ssvm(y = y, x = x, models = init_model$models,
+                                                     lambda = lambda, lambda_theta = lambda_theta_seq[j], kernel = kernel, kparam = kparam
+                                                     type = type)
+                            if (isCombined) {
+                              init_model = cstep_m_core.ssvm(x = x, y = y, lambda = lambda, theta_mat = theta_mat,
+                                                             kernel = kernel, kparam = kparam, type = type, ...)
+                            }
+                          })
+                          if (!inherits(error, "try-error")) {
+                            pred_val = predict.cstep_m_core(init_model, valid_x, theta_mat = theta_mat)
+                            acc = sum(pred_val == valid_y) / length(valid_y)
+                            err = 1 - acc
+                          } else {
+                            err = Inf
+                            theta_mat[] = 0
+                          }
+                          return(list(error = err, theta_mat = theta_mat))
+                        }, mc.cores = nCores)
+    valid_err = sapply(fold_err, "[[", "error")
+    opt_ind = max(which(valid_err == min(valid_err)))
+    opt_lambda_theta = lambda_theta_seq[opt_ind]
+    opt_valid_err = min(valid_err)
+    theta_mat_seq_list = lapply(fold_err, "[[", "theta_mat") 
+    opt_theta_mat = theta_mat_seq_list[[opt_ind]]
     
   } else {
     
