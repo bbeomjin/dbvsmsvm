@@ -350,7 +350,7 @@ thetastep_m.ssvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.ou
                         function(j) {
                           error = try({
                             theta = findtheta_m.ssvm(y = y, x = x, models = init_model$models,
-                                                     lambda = lambda, lambda_theta = lambda_theta_seq[j], kernel = kernel, kparam = kparam
+                                                     lambda = lambda, lambda_theta = lambda_theta_seq[j], kernel = kernel, kparam = kparam,
                                                      type = type)
                             if (isCombined) {
                               init_model = cstep_m_core.ssvm(x = x, y = y, lambda = lambda, theta_mat = theta_mat,
