@@ -241,7 +241,7 @@ cstep_m.ssvm = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfol
     }, mc.cores = nCores)
     
     valid_err = sapply(fold_err, "[[", "error")
-    opt_ind = max(which(valid_err = min(valid_err)))
+    opt_ind = max(which(valid_err == min(valid_err)))
     opt_param = c(lambda = lambda_seq[opt_ind])
     opt_valid_err = min(valid_err)
     
