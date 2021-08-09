@@ -1,7 +1,7 @@
 ssvm_m = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfolds = 5,
                   lambda_seq = 2^seq(-10, 10, length.out = 100), 
                   lambda_theta_seq = 2^{seq(-10, 10, length.out = 100)}, cv_type = "original", isCombined = TRUE,
-                  kernel = c("linear", "gaussian", "poly", "spline", "anova_gaussian", "gaussian2"), kparam = 1, type = c("OVO", "OVR"),
+                  kernel = c("linear", "gaussian", "poly", "spline", "anova_gaussian", "gaussian2"), kparam = 1, type = c("OVO", "OVA"),
                   scale = FALSE, criterion = c("0-1", "loss"), optModel = FALSE, nCores = 1, verbose = 1, ...)
 {
   out = list()
@@ -40,7 +40,7 @@ ssvm_m = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfolds = 5
 }
 
 
-cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kernel, kparam, type = c("OVO", "OVR"), ...)
+cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kernel, kparam, type = c("OVO", "OVA"), ...)
 {
   type = match.arg(type)
   n_class = length(unique(y))
@@ -99,7 +99,7 @@ cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kerne
     out$fit_class = fit_class
   }
   
-  if (type == "OVR") {
+  if (type == "OVA") {
     
     if (is.null(theta_mat)) {
       theta_mat = matrix(1, nrow = numK, ncol = n_class)
@@ -171,7 +171,7 @@ predict.cstep_m_core = function(object, newx, theta_mat = NULL)
     if (is(y, "factor")) {pred_class = factor(pred_class, classname)}
   }
   
-  if (object$type == "OVR") {
+  if (object$type == "OVA") {
     if (is.null(theta_mat)) {
       theta_mat = object$theta_mat
     }
@@ -198,7 +198,7 @@ predict.cstep_m_core = function(object, newx, theta_mat = NULL)
 
 cstep_m.ssvm = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfolds = 5,
                         lambda_seq = 2^seq(-10, 10, length.out = 100), 
-                        kernel = c("linear", "gaussian", "poly", "spline", "anova_gaussian", "gaussian2"), kparam = 1, type = c("OVO", "OVR"),
+                        kernel = c("linear", "gaussian", "poly", "spline", "anova_gaussian", "gaussian2"), kparam = 1, type = c("OVO", "OVA"),
                         theta_mat = NULL, scale = FALSE, criterion = c("0-1", "loss"), optModel = FALSE, nCores = 1, ...)
 {
   call = match.call()
@@ -349,7 +349,7 @@ thetastep_m.ssvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.ou
     fold_err = mclapply(1:length(lambda_theta_seq),
                         function(j) {
                           error = try({
-                            theta = findtheta_m.ssvm(y = y, x = x, models = init_model$models,
+                            theta_mat = findtheta_m.ssvm(y = y, x = x, models = init_model$models,
                                                      lambda = lambda, lambda_theta = lambda_theta_seq[j], kernel = kernel, kparam = kparam,
                                                      type = type)
                             if (isCombined) {
@@ -448,7 +448,7 @@ thetastep_m.ssvm = function(object, lambda_theta_seq = 2^{seq(-10, 10, length.ou
 
 
 
-findtheta_m.ssvm = function(y, x, models, lambda, lambda_theta, kernel, kparam, type = c("OVO", "OVR"))
+findtheta_m.ssvm = function(y, x, models, lambda, lambda_theta, kernel, kparam, type = c("OVO", "OVA"))
 {
   call = match.call()
   type = match.arg(type)
@@ -484,7 +484,7 @@ findtheta_m.ssvm = function(y, x, models, lambda, lambda_theta, kernel, kparam, 
     }
   }
   
-  if (type == "OVR") {
+  if (type == "OVA") {
     
     theta_mat = matrix(NA, nrow = numK, ncol = n_class)
     
