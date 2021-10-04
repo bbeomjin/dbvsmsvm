@@ -119,12 +119,13 @@ cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kerne
       svm_fit = svm_compact(K = subK, y = yy, lambda = lambda, ...)
       # svm_fit = svm_compact(K = subK, y = yy, lambda = lambda)
       model_list[[j]] = svm_fit
-      nj = which(svm_fit$fit_class == 1)
-      if (length(nj) == 0) {
-        next
-      } else {
-        fitted_mat[cbind(nj, classname[j])] = 1
-      }
+      # nj = which(svm_fit$fit_class == 1)
+      # if (length(nj) == 0) {
+      #   next
+      # } else {
+      #   fitted_mat[cbind(nj, classname[j])] = 1
+      # }
+      fitted_mat[, classname[j]] = svm_fit$fit
     }
     fit_class = classname[apply(fitted_mat, 1, which.max)]
     if (is(y, "factor")) {fit_class = factor(fit_class, classname)}
@@ -181,13 +182,14 @@ predict.cstep_m_core = function(object, newx, theta_mat = NULL)
       theta = theta_mat[, j]
       
       K_valid = combine_kernel(make_anovaKernel(newx, object$x, object$kernel, object$kparam), theta)
-      pred_val = predict.svm_compact(model, newK = K_valid)$class
-      nj = which(pred_val == 1)
-      if (length(nj) == 0) {
-        next
-      } else {
-        pred_mat[cbind(as.character(nj), classname[j])] = 1
-      }
+      pred_val = predict.svm_compact(model, newK = K_valid)$pred_value
+      # nj = which(pred_val == 1)
+      # if (length(nj) == 0) {
+      #   next
+      # } else {
+      #   pred_mat[cbind(as.character(nj), classname[j])] = 1
+      # }
+      pred_mat[, classname[j]] = pred_val
     }
     pred_class = classname[apply(pred_mat, 1, which.max)]
     if (is(y, "factor")) {pred_class = factor(pred_class, classname)}
