@@ -493,7 +493,7 @@ findtheta_m.ssvm = function(y, x, models, lambda, lambda_theta, kernel, kparam, 
     
     for (j in 1:n_class) {
       index = y %in% classname[j]
-      yy = factor(ifelse(index, 1, -1), levels = c(1. -1))
+      yy = factor(ifelse(index, 1, -1), levels = c(1, -1))
       subanova_K = make_anovaKernel(x, x, kernel, kparam)
       
       alpha = models[[j]]$alpha
