@@ -113,7 +113,7 @@ cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kerne
     for (j in 1:n_class) {
       theta = theta_mat[, j]
       index = y %in% classname[j]
-      yy = ifelse(index, -1, 1)
+      yy = factor(ifelse(index, 1, -1), levels = c(1, -1))
       subanova_K = make_anovaKernel(x, x, kernel, kparam)
       subK = combine_kernel(subanova_K, theta)
       svm_fit = svm_compact(K = subK, y = yy, lambda = lambda, ...)
@@ -192,7 +192,7 @@ predict.cstep_m_core = function(object, newx, theta_mat = NULL)
       pred_mat[, classname[j]] = pred_val
     }
     pred_class = classname[apply(pred_mat, 1, which.max)]
-    if (is(y, "factor")) {pred_class = factor(pred_class, classname)}
+    if (is(y, "factor")) {pred_class = factor(pred_class, levels = classname)}
   }
   return(pred_class)
 }
@@ -493,7 +493,7 @@ findtheta_m.ssvm = function(y, x, models, lambda, lambda_theta, kernel, kparam, 
     
     for (j in 1:n_class) {
       index = y %in% classname[j]
-      yy = ifelse(index, -1, 1)
+      yy = factor(ifelse(index, 1, -1), levels = c(1. -1))
       subanova_K = make_anovaKernel(x, x, kernel, kparam)
       
       alpha = models[[j]]$alpha
@@ -797,6 +797,7 @@ findtheta.ssvm = function(y, anova_kernel, alpha, bias, lambda, lambda_theta)
   for (j in 1:n_class) {y_int[which(y_temp %in% classname[j])] = j}
   if (is(y, "numeric")) {classname = as.numeric(classname)}
   
+  y_int = ifelse(y_inf == 1, 1, -1)
   n = length(y_int)
   
   cvec = alpha * y_int
