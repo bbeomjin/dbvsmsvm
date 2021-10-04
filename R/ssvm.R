@@ -113,7 +113,7 @@ cstep_m_core.ssvm = function(x = NULL, y = NULL, lambda, theta_mat = NULL, kerne
     for (j in 1:n_class) {
       theta = theta_mat[, j]
       index = y %in% classname[j]
-      yy = ifelse(index, 1, -1)
+      yy = ifelse(index, -1, 1)
       subanova_K = make_anovaKernel(x, x, kernel, kparam)
       subK = combine_kernel(subanova_K, theta)
       svm_fit = svm_compact(K = subK, y = yy, lambda = lambda, ...)
