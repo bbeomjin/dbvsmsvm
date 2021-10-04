@@ -797,8 +797,6 @@ findtheta.ssvm = function(y, anova_kernel, alpha, bias, lambda, lambda_theta)
   for (j in 1:n_class) {y_int[which(y_temp %in% classname[j])] = j}
   if (is(y, "numeric")) {classname = as.numeric(classname)}
   
-  y_int = ifelse(y_int == 1, -1, 1)
-  
   n = length(y_int)
   
   cvec = alpha * y_int
