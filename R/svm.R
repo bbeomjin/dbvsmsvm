@@ -57,7 +57,7 @@ svm_compact = function(K = NULL, y, lambda, epsilon = 1e-6, epsilon_D = 1e-8)
   blp = 1 - y_int * Kmat
   const_dir = rep(">=", n)
   cposneg = lp("min", objective.in = alp, const.mat = Alp, const.dir = const_dir, const.rhs = blp)$solution
-  bias = cposneg[n + 1] - cposneg[n + 2]
+  bias = -(cposneg[n + 1] - cposneg[n + 2])
   
   fit = bias + Kmat
   fit[fit == 0] = 1e-10
