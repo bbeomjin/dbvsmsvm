@@ -530,9 +530,6 @@ cstep.ssvm = function(x = NULL, y = NULL, valid_x = NULL, valid_y = NULL, nfolds
   lambda_seq = as.numeric(lambda_seq)
   kparam = as.numeric(kparam)
   
-  if (is.null(theta)) {
-    theta = rep(1, p)
-  }
   
   lambda_seq = sort(lambda_seq, decreasing = FALSE)
   

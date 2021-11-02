@@ -8,6 +8,7 @@ svm_compact = function(K = NULL, y, lambda, epsilon = 1e-6, epsilon_D = 1e-8)
   
   y_temp = factor(y)
   classname = levels(y_temp)
+  if (length(classname) != 2) {stop("The number of classes is not 2")} 
   n_class = length(classname)
   
   y_int = integer(length(y))
